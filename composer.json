@@ -1,0 +1,21 @@
+{
+    "name": "isharipov/ktemplate",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "KTemplate\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Iskander Sharipov",
+            "email": "quasilyte@gmail.com"
+        }
+    ],
+    "require": {
+        "vkcom/ktest-script": "^0.7.4",
+        "vkcom/kphpunit": "^1.0",
+        "phpunit/phpunit": "^9.5"
+    }
+}
