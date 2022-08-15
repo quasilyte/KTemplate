@@ -29,9 +29,9 @@ Supported kinds of expressions:
 | Int/float literals | `10`, `10.5` |
 | String literals | `"hello"`, `'world'` |
 | Bool literals | `true`, `false` |
-| Variables | `external_var`, `$local_var` |
-| Member access | `obj.field`, `arr.key`, `$arr.key` |
-| Array indexing | `$arr[0]`, `$arr['key']` |
+| Local variable | `$x`, `$foo` |
+| External variable | `x`, `x.y.z` |
+| Array indexing | `$arr[0]`, `$arr['key']`, `$arr.key` |
 | Operators | `x ~ y`, `x and y`, `not x` |
 
 It's possible to use parentheses to group the expressions and force some specific evaluation order in case the default precedence would not work for you.
