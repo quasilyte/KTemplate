@@ -34,7 +34,7 @@ It's possible to use parentheses to group the expressions and force some specifi
 
 The simplest form of expression is a variable.
 
-There are two variables in KTemplate:
+There are two types of variables in KTemplate:
 
 * Local: declared inside the template
 * External: the ones that are provided outside
