@@ -24,9 +24,15 @@ Different expression evaluation contexts may imply different conversion rules. O
 
 Supported kinds of expressions:
 
-* Int, float, string, bool literals
-* Variables, array/object data access
-* Operators
+| Expression | Examples |
+|---|---|
+| Int/float literals | `10`, `10.5` |
+| String literals | `"hello"`, `'world'` |
+| Bool literals | `true`, `false` |
+| Variables | `external_var`, `$local_var` |
+| Member access | `obj.field`, `arr.key`, `$arr.key` |
+| Array indexing | `$arr[0]`, `$arr['key']` |
+| Operators | `x ~ y`, `x and y`, `not x` |
 
 It's possible to use parentheses to group the expressions and force some specific evaluation order in case the default precedence would not work for you.
 
