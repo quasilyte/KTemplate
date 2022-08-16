@@ -64,6 +64,10 @@ class LexerTest extends TestCase {
                 '{% else %}',
                 ['CONTROL_START', 'ELSE', 'CONTROL_END'],
             ],
+            [
+                '{% elseif %}',
+                ['CONTROL_START', 'ELSEIF', 'CONTROL_END'],
+            ],
 
             // Expressions.
             [

@@ -42,6 +42,7 @@ class Token {
     public const KEYWORD_ENDIF = 36;
     public const KEYWORD_ENDFOR = 37;
     public const KEYWORD_ELSE = 38;
+    public const KEYWORD_ELSEIF = 39;
 
     public $kind = 0;
     public $pos_from = 0;
@@ -197,6 +198,8 @@ class Token {
             return 'ENDFOR';
         case self::KEYWORD_ELSE:
             return 'ELSE';
+        case self::KEYWORD_ELSEIF:
+            return 'ELSEIF';
         default:
             return '<?>';
         }

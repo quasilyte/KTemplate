@@ -101,22 +101,31 @@ class Compiler {
         $this->compileExpr(0, $e);
         $this->expectToken(Token::CONTROL_END);
 
-        $label_false = $this->newLabel();
+        $label_next = $this->newLabel();
         $label_end = $this->newLabel();
-        $this->emitJump(Op::JUMP_ZERO, $label_false);
+        $this->emitJump(Op::JUMP_ZERO, $label_next);
         while (true) {
             $tok = $this->lexer->scan();
             if ($tok->kind === Token::CONTROL_START) {
                 if ($this->lexer->consume(Token::KEYWORD_ENDIF)) {
                     $this->expectToken(Token::CONTROL_END);
+                    $this->tryBindLabel($label_next);
                     $this->bindLabel($label_end);
                     break;
                 }
                 if ($this->lexer->consume(Token::KEYWORD_ELSE)) {
                     $this->emitJump(Op::JUMP, $label_end);
                     $this->expectToken(Token::CONTROL_END);
-                    $this->bindLabel($label_false);
+                    $this->bindLabel($label_next);
                     continue;
+                }
+                if ($this->lexer->consume(Token::KEYWORD_ELSEIF)) {
+                    // {% if 1 %}a{% elseif 2 %}b{% endif %}
+                    $this->emitJump(Op::JUMP, $label_end);
+                    $this->bindLabel($label_next);
+                    $this->compileIf();
+                    $this->bindLabel($label_end);
+                    return;
                 }
             }
             $this->compileToken($tok);
@@ -229,8 +238,11 @@ class Compiler {
             return;
 
         case Expr::INT_LIT:
-            $op = $dst === 0 ? Op::LOAD_SLOT0_INT_CONST : Op::LOAD_INT_CONST;
-            $this->emit2($op, $dst, $this->internInt((int)$e->value));
+            if ($dst === 0) {
+                $this->emit1(Op::LOAD_SLOT0_INT_CONST, $this->internInt((int)$e->value));
+            } else {
+                $this->emit2(Op::LOAD_INT_CONST, $dst, $this->internInt((int)$e->value));
+            }
             return;
         }
     
@@ -395,7 +407,21 @@ class Compiler {
      * @param int $label_id
      */
     private function bindLabel($label_id) {
+        if (array_key_exists($label_id, $this->addr_by_label_id)) {
+            $this->fail(-1, "internal error: binding label with id=$label_id twice");
+        }
         $pc = count($this->result->code);
         $this->addr_by_label_id[$label_id] = $pc;
     }
+
+    /**
+     * @param int $label_id
+     */
+    private function tryBindLabel($label_id) {
+        if (array_key_exists($label_id, $this->addr_by_label_id)) {
+            return;
+        }
+        $this->bindLabel($label_id);
+    }
+
 }

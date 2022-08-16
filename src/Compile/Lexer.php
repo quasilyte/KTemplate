@@ -319,8 +319,12 @@ class Lexer {
                 return;
             }
         case 6:
-            if (substr_compare($this->src, 'endfor', $dst->pos_from, strlen('endofr')) === 0) {
+            if (substr_compare($this->src, 'endfor', $dst->pos_from, strlen('endfor')) === 0) {
                 $dst->kind = Token::KEYWORD_ENDFOR;
+                return;
+            }
+            if (substr_compare($this->src, 'elseif', $dst->pos_from, strlen('elseif')) === 0) {
+                $dst->kind = Token::KEYWORD_ELSEIF;
                 return;
             }
         }
