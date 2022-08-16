@@ -13,9 +13,12 @@
             "email": "quasilyte@gmail.com"
         }
     ],
-    "require": {
+    "require-dev": {
         "vkcom/ktest-script": "^0.7.4",
         "vkcom/kphpunit": "^1.0",
         "phpunit/phpunit": "^9.5"
+    },
+    "require": {
+        "vkcom/kphp-polyfills": "^1.0"
     }
 }

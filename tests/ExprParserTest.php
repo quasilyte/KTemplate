@@ -19,13 +19,15 @@ class ExprParserTest extends TestCase {
 
     private static function formatExpr(ExprParser $p, Expr $e): string {
         switch ($e->kind) {
-        case Expr::NAME:
+        case Expr::IDENT:
             return (string)$e->value;
         case Expr::TRUE_LIT:
             return 'true';
         case Expr::FALSE_LIT:
             return 'false';
 
+        case Expr::DOT_ACCESS:
+            return self::formatBinaryExpr($p, $e, '.');
         case Expr::ADD:
             return self::formatBinaryExpr($p, $e, '+');
         case Expr::SUB:
@@ -76,6 +78,11 @@ class ExprParserTest extends TestCase {
             ['x1 * x2 * x3 * x4', '(* (* (* x1 x2) x3) x4)', 7],
 
             ['x ~ y ~ z', '(~ (~ x y) z)', 5],
+
+            ['x.y', '(. x y)', 3],
+            ['x.y.z', '(. (. x y) z)', 5],
+            ['(x.y).z', '(. (. x y) z)', 5],
+            ['a.b + d.c', '(+ (. a b) (. d c))', 7],
 
             ['x and y', '(and x y)', 3],
             ['x or y', '(or x y)', 3],

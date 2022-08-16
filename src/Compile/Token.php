@@ -14,7 +14,7 @@ class Token {
     public const ERROR = 8;
     public const IDENT = 9;
     public const INT_LIT = 10;
-    public const STR_LIT = 11;
+    public const STRING_LIT = 11;
     public const PLUS = 12; // +
     public const MINUS = 13; // -
     public const STAR = 14; // *
@@ -22,22 +22,26 @@ class Token {
     public const LPAREN = 16; // (
     public const RPAREN = 17; // )
     public const TILDE = 18; // ~
-    public const KEYWORD_OR = 19;
-    public const KEYWORD_IF = 20;
-    public const KEYWORD_DO = 21;
-    public const KEYWORD_AND = 22;
-    public const KEYWORD_FOR = 23;
-    public const KEYWORD_USE = 24;
-    public const KEYWORD_SET = 25;
-    public const EQ = 26; // ==
-    public const NOT_EQ = 27; // !=
-    public const LT = 28; // <
-    public const GT = 29; // >
-    public const LT_EQ = 30; // <=
-    public const GT_EQ = 31; // >=
-    public const KEYWORD_NOT = 32;
-    public const KEYWORD_TRUE = 33;
-    public const KEYWORD_FALSE = 34;
+    public const DOT = 19; // .
+    public const KEYWORD_OR = 20;
+    public const KEYWORD_IF = 21;
+    public const KEYWORD_DO = 22;
+    public const KEYWORD_AND = 23;
+    public const KEYWORD_FOR = 24;
+    public const KEYWORD_USE = 25;
+    public const KEYWORD_SET = 26;
+    public const EQ = 27; // ==
+    public const NOT_EQ = 28; // !=
+    public const LT = 29; // <
+    public const GT = 30; // >
+    public const LT_EQ = 31; // <=
+    public const GT_EQ = 32; // >=
+    public const KEYWORD_NOT = 33;
+    public const KEYWORD_TRUE = 34;
+    public const KEYWORD_FALSE = 35;
+    public const KEYWORD_ENDIF = 36;
+    public const KEYWORD_ENDFOR = 37;
+    public const KEYWORD_ELSE = 38;
 
     public $kind = 0;
     public $pos_from = 0;
@@ -61,7 +65,7 @@ class Token {
         case self::COMMENT:
         case self::IDENT:
         case self::INT_LIT:
-        case self::STR_LIT:
+        case self::STRING_LIT:
             return true;
         default:
             return false;
@@ -94,6 +98,8 @@ class Token {
             return '(';
         case self::TILDE:
             return '~';
+        case self::DOT:
+            return '.';
         case self::EQ:
             return '==';
         case self::NOT_EQ:
@@ -135,8 +141,8 @@ class Token {
             return 'IDENT';
         case self::INT_LIT:
             return 'INT_LIT';
-        case self::STR_LIT:
-            return 'STR_LIT';
+        case self::STRING_LIT:
+            return 'STRING_LIT';
         case self::PLUS:
             return 'PLUS';
         case self::MINUS:
@@ -151,6 +157,8 @@ class Token {
             return 'RPAREN';
         case self::TILDE:
             return 'TILDE';
+        case self::DOT:
+            return 'DOT';
         case self::KEYWORD_OR:
             return 'OR';
         case self::KEYWORD_IF:
@@ -183,6 +191,12 @@ class Token {
             return 'TRUE';
         case self::KEYWORD_FALSE:
             return 'FALSE';
+        case self::KEYWORD_ENDIF:
+            return 'ENDIF';
+        case self::KEYWORD_ENDFOR:
+            return 'ENDFOR';
+        case self::KEYWORD_ELSE:
+            return 'ELSE';
         default:
             return '<?>';
         }

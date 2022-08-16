@@ -43,10 +43,36 @@ class LexerTest extends TestCase {
                 ['COMMENT(c1)', 'COMMENT()', 'COMMENT(c3)', 'TEXT( )'],
             ],
 
+            // Controls.
+            [
+                '{% if 1 %}',
+                ['CONTROL_START', 'IF', 'INT_LIT(1)', 'CONTROL_END'],
+            ],
+            [
+                '{% endif %}',
+                ['CONTROL_START', 'ENDIF', 'CONTROL_END'],
+            ],
+            [
+                '{% endfor %}',
+                ['CONTROL_START', 'ENDFOR', 'CONTROL_END'],
+            ],
+            [
+                '{%endfor%}',
+                ['CONTROL_START', 'ENDFOR', 'CONTROL_END'],
+            ],
+            [
+                '{% else %}',
+                ['CONTROL_START', 'ELSE', 'CONTROL_END'],
+            ],
+
             // Expressions.
             [
                 '{{ x }}',
                 ['ECHO_START', 'IDENT(x)', 'ECHO_END'],
+            ],
+            [
+                '{{ x.y.z }}',
+                ['ECHO_START', 'IDENT(x)', 'DOT', 'IDENT(y)', 'DOT', 'IDENT(z)', 'ECHO_END'],
             ],
             [
                 '{{ (x) }}',

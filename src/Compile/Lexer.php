@@ -150,6 +150,9 @@ class Lexer {
             case ord('~'):
                 $this->acceptSimpleToken($dst, Token::TILDE, 1);
                 return;
+            case ord('.'):
+                $this->acceptSimpleToken($dst, Token::DOT, 1);
+                return;
             case ord('('):
                 $this->acceptSimpleToken($dst, Token::LPAREN, 1);
                 return;
@@ -302,9 +305,22 @@ class Lexer {
                 $dst->kind = Token::KEYWORD_TRUE;
                 return;
             }
+            if (substr_compare($this->src, 'else', $dst->pos_from, strlen('else')) === 0) {
+                $dst->kind = Token::KEYWORD_ELSE;
+                return;
+            }
         case 5:
             if (substr_compare($this->src, 'false', $dst->pos_from, strlen('false')) === 0) {
                 $dst->kind = Token::KEYWORD_FALSE;
+                return;
+            }
+            if (substr_compare($this->src, 'endif', $dst->pos_from, strlen('endif')) === 0) {
+                $dst->kind = Token::KEYWORD_ENDIF;
+                return;
+            }
+        case 6:
+            if (substr_compare($this->src, 'endfor', $dst->pos_from, strlen('endofr')) === 0) {
+                $dst->kind = Token::KEYWORD_ENDFOR;
                 return;
             }
         }

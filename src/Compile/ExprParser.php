@@ -83,7 +83,7 @@ class ExprParser {
             $left->kind = Expr::FALSE_LIT;
             break;
         case Token::IDENT:
-            $left->kind = Expr::NAME;
+            $left->kind = Expr::IDENT;
             $left->value = $lexer->tokenValue($tok);
             break;
         case Token::INT_LIT:
@@ -110,6 +110,9 @@ class ExprParser {
             }
             $tok = $lexer->scan();
             switch ($tok->kind) {
+            case Token::DOT:
+                $this->parseBinaryExpr($left, Expr::DOT_ACCESS, $right_prec);
+                break;
             case Token::PLUS:
                 $this->parseBinaryExpr($left, Expr::ADD, $right_prec);
                 break;
@@ -206,6 +209,8 @@ class ExprParser {
         case Token::STAR:
         case Token::SLASH:
             return 6;
+        case Token::DOT:
+            return 7;
         default:
             return -1;
         }

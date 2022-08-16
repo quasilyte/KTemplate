@@ -4,7 +4,7 @@ namespace KTemplate\Compile;
 
 class Expr {
     public const BAD = 0;
-    public const NAME = 1;
+    public const IDENT = 1;
     public const ADD = 2;
     public const SUB = 3;
     public const MUL = 4;
@@ -23,7 +23,8 @@ class Expr {
     public const FALSE_LIT = 17;
     public const INT_LIT = 18;
     public const FLOAT_LIT = 19;
-    public const STR_LIT = 20;
+    public const STRING_LIT = 20;
+    public const DOT_ACCESS = 21;
 
     /** @var int */
     public $kind = 0;
