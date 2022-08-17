@@ -14,6 +14,28 @@ class CompilerTest extends TestCase {
 
     public function testCompile() {
         $tests = [
+            // Local variables.
+            '{% let $s = "abc" %}{{ $s }}' => [
+                '  LOAD_STRING_CONST slot1 `abc`',
+                '  OUTPUT slot1',
+                '  RETURN',
+            ],
+
+            // Operators.
+            '{% let $x = 1 %}{{ $x + $x }}' => [
+                '  LOAD_INT_CONST slot1 1',
+                '  ADD_SLOT0 *slot0 slot1 slot1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{% let $x = 1 %}{{ $x == 1 }}' => [
+                '  LOAD_INT_CONST slot1 1',
+                '  LOAD_INT_CONST slot2 1',
+                '  EQ_SLOT0 *slot0 slot1 slot2',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
             // Bool constants.
             '{% let $x = true %}' => [
                 '  LOAD_BOOL slot1 $1',
@@ -84,13 +106,6 @@ class CompilerTest extends TestCase {
                 'L2:',
                 '  OUTPUT_STRING_CONST `c`',
                 'L1:',
-                '  RETURN',
-            ],
-
-            // Local variables.
-            '{% let $s = "abc" %}{{ $s }}' => [
-                '  LOAD_STRING_CONST slot1 `abc`',
-                '  OUTPUT slot1',
                 '  RETURN',
             ],
         ];

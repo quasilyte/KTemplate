@@ -56,6 +56,10 @@ var rawOpcodes = []opcodeTemplate{
 	{"JUMP_ZERO", "op *slot0 pcdelta:rel8"},
 	{"JUMP_NOT_ZERO", "op *slot0 pcdelta:rel8"},
 
+	{"EQ", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
+	{"NOT_EQ", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"NOT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 	{"ADD", "op dst:wslot arg1:rslot arg2:rslot"},
 	{"ADD_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 	{"MUL", "op dst:wslot arg1:rslot arg2:rslot"},

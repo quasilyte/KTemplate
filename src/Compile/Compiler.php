@@ -293,6 +293,12 @@ class Compiler {
             $this->failExpr($e, 'TODO');
             return;
 
+        case Expr::EQ:
+            $this->compileBinaryExpr($dst, Op::EQ, $e);
+            return;
+        case Expr::NOT_EQ:
+            $this->compileBinaryExpr($dst, Op::NOT_EQ, $e);
+            return;
         case Expr::ADD:
             $this->compileBinaryExpr($dst, Op::ADD, $e);
             return;

@@ -112,6 +112,18 @@ class Renderer {
                 }
                 break;
 
+            case Op::EQ:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] == $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::EQ_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] == $state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::NOT_EQ:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] != $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::NOT_EQ_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] != $state->slots[($opdata >> 16) & 0xff];
+                break;
             case Op::ADD:
                 $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] + $state->slots[($opdata >> 24) & 0xff];
                 break;

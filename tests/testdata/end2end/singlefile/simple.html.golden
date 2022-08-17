@@ -8,3 +8,7 @@ test_name='simple.html'
 true->1
 
 false->
+$s1 == 'aaa'->1
+$s1 == ''->
+$s1 != 'aaa'->
+$s1 != ''->1

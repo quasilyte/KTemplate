@@ -86,18 +86,32 @@ class Op {
     public const JUMP_NOT_ZERO = 24;
     
     // Encoding: 0x19 dst:wslot arg1:rslot arg2:rslot
-    public const ADD = 25;
+    public const EQ = 25;
     
     // Encoding: 0x1a arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const ADD_SLOT0 = 26;
+    public const EQ_SLOT0 = 26;
     
     // Encoding: 0x1b dst:wslot arg1:rslot arg2:rslot
-    public const MUL = 27;
+    public const NOT_EQ = 27;
     
     // Encoding: 0x1c arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const MUL_SLOT0 = 28;
+    public const NOT_EQ_SLOT0 = 28;
+    
+    // Encoding: 0x1d dst:wslot arg1:rslot arg2:rslot
+    public const ADD = 29;
+    
+    // Encoding: 0x1e arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0
+    public const ADD_SLOT0 = 30;
+    
+    // Encoding: 0x1f dst:wslot arg1:rslot arg2:rslot
+    public const MUL = 31;
+    
+    // Encoding: 0x20 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0
+    public const MUL_SLOT0 = 32;
     
     public static function opcodeString(int $op): string {
         switch ($op) {
@@ -150,12 +164,20 @@ class Op {
         case 24:
             return 'JUMP_NOT_ZERO';
         case 25:
-            return 'ADD';
+            return 'EQ';
         case 26:
-            return 'ADD_SLOT0';
+            return 'EQ_SLOT0';
         case 27:
-            return 'MUL';
+            return 'NOT_EQ';
         case 28:
+            return 'NOT_EQ_SLOT0';
+        case 29:
+            return 'ADD';
+        case 30:
+            return 'ADD_SLOT0';
+        case 31:
+            return 'MUL';
+        case 32:
             return 'MUL_SLOT0';
         default:
             return '?';
@@ -212,13 +234,21 @@ class Op {
             return OpInfo::FLAG_IMPLICIT_SLOT0;
         case 24: // JUMP_NOT_ZERO
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 25: // ADD
+        case 25: // EQ
             return 0;
-        case 26: // ADD_SLOT0
+        case 26: // EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 27: // MUL
+        case 27: // NOT_EQ
             return 0;
-        case 28: // MUL_SLOT0
+        case 28: // NOT_EQ_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 29: // ADD
+            return 0;
+        case 30: // ADD_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 31: // MUL
+            return 0;
+        case 32: // MUL_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
         default:
             return 0;
@@ -250,6 +280,10 @@ class Op {
         self::JUMP => [OpInfo::ARG_REL8],
         self::JUMP_ZERO => [OpInfo::ARG_REL8],
         self::JUMP_NOT_ZERO => [OpInfo::ARG_REL8],
+        self::EQ => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::EQ_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::NOT_EQ => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::NOT_EQ_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::ADD => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::ADD_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::MUL => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
