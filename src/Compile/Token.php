@@ -43,6 +43,9 @@ class Token {
     public const KEYWORD_ENDFOR = 37;
     public const KEYWORD_ELSE = 38;
     public const KEYWORD_ELSEIF = 39;
+    public const KEYWORD_LET = 40;
+    public const ASSIGN = 41; // =
+    public const DOLLAR_IDENT = 42;
 
     public $kind = 0;
     public $pos_from = 0;
@@ -65,6 +68,7 @@ class Token {
         case self::TEXT:
         case self::COMMENT:
         case self::IDENT:
+        case self::DOLLAR_IDENT:
         case self::INT_LIT:
         case self::STRING_LIT:
             return true;
@@ -85,6 +89,8 @@ class Token {
             return '%}';
         case self::COMMENT:
             return '{##}';
+        case self::ASSIGN:
+            return '=';
         case self::PLUS:
             return '+';
         case self::MINUS:
@@ -140,6 +146,8 @@ class Token {
             return 'ERROR';
         case self::IDENT:
             return 'IDENT';
+        case self::DOLLAR_IDENT:
+            return 'DOLLAR_IDENT';
         case self::INT_LIT:
             return 'INT_LIT';
         case self::STRING_LIT:
@@ -200,6 +208,10 @@ class Token {
             return 'ELSE';
         case self::KEYWORD_ELSEIF:
             return 'ELSEIF';
+        case self::KEYWORD_LET:
+            return 'LET';
+        case self::ASSIGN:
+            return 'ASSIGN';
         default:
             return '<?>';
         }

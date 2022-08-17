@@ -74,8 +74,21 @@ class Lexer {
         return $this->tok2;
     }
 
-    public function tokenValue(Token $tok): string {
+    /**
+     * @param Token $tok
+     * @return string
+     */
+    public function tokenText($tok) {
         return (string)substr($this->src, $tok->pos_from, $tok->pos_to - $tok->pos_from);
+    }
+
+    /**
+     * @param Token $tok
+     * @return string
+     */
+    public function dollarVarName($tok) {
+        $from = $tok->pos_from + 1; // Skip the '$' sign
+        return (string)substr($this->src, $from, $tok->pos_to - $from);
     }
 
     public function getError(): string {
@@ -103,7 +116,7 @@ class Lexer {
     }
 
     private static function isFirstIdentChar(int $ch) {
-        return self::isLetter($ch) || $ch === ord('_');
+        return $ch === ord('$') || self::isLetter($ch) || $ch === ord('_');
     }
 
     private static function isIdentChar(int $ch) {
@@ -182,6 +195,9 @@ class Lexer {
                 case ord('='):
                     $this->acceptSimpleToken($dst, Token::EQ, 2);
                     return;
+                default:
+                    $this->acceptSimpleToken($dst, Token::ASSIGN, 1);
+                    return;
                 }
             case ord('!'):
                 switch ($this->peekChar(1)) {
@@ -257,14 +273,20 @@ class Lexer {
         $dst->pos_to = $this->pos;
     }
 
-    private function scanIdentInto(Token $dst) {
-        $dst->kind = Token::IDENT;
+    /**
+     * @param Token $dst
+     */
+    private function scanIdentInto($dst) {
+        $dst->kind = ord($this->src[$this->pos]) === ord('$') ? Token::DOLLAR_IDENT : Token::IDENT;
         $dst->pos_from = $this->pos;
         $this->pos++;
         while ($this->pos < $this->src_len && self::isIdentChar(ord($this->src[$this->pos]))) {
             $this->pos++;
         }
         $dst->pos_to = $this->pos;
+        if ($dst->kind === Token::DOLLAR_IDENT) {
+            return; // Keywords never start with '$'
+        }
         switch ((int)($dst->pos_to - $dst->pos_from)) {
         case 2:
             if (substr_compare($this->src, 'or', $dst->pos_from, strlen('or')) === 0) {
@@ -298,6 +320,10 @@ class Lexer {
             }
             if (substr_compare($this->src, 'set', $dst->pos_from, strlen('set')) === 0) {
                 $dst->kind = Token::KEYWORD_SET;
+                return;
+            }
+            if (substr_compare($this->src, 'let', $dst->pos_from, strlen('let')) === 0) {
+                $dst->kind = Token::KEYWORD_LET;
                 return;
             }
         case 4:

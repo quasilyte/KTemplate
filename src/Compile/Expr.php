@@ -25,6 +25,7 @@ class Expr {
     public const FLOAT_LIT = 19;
     public const STRING_LIT = 20;
     public const DOT_ACCESS = 21;
+    public const DOLLAR_IDENT = 22;
 
     /** @var int */
     public $kind = 0;

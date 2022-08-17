@@ -30,6 +30,7 @@ var rawOpcodes = []opcodeTemplate{
 	{"RETURN", "op"},
 
 	{"OUTPUT_SLOT0", "op *slot0"},
+	{"OUTPUT", "op arg:rslot"},
 	{"OUTPUT_INT_CONST", "op val:intindex"},
 	{"OUTPUT_STRING_CONST", "op val:strindex"},
 	{"OUTPUT_VAR_1", "op p1:strindex"},
@@ -43,12 +44,17 @@ var rawOpcodes = []opcodeTemplate{
 	{"LOAD_VAR_2", "op dst:wslot p1:strindex p2:strindex"},
 	{"LOAD_VAR_3", "op dst:wslot p1:strindex p2:strindex p3:strindex"},
 
-	{"CONCAT_2", "op *slot0 s2:rslot"},
-	{"CONCAT_3", "op *slot0 s2:rslot s3:rslot"},
+	{"CONCAT_SLOT0_2", "op *slot0 arg2:rslot"},
+	{"CONCAT_SLOT0_3", "op *slot0 arg2:rslot arg3:rslot"},
 
 	{"JUMP", "op pcdelta:rel8"},
 	{"JUMP_ZERO", "op *slot0 pcdelta:rel8"},
 	{"JUMP_NOT_ZERO", "op *slot0 pcdelta:rel8"},
+
+	{"ADD", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"ADD_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
+	{"MUL", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"MUL_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 }
 
 func getOpcodeInfo(data opcodeTemplate) opcodeInfo {

@@ -71,8 +71,8 @@ class LexerTest extends TestCase {
 
             // Expressions.
             [
-                '{{ x }}',
-                ['ECHO_START', 'IDENT(x)', 'ECHO_END'],
+                '{{ $x }}',
+                ['ECHO_START', 'DOLLAR_IDENT($x)', 'ECHO_END'],
             ],
             [
                 '{{ x.y.z }}',
@@ -127,12 +127,12 @@ class LexerTest extends TestCase {
                 ['ECHO_START', 'IF', 'DO', 'ECHO_END'],
             ],
             [
-                '{{ for set and use }}',
-                ['ECHO_START', 'FOR', 'SET', 'AND', 'USE', 'ECHO_END'],
+                '{{ for set and use let }}',
+                ['ECHO_START', 'FOR', 'SET', 'AND', 'USE', 'LET', 'ECHO_END'],
             ],
             [
-                '{{ < }}',
-                ['ECHO_START', 'LT', 'ECHO_END'],
+                '{{ < = }}',
+                ['ECHO_START', 'LT', 'ASSIGN', 'ECHO_END'],
             ],
             [
                 '{{ <= }}',
@@ -183,12 +183,12 @@ class LexerTest extends TestCase {
                 }
                 $kind_string = Token::kindString($tok->kind);
                 if (Token::hasValue($tok->kind)) {
-                    $have[] = "$kind_string(" . $lexer->tokenValue($tok) . ')';
+                    $have[] = "$kind_string(" . $lexer->tokenText($tok) . ')';
                 } else {
                     $have[] = $kind_string;
                 }
             }
-            $this->assertEquals($have, $want);
+            $this->assertEquals($want, $have);
         }
     }
 }

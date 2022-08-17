@@ -45,7 +45,13 @@ class Disasm {
                     $parts[] = "slot$v";
                     break;
                 case OpInfo::ARG_STRING_CONST:
-                    $parts[] = "`" . $t->string_values[$v] . "`";
+                    $s = addslashes($t->string_values[$v]);
+                    $s = str_replace("\n", "\\n", $s);
+                    $s = str_replace("\r", "\\r", $s);
+                    if (strlen($s) > 32) {
+                        $s = substr($s, 0, 29) . '...';
+                    } 
+                    $parts[] = "`" . $s . "`";
                     break;
                 case OpInfo::ARG_INT_CONST:
                     $parts[] = $t->int_values[$v];

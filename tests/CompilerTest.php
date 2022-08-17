@@ -85,7 +85,7 @@ class CompilerTest extends TestCase {
             foreach ($have as $s) {
                 $have_pretty[] = "'$s',";
             }
-            $this->assertEquals($have, $want, "input=$input\n" . implode("\n", $have_pretty));
+            $this->assertEquals($want, $have, "input=$input\n" . implode("\n", $have_pretty));
         }
     }
 }

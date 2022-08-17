@@ -108,7 +108,7 @@ class ExprParserTest extends TestCase {
             $have_ast = self::formatExpr($p, $e);
             $have = ["input=$input", "allocs=$want_allocs", $want_ast];
             $want = ["input=$input", "allocs=$have_allocs", $have_ast];
-            $this->assertEquals($have, $want);
+            $this->assertEquals($want, $have);
         }
     }
 }

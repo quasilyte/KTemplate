@@ -82,13 +82,17 @@ class ExprParser {
         case Token::KEYWORD_FALSE:
             $left->kind = Expr::FALSE_LIT;
             break;
+        case Token::DOLLAR_IDENT:
+            $left->kind = Expr::DOLLAR_IDENT;
+            $left->value = $lexer->dollarVarName($tok);
+            break;
         case Token::IDENT:
             $left->kind = Expr::IDENT;
-            $left->value = $lexer->tokenValue($tok);
+            $left->value = $lexer->tokenText($tok);
             break;
         case Token::INT_LIT:
             $left->kind = Expr::INT_LIT;
-            $left->value = (int)$lexer->tokenValue($tok);
+            $left->value = (int)$lexer->tokenText($tok);
             break;
         case Token::LPAREN:
             $this->parseExpr($left, 0);

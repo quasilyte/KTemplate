@@ -19,6 +19,9 @@ class Compiler {
     /** @var ConstFolder */
     private $const_folder;
 
+    /** @var Frame */
+    private $frame;
+
     /** @var int[] */
     private $addr_by_label_id = [];
     /** @var int */
@@ -33,6 +36,7 @@ class Compiler {
         $this->lexer = new Lexer();
         $this->parser = new ExprParser();
         $this->const_folder = new ConstFolder($this->parser);
+        $this->frame = new Frame();
     }
 
     /**
@@ -45,6 +49,7 @@ class Compiler {
         /** @var ?\Throwable $exception */
         $exception = null;
 
+        $this->frame->enterScope();
         try {
             while (true) {
                 $tok = $this->lexer->scan();
@@ -59,6 +64,7 @@ class Compiler {
         } catch (\Throwable $e) {
             $exception = $e;
         }
+        $this->frame->leaveScope();
 
         $this->finish();
         if ($exception) {
@@ -72,7 +78,7 @@ class Compiler {
         case Token::COMMENT:
             return; // Just skip the comment
         case Token::TEXT:
-            $this->compileOutputStringConst($this->lexer->tokenValue($tok));
+            $this->compileOutputStringConst($this->lexer->tokenText($tok));
             return;
         case Token::ECHO_START:
             $this->compileEcho();
@@ -91,16 +97,41 @@ class Compiler {
         case Token::KEYWORD_IF:
             $this->compileIf();
             return;
+        case Token::KEYWORD_LET:
+            $this->compileLet();
+            return;
         }
 
         $this->failToken($tok, 'unexpected control token: ' . Token::kindString($tok->kind));
     }
 
+    private function compileLet() {
+        $tok = $this->lexer->scan();
+        if ($tok->kind !== Token::DOLLAR_IDENT) {
+            $this->failToken($tok, 'let names should be identifiers with leading $, found ' . Token::kindString($tok->kind));
+        }
+        $var_name = $this->lexer->dollarVarName($tok);
+        if ($this->frame->lookupLocalInCurrentScope($var_name) !== -1) {
+            $this->failToken($tok, "variable $var_name is already declared in this scope");
+        }
+        $var_slot = $this->frame->allocVarSlot($var_name);
+        $this->expectToken(Token::ASSIGN);
+        $e = $this->parser->parseRootExpr($this->lexer);
+        $this->compileRootExpr($var_slot, $e);
+        $this->expectToken(Token::CONTROL_END);
+    }
+
     private function compileIf() {
         $e = $this->parser->parseRootExpr($this->lexer);
-        $this->compileExpr(0, $e);
+        $this->compileRootExpr(0, $e);
         $this->expectToken(Token::CONTROL_END);
 
+        $this->frame->enterScope();
+        $this->compileIfBody();
+        $this->frame->leaveScope();
+    }
+
+    private function compileIfBody() {
         $label_next = $this->newLabel();
         $label_end = $this->newLabel();
         $this->emitJump(Op::JUMP_ZERO, $label_next);
@@ -120,7 +151,6 @@ class Compiler {
                     continue;
                 }
                 if ($this->lexer->consume(Token::KEYWORD_ELSEIF)) {
-                    // {% if 1 %}a{% elseif 2 %}b{% endif %}
                     $this->emitJump(Op::JUMP, $label_end);
                     $this->bindLabel($label_next);
                     $this->compileIf();
@@ -135,7 +165,7 @@ class Compiler {
     private function compileEcho() {
         $e = $this->parser->parseRootExpr($this->lexer);
         if (!$this->tryCompileDirectOutput($e)) {
-            $this->compileExpr(0, $e);
+            $this->compileRootExpr(0, $e);
             $this->emit(Op::OUTPUT_SLOT0);
         }
         $this->expectToken(Token::ECHO_END);
@@ -166,6 +196,9 @@ class Compiler {
             return true;
         }
         switch ($e->kind) {
+        case Expr::DOLLAR_IDENT:
+            $this->emit1(Op::OUTPUT, $this->lookupLocalVar($e));
+            return true;
         case Expr::IDENT:
             $this->emit1(Op::OUTPUT_VAR_1, $this->internString((string)$e->value));
             return true;
@@ -231,10 +264,40 @@ class Compiler {
      * @param int $dst
      * @param Expr $e
      */
+    private function compileRootExpr($dst, $e) {
+        $this->frame->enterTempBlock();
+        $this->compileExpr($dst, $e);
+        $this->frame->leaveTempBlock();
+    }
+
+    /**
+     * @param Expr $e
+     * @return int
+     */
+    private function compileTempExpr($e) {
+        if ($e->kind === Expr::DOLLAR_IDENT) {
+            return $this->lookupLocalVar($e);
+        }
+        $temp = $this->frame->allocTempSlot();
+        $this->compileExpr($temp, $e);
+        return $temp;
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
     private function compileExpr($dst, $e) {
         switch ($e->kind) {
         case Expr::IDENT:
             $this->failExpr($e, 'TODO');
+            return;
+
+        case Expr::ADD:
+            $this->compileBinaryExpr($dst, Op::ADD, $e);
+            return;
+        case Expr::MUL:
+            $this->compileBinaryExpr($dst, Op::MUL, $e);
             return;
 
         case Expr::INT_LIT:
@@ -247,6 +310,21 @@ class Compiler {
         }
     
         $this->failExpr($e, "compile expr: unexpected $e->kind");
+    }
+
+    /**
+     * @param int $dst
+     * @param int $op
+     * @param Expr $e
+     */
+    private function compileBinaryExpr($dst, $op, $e) {
+        $lhs = $this->compileTempExpr($this->parser->getExprMember($e, 0));
+        $rhs = $this->compileTempExpr($this->parser->getExprMember($e, 1));
+        if ($dst === 0) {
+            $this->emit2($op + 1, $lhs, $rhs);
+            return;
+        }
+        $this->emit3($op, $dst, $lhs, $rhs);
     }
 
     /**
@@ -266,6 +344,7 @@ class Compiler {
     private function reset($filename, $source) {
         $this->result = new Template();
         $this->lexer->setSource($filename, $source);
+        $this->frame->reset();
         $this->string_values = [];
         $this->int_values = [];
         $this->addr_by_label_id = [];
@@ -424,4 +503,15 @@ class Compiler {
         $this->bindLabel($label_id);
     }
 
+    /**
+     * @param Expr $e
+     * @return int
+     */
+    private function lookupLocalVar($e) {
+        $slot = $this->frame->lookupLocal((string)$e->value);
+        if ($slot === -1) {
+            $this->failExpr($e, "referenced undefined local var $e->value");
+        }
+        return $slot;
+    }
 }

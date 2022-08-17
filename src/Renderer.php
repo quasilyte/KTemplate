@@ -45,6 +45,9 @@ class Renderer {
             case Op::OUTPUT_SLOT0:
                 $state->buf .= $slot0;
                 break;
+            case Op::OUTPUT:
+                $state->buf .= $state->slots[($opdata >> 8) & 0xff];
+                break;
             case Op::OUTPUT_STRING_CONST:
                 $state->buf .= $t->string_values[($opdata >> 8) & 0xff];
                 break;
@@ -73,6 +76,9 @@ class Renderer {
             case Op::LOAD_SLOT0_INT_CONST:
                 $slot0 = $t->int_values[($opdata >> 8) & 0xff];
                 break;
+            case Op::LOAD_INT_CONST:
+                $state->slots[($opdata >> 8) & 0xff] = $t->int_values[($opdata >> 16) & 0xff];
+                break;
             
             case Op::JUMP:
                 $pc += ($opdata >> 8) & 0xff;
@@ -86,6 +92,19 @@ class Renderer {
                 if ((int)$slot0 !== 0) {
                     $pc += ($opdata >> 8) & 0xff;
                 }
+                break;
+
+            case Op::ADD:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] + $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::ADD_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] + $state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::MUL:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] * $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::MUL_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] * $state->slots[($opdata >> 16) & 0xff];
                 break;
 
             default:
