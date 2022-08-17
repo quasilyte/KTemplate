@@ -35,6 +35,13 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
+            '{% let $s = "a" %}{{ $s ~ $s ~ $s }}' => [
+                '  LOAD_STRING_CONST slot1 `a`',
+                '  CONCAT slot2 slot1 slot1',
+                '  CONCAT_SLOT0 *slot0 slot2 slot1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
 
             // Bool constants.
             '{% let $x = true %}' => [

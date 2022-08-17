@@ -76,7 +76,7 @@ class Renderer {
             case Op::LOAD_BOOL:
                 $state->slots[($opdata >> 8) & 0xff] = (bool)(($opdata >> 16) & 0xff);
                 break;
-            case Op::LOAD_BOOL:
+            case Op::LOAD_SLOT0_BOOL:
                 $slot0 = (bool)(($opdata >> 8) & 0xff);
                 break;
             case Op::LOAD_INT_CONST:
@@ -112,11 +112,29 @@ class Renderer {
                 }
                 break;
 
+            case Op::CONCAT:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] . $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::CONCAT_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] . $state->slots[($opdata >> 16) & 0xff];
+                break;
             case Op::EQ:
                 $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] == $state->slots[($opdata >> 24) & 0xff];
                 break;
             case Op::EQ_SLOT0:
                 $slot0 = $state->slots[($opdata >> 8) & 0xff] == $state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::GT:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] > $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::GT_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] > $state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::LT:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] < $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::LT_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] < $state->slots[($opdata >> 16) & 0xff];
                 break;
             case Op::NOT_EQ:
                 $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] != $state->slots[($opdata >> 24) & 0xff];

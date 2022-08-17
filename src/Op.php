@@ -66,24 +66,23 @@ class Op {
     // Encoding: 0x13
     public const LOAD_SLOT0_NULL = 19;
     
-    // Encoding: 0x14 arg2:rslot
-    // Flags: FLAG_IMPLICIT_SLOT0
-    public const CONCAT_SLOT0_2 = 20;
+    // Encoding: 0x14 pcdelta:rel8
+    public const JUMP = 20;
     
-    // Encoding: 0x15 arg2:rslot arg3:rslot
+    // Encoding: 0x15 pcdelta:rel8
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const CONCAT_SLOT0_3 = 21;
+    public const JUMP_ZERO = 21;
     
     // Encoding: 0x16 pcdelta:rel8
-    public const JUMP = 22;
-    
-    // Encoding: 0x17 pcdelta:rel8
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const JUMP_ZERO = 23;
+    public const JUMP_NOT_ZERO = 22;
     
-    // Encoding: 0x18 pcdelta:rel8
+    // Encoding: 0x17 dst:wslot arg1:rslot arg2:rslot
+    public const CONCAT = 23;
+    
+    // Encoding: 0x18 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const JUMP_NOT_ZERO = 24;
+    public const CONCAT_SLOT0 = 24;
     
     // Encoding: 0x19 dst:wslot arg1:rslot arg2:rslot
     public const EQ = 25;
@@ -93,25 +92,39 @@ class Op {
     public const EQ_SLOT0 = 26;
     
     // Encoding: 0x1b dst:wslot arg1:rslot arg2:rslot
-    public const NOT_EQ = 27;
+    public const GT = 27;
     
     // Encoding: 0x1c arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const NOT_EQ_SLOT0 = 28;
+    public const GT_SLOT0 = 28;
     
     // Encoding: 0x1d dst:wslot arg1:rslot arg2:rslot
-    public const ADD = 29;
+    public const LT = 29;
     
     // Encoding: 0x1e arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const ADD_SLOT0 = 30;
+    public const LT_SLOT0 = 30;
     
     // Encoding: 0x1f dst:wslot arg1:rslot arg2:rslot
-    public const MUL = 31;
+    public const NOT_EQ = 31;
     
     // Encoding: 0x20 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const MUL_SLOT0 = 32;
+    public const NOT_EQ_SLOT0 = 32;
+    
+    // Encoding: 0x21 dst:wslot arg1:rslot arg2:rslot
+    public const ADD = 33;
+    
+    // Encoding: 0x22 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0
+    public const ADD_SLOT0 = 34;
+    
+    // Encoding: 0x23 dst:wslot arg1:rslot arg2:rslot
+    public const MUL = 35;
+    
+    // Encoding: 0x24 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0
+    public const MUL_SLOT0 = 36;
     
     public static function opcodeString(int $op): string {
         switch ($op) {
@@ -154,30 +167,38 @@ class Op {
         case 19:
             return 'LOAD_SLOT0_NULL';
         case 20:
-            return 'CONCAT_SLOT0_2';
-        case 21:
-            return 'CONCAT_SLOT0_3';
-        case 22:
             return 'JUMP';
-        case 23:
+        case 21:
             return 'JUMP_ZERO';
-        case 24:
+        case 22:
             return 'JUMP_NOT_ZERO';
+        case 23:
+            return 'CONCAT';
+        case 24:
+            return 'CONCAT_SLOT0';
         case 25:
             return 'EQ';
         case 26:
             return 'EQ_SLOT0';
         case 27:
-            return 'NOT_EQ';
+            return 'GT';
         case 28:
-            return 'NOT_EQ_SLOT0';
+            return 'GT_SLOT0';
         case 29:
-            return 'ADD';
+            return 'LT';
         case 30:
-            return 'ADD_SLOT0';
+            return 'LT_SLOT0';
         case 31:
-            return 'MUL';
+            return 'NOT_EQ';
         case 32:
+            return 'NOT_EQ_SLOT0';
+        case 33:
+            return 'ADD';
+        case 34:
+            return 'ADD_SLOT0';
+        case 35:
+            return 'MUL';
+        case 36:
             return 'MUL_SLOT0';
         default:
             return '?';
@@ -224,31 +245,39 @@ class Op {
             return 0;
         case 19: // LOAD_SLOT0_NULL
             return 0;
-        case 20: // CONCAT_SLOT0_2
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 21: // CONCAT_SLOT0_3
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 22: // JUMP
+        case 20: // JUMP
             return 0;
-        case 23: // JUMP_ZERO
+        case 21: // JUMP_ZERO
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 24: // JUMP_NOT_ZERO
+        case 22: // JUMP_NOT_ZERO
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 23: // CONCAT
+            return 0;
+        case 24: // CONCAT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
         case 25: // EQ
             return 0;
         case 26: // EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 27: // NOT_EQ
+        case 27: // GT
             return 0;
-        case 28: // NOT_EQ_SLOT0
+        case 28: // GT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 29: // ADD
+        case 29: // LT
             return 0;
-        case 30: // ADD_SLOT0
+        case 30: // LT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 31: // MUL
+        case 31: // NOT_EQ
             return 0;
-        case 32: // MUL_SLOT0
+        case 32: // NOT_EQ_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 33: // ADD
+            return 0;
+        case 34: // ADD_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 35: // MUL
+            return 0;
+        case 36: // MUL_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
         default:
             return 0;
@@ -275,13 +304,17 @@ class Op {
         self::LOAD_VAR_3 => [OpInfo::ARG_SLOT, OpInfo::ARG_STRING_CONST, OpInfo::ARG_STRING_CONST, OpInfo::ARG_STRING_CONST],
         self::LOAD_NULL => [OpInfo::ARG_SLOT],
         self::LOAD_SLOT0_NULL => [],
-        self::CONCAT_SLOT0_2 => [OpInfo::ARG_SLOT],
-        self::CONCAT_SLOT0_3 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::JUMP => [OpInfo::ARG_REL8],
         self::JUMP_ZERO => [OpInfo::ARG_REL8],
         self::JUMP_NOT_ZERO => [OpInfo::ARG_REL8],
+        self::CONCAT => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::CONCAT_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::EQ => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::EQ_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::GT => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::GT_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::LT => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::LT_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::NOT_EQ => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::NOT_EQ_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::ADD => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],

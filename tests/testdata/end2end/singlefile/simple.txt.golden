@@ -1,0 +1,21 @@
+10
+
+
+
+aaa
+test_name='simple.txt'
+
+true->1
+
+false->
+$s1 == 'aaa'->1
+$s1 == ''->
+$s1 != 'aaa'->
+$s1 != ''->1
+$s1 . $s->aaaaaa
+$s1 . $s . $s->aaaaaaaaa
+
+$i1 > $i2->
+$i1 < $i2->1
+$i2 > $i1->1
+$i2 < $i1->
