@@ -331,6 +331,10 @@ class Lexer {
                 $dst->kind = Token::KEYWORD_TRUE;
                 return;
             }
+            if (substr_compare($this->src, 'null', $dst->pos_from, strlen('null')) === 0) {
+                $dst->kind = Token::KEYWORD_NULL;
+                return;
+            }
             if (substr_compare($this->src, 'else', $dst->pos_from, strlen('else')) === 0) {
                 $dst->kind = Token::KEYWORD_ELSE;
                 return;

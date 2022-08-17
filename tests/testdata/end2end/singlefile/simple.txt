@@ -1,1 +1,3 @@
 {{ 10 }}
+{% let $null = null %}
+{{ $null }}

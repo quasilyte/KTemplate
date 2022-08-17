@@ -37,12 +37,14 @@ var rawOpcodes = []opcodeTemplate{
 	{"OUTPUT_VAR_2", "op p1:strindex p2:strindex"},
 	{"OUTPUT_VAR_3", "op p1:strindex p2:strindex p3:strindex"},
 
-	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex"},
 	{"LOAD_INT_CONST", "op dst:wslot val:intindex"},
+	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex"},
 	{"LOAD_STRING_CONST", "op dst:wslot val:strindex"},
 	{"LOAD_VAR_1", "op dst:wslot p1:strindex"},
 	{"LOAD_VAR_2", "op dst:wslot p1:strindex p2:strindex"},
 	{"LOAD_VAR_3", "op dst:wslot p1:strindex p2:strindex p3:strindex"},
+	{"LOAD_NULL", "op dst:wslot"},
+	{"LOAD_SLOT0_NULL", "op"},
 
 	{"CONCAT_SLOT0_2", "op *slot0 arg2:rslot"},
 	{"CONCAT_SLOT0_3", "op *slot0 arg2:rslot arg3:rslot"},

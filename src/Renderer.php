@@ -72,12 +72,18 @@ class Renderer {
                 $key->part3 = $t->string_values[($opdata >> 24) & 0xff];
                 $state->buf .= $state->data_provider->getData($key);
                 break;
-            
+           
+            case Op::LOAD_INT_CONST:
+                $state->slots[($opdata >> 8) & 0xff] = $t->int_values[($opdata >> 16) & 0xff];
+                break;
             case Op::LOAD_SLOT0_INT_CONST:
                 $slot0 = $t->int_values[($opdata >> 8) & 0xff];
                 break;
-            case Op::LOAD_INT_CONST:
-                $state->slots[($opdata >> 8) & 0xff] = $t->int_values[($opdata >> 16) & 0xff];
+            case Op::LOAD_NULL:
+                $state->slots[($opdata >> 8) & 0xff] = null;
+                break;
+            case Op::LOAD_SLOT0_NULL:
+                $slot0 = null;
                 break;
             
             case Op::JUMP:

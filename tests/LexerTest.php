@@ -83,8 +83,8 @@ class LexerTest extends TestCase {
                 ['ECHO_START', 'LPAREN', 'IDENT(x)', 'RPAREN', 'ECHO_END'],
             ],
             [
-                '{{ ( x ) }}',
-                ['ECHO_START', 'LPAREN', 'IDENT(x)', 'RPAREN', 'ECHO_END'],
+                '{{ ( null ) }}',
+                ['ECHO_START', 'LPAREN', 'NULL', 'RPAREN', 'ECHO_END'],
             ],
             [
                 '{{ x + y }}',

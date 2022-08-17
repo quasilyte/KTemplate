@@ -4,7 +4,7 @@ A template is a text that may contain special tags that are processed by the eng
 
 Rendering a template results in a string with all special tags being expanded. All text outside of the special tags is emitted as is.
 
-There are 3 main kinds of template engine tags:
+There are 3 main kinds of template tags:
 
 * `{{ ... }}` output tags
 * `{# ... #}` comment tags
@@ -26,11 +26,12 @@ Supported kinds of expressions:
 
 | Expression | Examples |
 |---|---|
+| Null literals | `null` |
 | Int/float literals | `10`, `10.5` |
 | String literals | `"hello"`, `'world'` |
 | Bool literals | `true`, `false` |
-| Local variable | `$x`, `$foo` |
-| External variable | `x`, `x.y.z` |
+| Local variables | `$x`, `$foo` |
+| External variables | `x`, `x.y.z` |
 | Array indexing | `$arr[0]`, `$arr['key']`, `$arr.key` |
 | Operators | `x ~ y`, `x and y`, `not x` |
 
@@ -50,11 +51,11 @@ The external variables lookup is resolved by the `DataProvider`. This configured
 This code fragement uses the local variable `x`:
 
 ```html
-{% set $x = 10 %}
+{% let $x = 10 %}
 {{ $x }}
 ```
 
-This code fragement may end up using the data provider to resolve `x`:
+This code fragement is using the data provider to resolve `x`:
 
 ```html
 {{ x }}
@@ -64,7 +65,7 @@ Both local and external variables can be used to access the data members, but th
 
 Since there is a functional distinction between the two, the local variables are always prefixed with `$`. It also makes it easier for the template compiler to complain at compile-time when some undefined local variable is referenced instead of assuming that it's an external variable.
 
-The local variables are lexically scoped.
+The local variables are lexically scoped. You define variables with `let` and change their value with `set`. It's a compile-time error to refer to an undefined local variable.
 
 ### Operators
 
@@ -102,4 +103,25 @@ The simplest form includes only `if` and `endif`:
 {% else %}
     The text that is rendered otherwise.
 {% endif %}
+```
+
+### Let
+
+`let` declares and initializes a local variable.
+
+After a variable is defined, it can be used as an expression.
+
+```html
+{% let $minutes_per_hour = 60 %}
+{{ 24 * $minutes_per_hour }}
+```
+
+Note that local variables are block-scoped. You can't access that variable outside of that block.
+
+```html
+{% if cond %}
+    {% let $x = 10 %}
+    {{ $x }} {# OK, can use $x here #}
+{% endif }   {# This tag closes the block started by if #}
+{{ $x }}     {# Compile time error: can't use $x here }
 ```

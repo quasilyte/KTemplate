@@ -46,6 +46,7 @@ class Token {
     public const KEYWORD_LET = 40;
     public const ASSIGN = 41; // =
     public const DOLLAR_IDENT = 42;
+    public const KEYWORD_NULL = 43;
 
     public $kind = 0;
     public $pos_from = 0;
@@ -212,6 +213,8 @@ class Token {
             return 'LET';
         case self::ASSIGN:
             return 'ASSIGN';
+        case self::KEYWORD_NULL:
+            return 'NULL';
         default:
             return '<?>';
         }

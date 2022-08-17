@@ -94,6 +94,9 @@ class ExprParser {
             $left->kind = Expr::INT_LIT;
             $left->value = (int)$lexer->tokenText($tok);
             break;
+        case Token::KEYWORD_NULL:
+            $left->kind = Expr::NULL_LIT;
+            break;
         case Token::LPAREN:
             $this->parseExpr($left, 0);
             if (!$lexer->consume(Token::RPAREN)) {

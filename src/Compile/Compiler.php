@@ -300,6 +300,14 @@ class Compiler {
             $this->compileBinaryExpr($dst, Op::MUL, $e);
             return;
 
+        case Expr::NULL_LIT:
+            if ($dst === 0) {
+                $this->emit(Op::LOAD_SLOT0_NULL);
+            } else {
+                $this->emit1(Op::LOAD_NULL, $dst);
+            }
+            return;
+
         case Expr::INT_LIT:
             if ($dst === 0) {
                 $this->emit1(Op::LOAD_SLOT0_INT_CONST, $this->internInt((int)$e->value));
