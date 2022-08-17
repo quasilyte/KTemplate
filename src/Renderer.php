@@ -72,7 +72,7 @@ class Renderer {
                 $key->part3 = $t->string_values[($opdata >> 24) & 0xff];
                 $state->buf .= $state->data_provider->getData($key);
                 break;
-           
+
             case Op::LOAD_BOOL:
                 $state->slots[($opdata >> 8) & 0xff] = (bool)(($opdata >> 16) & 0xff);
                 break;
@@ -110,6 +110,13 @@ class Renderer {
                 if ((int)$slot0 !== 0) {
                     $pc += ($opdata >> 8) & 0xff;
                 }
+                break;
+
+            case Op::NOT:
+                $state->slots[($opdata >> 8) & 0xff] = !$state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::NOT_SLOT0:
+                $slot0 = !$state->slots[($opdata >> 8) & 0xff];
                 break;
 
             case Op::CONCAT:

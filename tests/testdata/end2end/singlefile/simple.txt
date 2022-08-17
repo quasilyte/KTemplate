@@ -8,6 +8,12 @@ test_name='{{ test_name }}'
 true->{{ $bool_true }}
 {% let $bool_false = false %}
 false->{{ $bool_false }}
+!true->{{ not $bool_true }}
+!false->{{ not $bool_false }}
+!!true->{{ not not $bool_true }}
+!!false->{{ not not $bool_false }}
+!!!true->{{ not not not $bool_true }}
+!!!false->{{ not not not $bool_false }}
 $s1 == 'aaa'->{{ $s1 == 'aaa' }}
 $s1 == ''->{{ $s1 == '' }}
 $s1 != 'aaa'->{{ $s1 != 'aaa' }}

@@ -42,6 +42,19 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
+            '{% let $b = true %}{{ not $b }}' => [
+                '  LOAD_BOOL slot1 $1',
+                '  NOT_SLOT0 *slot0 slot1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{% let $b = true %}{{ not not $b }}' => [
+                '  LOAD_BOOL slot1 $1',
+                '  NOT slot2 slot1',
+                '  NOT_SLOT0 *slot0 slot2',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
 
             // Bool constants.
             '{% let $x = true %}' => [

@@ -293,6 +293,10 @@ class Compiler {
             $this->failExpr($e, 'TODO');
             return;
 
+        case Expr::NOT:
+            $this->compileUnaryExpr($dst, Op::NOT, $e);
+            return;
+
         case Expr::CONCAT:
             $this->compileBinaryExpr($dst, Op::CONCAT, $e);
             return;
@@ -364,6 +368,20 @@ class Compiler {
             return;
         }
         $this->emit3($op, $dst, $lhs, $rhs);
+    }
+
+    /**
+     * @param int $dst
+     * @param int $op
+     * @param Expr $e
+     */
+    private function compileUnaryExpr($dst, $op, $e) {
+        $arg = $this->compileTempExpr($this->parser->getExprMember($e, 0));
+        if ($dst === 0) {
+            $this->emit1($op + 1, $arg);
+            return;
+        }
+        $this->emit2($op, $dst, $arg);
     }
 
     /**

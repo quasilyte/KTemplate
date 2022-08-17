@@ -8,6 +8,12 @@ test_name='simple.txt'
 true->1
 
 false->
+!true->
+!false->1
+!!true->1
+!!false->
+!!!true->
+!!!false->1
 $s1 == 'aaa'->1
 $s1 == ''->
 $s1 != 'aaa'->
