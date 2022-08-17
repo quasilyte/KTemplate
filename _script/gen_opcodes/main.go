@@ -40,6 +40,7 @@ var rawOpcodes = []opcodeTemplate{
 	{"LOAD_INT_CONST", "op dst:wslot val:intindex"},
 	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex"},
 	{"LOAD_STRING_CONST", "op dst:wslot val:strindex"},
+	{"LOAD_SLOT0_STRING_CONST", "op *slot0 val:strindex"},
 	{"LOAD_VAR_1", "op dst:wslot p1:strindex"},
 	{"LOAD_VAR_2", "op dst:wslot p1:strindex p2:strindex"},
 	{"LOAD_VAR_3", "op dst:wslot p1:strindex p2:strindex p3:strindex"},

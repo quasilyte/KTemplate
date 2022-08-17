@@ -76,6 +76,13 @@ class CompilerTest extends TestCase {
                 'L1:',
                 '  RETURN',
             ],
+
+            // Local variables.
+            '{% let $s = "abc" %}{{ $s }}' => [
+                '  LOAD_STRING_CONST slot1 `abc`',
+                '  OUTPUT slot1',
+                '  RETURN',
+            ],
         ];
 
         foreach ($tests as $input => $want) {
@@ -85,7 +92,7 @@ class CompilerTest extends TestCase {
             foreach ($have as $s) {
                 $have_pretty[] = "'$s',";
             }
-            $this->assertEquals($want, $have, "input=$input\n" . implode("\n", $have_pretty));
+            $this->assertEquals($have, $want, "input=$input\n" . implode("\n", $have_pretty));
         }
     }
 }

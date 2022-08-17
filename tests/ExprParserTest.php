@@ -26,6 +26,9 @@ class ExprParserTest extends TestCase {
         case Expr::FALSE_LIT:
             return 'false';
 
+        case Expr::STRING_LIT:
+            return '`' . (string)$e->value . '`';
+
         case Expr::DOT_ACCESS:
             return self::formatBinaryExpr($p, $e, '.');
         case Expr::ADD:
@@ -68,6 +71,9 @@ class ExprParserTest extends TestCase {
             ['true', 'true', 1],
             ['false', 'false', 1],
 
+            ['"abc"', '`abc`', 1],
+            ["'abc'", '`abc`', 1],
+
             ['x + y', '(+ x y)', 3],
             ['x + y + z', '(+ (+ x y) z)', 5],
             ['x + y - z', '(- (+ x y) z)', 5],
@@ -108,7 +114,7 @@ class ExprParserTest extends TestCase {
             $have_ast = self::formatExpr($p, $e);
             $have = ["input=$input", "allocs=$want_allocs", $want_ast];
             $want = ["input=$input", "allocs=$have_allocs", $have_ast];
-            $this->assertEquals($want, $have);
+            $this->assertEquals($have, $want);
         }
     }
 }

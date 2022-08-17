@@ -308,6 +308,14 @@ class Compiler {
             }
             return;
 
+        case Expr::STRING_LIT:
+            if ($dst === 0) {
+                $this->emit1(Op::LOAD_SLOT0_STRING_CONST, $this->internString((string)$e->value));
+            } else {
+                $this->emit2(Op::LOAD_STRING_CONST, $dst, $this->internString((string)$e->value));
+            }
+            return;
+
         case Expr::INT_LIT:
             if ($dst === 0) {
                 $this->emit1(Op::LOAD_SLOT0_INT_CONST, $this->internInt((int)$e->value));

@@ -1,3 +1,5 @@
 {{ 10 }}
 {% let $null = null %}
 {{ $null }}
+{% let $s1 = 'aaa' %}
+{{ $s1 }}

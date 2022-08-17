@@ -14,7 +14,7 @@ class Token {
     public const ERROR = 8;
     public const IDENT = 9;
     public const INT_LIT = 10;
-    public const STRING_LIT = 11;
+    public const STRING_LIT_Q1 = 11;
     public const PLUS = 12; // +
     public const MINUS = 13; // -
     public const STAR = 14; // *
@@ -47,6 +47,7 @@ class Token {
     public const ASSIGN = 41; // =
     public const DOLLAR_IDENT = 42;
     public const KEYWORD_NULL = 43;
+    public const STRING_LIT_Q2 = 44;
 
     public $kind = 0;
     public $pos_from = 0;
@@ -71,8 +72,9 @@ class Token {
         case self::IDENT:
         case self::DOLLAR_IDENT:
         case self::INT_LIT:
-        case self::STRING_LIT:
-            return true;
+        case self::STRING_LIT_Q1:
+        case self::STRING_LIT_Q2:
+                    return true;
         default:
             return false;
         }
@@ -151,8 +153,10 @@ class Token {
             return 'DOLLAR_IDENT';
         case self::INT_LIT:
             return 'INT_LIT';
-        case self::STRING_LIT:
-            return 'STRING_LIT';
+        case self::STRING_LIT_Q1:
+            return 'STRING_LIT_Q1';
+        case self::STRING_LIT_Q2:
+            return 'STRING_LIT_Q2';
         case self::PLUS:
             return 'PLUS';
         case self::MINUS:

@@ -31,7 +31,7 @@ class End2EndTest extends TestCase {
                 $this->fail("$test: no output file found, auto-creating one");
             }
             $want = file_get_contents("$dir/$test.golden");
-            $this->assertEquals($want, $have);
+            $this->assertEquals($have, $want);
         }
     }
 }

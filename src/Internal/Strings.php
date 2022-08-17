@@ -19,4 +19,12 @@ class Strings {
     public static function hasSuffix($s, $suffix) {
         return substr_compare($s, $suffix, -strlen($suffix)) === 0;
     }
+
+    /**
+     * @param string $s
+     * @param string $part
+     */
+    public static function contains($s, $part) {
+        return strlen($part) === 0 || strpos($s, $part) !== false;
+    }
 }

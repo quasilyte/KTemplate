@@ -91,6 +91,16 @@ class Lexer {
         return (string)substr($this->src, $from, $tok->pos_to - $from);
     }
 
+    /**
+     * @param Token $tok
+     * @return string
+     */
+    public function stringText($tok) {
+        $from = $tok->pos_from + 1; // Skip the opening quote
+        $to = $tok->pos_to - $from - 1; // Skip the closing quote
+        return (string)substr($this->src, $from, $to);
+    }
+
     public function getError(): string {
         return $this->err;
     }
@@ -148,6 +158,12 @@ class Lexer {
                 return;
             }
             switch ($ch) {
+            case ord('\''):
+                $this->scanStringInto($dst, ord('\''));
+                return;
+            case ord('"'):
+                $this->scanStringInto($dst, ord('"'));
+                return;
             case ord('+'):
                 $this->acceptSimpleToken($dst, Token::PLUS, 1);
                 return;
@@ -261,6 +277,29 @@ class Lexer {
         while ($this->pos < $this->src_len && $this->src[$this->pos] === ' ') {
             $this->pos++;
         }
+    }
+
+    /**
+     * @param Token $dst
+     * @param int $quote
+     */
+    private function scanStringInto($dst, $quote) {
+        $dst->kind = $quote === ord('"') ? Token::STRING_LIT_Q2 : Token::STRING_LIT_Q1;
+        $dst->pos_from = $this->pos;
+        $this->pos++;
+        while ($this->pos < $this->src_len) {
+            $ch = ord($this->src[$this->pos]);
+            if ($ch === $quote && ord($this->src[$this->pos-1]) !== ord('\\')) {
+                break;
+            }
+            $this->pos++;
+        }
+        if (ord($this->src[$this->pos]) !== $quote) {
+            $this->setError($dst, 'unterminated string literal');
+            return;
+        }
+        $this->pos++;
+        $dst->pos_to = $this->pos;
     }
 
     private function scanNumberInto(Token $dst) {

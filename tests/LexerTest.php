@@ -69,6 +69,32 @@ class LexerTest extends TestCase {
                 ['CONTROL_START', 'ELSEIF', 'CONTROL_END'],
             ],
 
+            // String literals.
+            [
+                '{{ "" }}',
+                ['ECHO_START', 'STRING_LIT_Q2("")', 'ECHO_END'],
+            ],
+            [
+                '{{ "abc" }}',
+                ['ECHO_START', 'STRING_LIT_Q2("abc")', 'ECHO_END'],
+            ],
+            [
+                '{{ "ab\"c" }}',
+                ['ECHO_START', 'STRING_LIT_Q2("ab\"c")', 'ECHO_END'],
+            ],
+            [
+                "{{ '' }}",
+                ['ECHO_START', "STRING_LIT_Q1('')", 'ECHO_END'],
+            ],
+            [
+                "{{ 'abc' }}",
+                ['ECHO_START', "STRING_LIT_Q1('abc')", 'ECHO_END'],
+            ],
+            [
+                "{{ 'ab\'c' }}",
+                ['ECHO_START', "STRING_LIT_Q1('ab\'c')", 'ECHO_END'],
+            ],
+
             // Expressions.
             [
                 '{{ $x }}',
@@ -188,7 +214,7 @@ class LexerTest extends TestCase {
                     $have[] = $kind_string;
                 }
             }
-            $this->assertEquals($want, $have);
+            $this->assertEquals($have, $want);
         }
     }
 }
