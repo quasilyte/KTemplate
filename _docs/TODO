@@ -1,4 +1,6 @@
-* add for loops
+* add missing operators
+* `set` for variables
+* add `for` loops
 * docs: add examples
 * cached external vars lookup with lazy init
 * more end2end tests
@@ -8,3 +10,8 @@
 * template serialization/deserialization
 * filesystem bytecode cache
 * float literals, values and constants
+* filters
+* builtin functions
+* custom functions
+* output escaping settings
+* macros system
