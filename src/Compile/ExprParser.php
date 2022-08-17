@@ -208,9 +208,9 @@ class ExprParser {
         // https://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.double
 
         if ($quote === ord('"')) {
-            return $this->interpretStringQ2($raw_string);
+            return $this->interpretStringQ2($e, $raw_string);
         }
-        return $this->interpretStringQ1($raw_string);
+        return $this->interpretStringQ1($e, $raw_string);
     }
 
     /**

@@ -86,7 +86,7 @@ class CompilerTest extends TestCase {
         ];
 
         foreach ($tests as $input => $want) {
-            $t = self::$compiler->compile('test', $input);
+            $t = self::$compiler->compile('test', (string)$input);
             $have = Disasm::getBytecode($t);
             $have_pretty = [];
             foreach ($have as $s) {

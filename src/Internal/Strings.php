@@ -9,7 +9,7 @@ class Strings {
      * @return bool
      */
     public static function hasPrefix($s, $prefix) {
-        return strncmp($s, $prefix, strlen($prefix)) === 0;
+        return strlen($s) >= strlen($prefix) && strncmp($s, $prefix, strlen($prefix)) === 0;
     }
     /**
      * @param string $s
@@ -17,7 +17,7 @@ class Strings {
      * @return bool
      */
     public static function hasSuffix($s, $suffix) {
-        return substr_compare($s, $suffix, -strlen($suffix)) === 0;
+        return strlen($s) >= strlen($suffix) && substr_compare($s, $suffix, -strlen($suffix)) === 0;
     }
 
     /**
