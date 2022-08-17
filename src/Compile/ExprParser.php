@@ -79,10 +79,12 @@ class ExprParser {
         $tok = $lexer->scan();
         switch ($tok->kind) {
         case Token::KEYWORD_TRUE:
-            $left->kind = Expr::TRUE_LIT;
+            $left->kind = Expr::BOOL_LIT;
+            $left->value = true;
             break;
         case Token::KEYWORD_FALSE:
-            $left->kind = Expr::FALSE_LIT;
+            $left->kind = Expr::BOOL_LIT;
+            $left->value = false;
             break;
         case Token::DOLLAR_IDENT:
             $left->kind = Expr::DOLLAR_IDENT;

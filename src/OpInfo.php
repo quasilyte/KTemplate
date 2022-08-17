@@ -7,6 +7,7 @@ class OpInfo {
     public const ARG_STRING_CONST = 1;
     public const ARG_INT_CONST = 2;
     public const ARG_REL8 = 3;
+    public const ARG_IMM8 = 4;
 
     public const FLAG_IMPLICIT_SLOT0 = 1 << 0;
 

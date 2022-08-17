@@ -73,6 +73,12 @@ class Renderer {
                 $state->buf .= $state->data_provider->getData($key);
                 break;
            
+            case Op::LOAD_BOOL:
+                $state->slots[($opdata >> 8) & 0xff] = (bool)(($opdata >> 16) & 0xff);
+                break;
+            case Op::LOAD_BOOL:
+                $slot0 = (bool)(($opdata >> 8) & 0xff);
+                break;
             case Op::LOAD_INT_CONST:
                 $state->slots[($opdata >> 8) & 0xff] = $t->int_values[($opdata >> 16) & 0xff];
                 break;

@@ -30,67 +30,74 @@ class Op {
     // Encoding: 0x08 p1:strindex p2:strindex p3:strindex
     public const OUTPUT_VAR_3 = 8;
     
-    // Encoding: 0x09 dst:wslot val:intindex
-    public const LOAD_INT_CONST = 9;
+    // Encoding: 0x09 dst:wslot val:imm8
+    public const LOAD_BOOL = 9;
     
-    // Encoding: 0x0a val:intindex
+    // Encoding: 0x0a val:imm8
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const LOAD_SLOT0_INT_CONST = 10;
+    public const LOAD_SLOT0_BOOL = 10;
     
-    // Encoding: 0x0b dst:wslot val:strindex
-    public const LOAD_STRING_CONST = 11;
+    // Encoding: 0x0b dst:wslot val:intindex
+    public const LOAD_INT_CONST = 11;
     
-    // Encoding: 0x0c val:strindex
+    // Encoding: 0x0c val:intindex
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const LOAD_SLOT0_STRING_CONST = 12;
+    public const LOAD_SLOT0_INT_CONST = 12;
     
-    // Encoding: 0x0d dst:wslot p1:strindex
-    public const LOAD_VAR_1 = 13;
+    // Encoding: 0x0d dst:wslot val:strindex
+    public const LOAD_STRING_CONST = 13;
     
-    // Encoding: 0x0e dst:wslot p1:strindex p2:strindex
-    public const LOAD_VAR_2 = 14;
-    
-    // Encoding: 0x0f dst:wslot p1:strindex p2:strindex p3:strindex
-    public const LOAD_VAR_3 = 15;
-    
-    // Encoding: 0x10 dst:wslot
-    public const LOAD_NULL = 16;
-    
-    // Encoding: 0x11
-    public const LOAD_SLOT0_NULL = 17;
-    
-    // Encoding: 0x12 arg2:rslot
+    // Encoding: 0x0e val:strindex
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const CONCAT_SLOT0_2 = 18;
+    public const LOAD_SLOT0_STRING_CONST = 14;
     
-    // Encoding: 0x13 arg2:rslot arg3:rslot
+    // Encoding: 0x0f dst:wslot p1:strindex
+    public const LOAD_VAR_1 = 15;
+    
+    // Encoding: 0x10 dst:wslot p1:strindex p2:strindex
+    public const LOAD_VAR_2 = 16;
+    
+    // Encoding: 0x11 dst:wslot p1:strindex p2:strindex p3:strindex
+    public const LOAD_VAR_3 = 17;
+    
+    // Encoding: 0x12 dst:wslot
+    public const LOAD_NULL = 18;
+    
+    // Encoding: 0x13
+    public const LOAD_SLOT0_NULL = 19;
+    
+    // Encoding: 0x14 arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const CONCAT_SLOT0_3 = 19;
+    public const CONCAT_SLOT0_2 = 20;
     
-    // Encoding: 0x14 pcdelta:rel8
-    public const JUMP = 20;
-    
-    // Encoding: 0x15 pcdelta:rel8
+    // Encoding: 0x15 arg2:rslot arg3:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const JUMP_ZERO = 21;
+    public const CONCAT_SLOT0_3 = 21;
     
     // Encoding: 0x16 pcdelta:rel8
-    // Flags: FLAG_IMPLICIT_SLOT0
-    public const JUMP_NOT_ZERO = 22;
+    public const JUMP = 22;
     
-    // Encoding: 0x17 dst:wslot arg1:rslot arg2:rslot
-    public const ADD = 23;
-    
-    // Encoding: 0x18 arg1:rslot arg2:rslot
+    // Encoding: 0x17 pcdelta:rel8
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const ADD_SLOT0 = 24;
+    public const JUMP_ZERO = 23;
+    
+    // Encoding: 0x18 pcdelta:rel8
+    // Flags: FLAG_IMPLICIT_SLOT0
+    public const JUMP_NOT_ZERO = 24;
     
     // Encoding: 0x19 dst:wslot arg1:rslot arg2:rslot
-    public const MUL = 25;
+    public const ADD = 25;
     
     // Encoding: 0x1a arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0
-    public const MUL_SLOT0 = 26;
+    public const ADD_SLOT0 = 26;
+    
+    // Encoding: 0x1b dst:wslot arg1:rslot arg2:rslot
+    public const MUL = 27;
+    
+    // Encoding: 0x1c arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0
+    public const MUL_SLOT0 = 28;
     
     public static function opcodeString(int $op): string {
         switch ($op) {
@@ -111,40 +118,44 @@ class Op {
         case 8:
             return 'OUTPUT_VAR_3';
         case 9:
-            return 'LOAD_INT_CONST';
+            return 'LOAD_BOOL';
         case 10:
-            return 'LOAD_SLOT0_INT_CONST';
+            return 'LOAD_SLOT0_BOOL';
         case 11:
-            return 'LOAD_STRING_CONST';
+            return 'LOAD_INT_CONST';
         case 12:
-            return 'LOAD_SLOT0_STRING_CONST';
+            return 'LOAD_SLOT0_INT_CONST';
         case 13:
-            return 'LOAD_VAR_1';
+            return 'LOAD_STRING_CONST';
         case 14:
-            return 'LOAD_VAR_2';
+            return 'LOAD_SLOT0_STRING_CONST';
         case 15:
-            return 'LOAD_VAR_3';
+            return 'LOAD_VAR_1';
         case 16:
-            return 'LOAD_NULL';
+            return 'LOAD_VAR_2';
         case 17:
-            return 'LOAD_SLOT0_NULL';
+            return 'LOAD_VAR_3';
         case 18:
-            return 'CONCAT_SLOT0_2';
+            return 'LOAD_NULL';
         case 19:
-            return 'CONCAT_SLOT0_3';
+            return 'LOAD_SLOT0_NULL';
         case 20:
-            return 'JUMP';
+            return 'CONCAT_SLOT0_2';
         case 21:
-            return 'JUMP_ZERO';
+            return 'CONCAT_SLOT0_3';
         case 22:
-            return 'JUMP_NOT_ZERO';
+            return 'JUMP';
         case 23:
-            return 'ADD';
+            return 'JUMP_ZERO';
         case 24:
-            return 'ADD_SLOT0';
+            return 'JUMP_NOT_ZERO';
         case 25:
-            return 'MUL';
+            return 'ADD';
         case 26:
+            return 'ADD_SLOT0';
+        case 27:
+            return 'MUL';
+        case 28:
             return 'MUL_SLOT0';
         default:
             return '?';
@@ -169,41 +180,45 @@ class Op {
             return 0;
         case 8: // OUTPUT_VAR_3
             return 0;
-        case 9: // LOAD_INT_CONST
+        case 9: // LOAD_BOOL
             return 0;
-        case 10: // LOAD_SLOT0_INT_CONST
+        case 10: // LOAD_SLOT0_BOOL
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 11: // LOAD_STRING_CONST
+        case 11: // LOAD_INT_CONST
             return 0;
-        case 12: // LOAD_SLOT0_STRING_CONST
+        case 12: // LOAD_SLOT0_INT_CONST
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 13: // LOAD_VAR_1
+        case 13: // LOAD_STRING_CONST
             return 0;
-        case 14: // LOAD_VAR_2
-            return 0;
-        case 15: // LOAD_VAR_3
-            return 0;
-        case 16: // LOAD_NULL
-            return 0;
-        case 17: // LOAD_SLOT0_NULL
-            return 0;
-        case 18: // CONCAT_SLOT0_2
+        case 14: // LOAD_SLOT0_STRING_CONST
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 19: // CONCAT_SLOT0_3
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 20: // JUMP
+        case 15: // LOAD_VAR_1
             return 0;
-        case 21: // JUMP_ZERO
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 22: // JUMP_NOT_ZERO
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 23: // ADD
+        case 16: // LOAD_VAR_2
             return 0;
-        case 24: // ADD_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 25: // MUL
+        case 17: // LOAD_VAR_3
             return 0;
-        case 26: // MUL_SLOT0
+        case 18: // LOAD_NULL
+            return 0;
+        case 19: // LOAD_SLOT0_NULL
+            return 0;
+        case 20: // CONCAT_SLOT0_2
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 21: // CONCAT_SLOT0_3
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 22: // JUMP
+            return 0;
+        case 23: // JUMP_ZERO
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 24: // JUMP_NOT_ZERO
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 25: // ADD
+            return 0;
+        case 26: // ADD_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case 27: // MUL
+            return 0;
+        case 28: // MUL_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
         default:
             return 0;
@@ -219,6 +234,8 @@ class Op {
         self::OUTPUT_VAR_1 => [OpInfo::ARG_STRING_CONST],
         self::OUTPUT_VAR_2 => [OpInfo::ARG_STRING_CONST, OpInfo::ARG_STRING_CONST],
         self::OUTPUT_VAR_3 => [OpInfo::ARG_STRING_CONST, OpInfo::ARG_STRING_CONST, OpInfo::ARG_STRING_CONST],
+        self::LOAD_BOOL => [OpInfo::ARG_SLOT, OpInfo::ARG_IMM8],
+        self::LOAD_SLOT0_BOOL => [OpInfo::ARG_IMM8],
         self::LOAD_INT_CONST => [OpInfo::ARG_SLOT, OpInfo::ARG_INT_CONST],
         self::LOAD_SLOT0_INT_CONST => [OpInfo::ARG_INT_CONST],
         self::LOAD_STRING_CONST => [OpInfo::ARG_SLOT, OpInfo::ARG_STRING_CONST],

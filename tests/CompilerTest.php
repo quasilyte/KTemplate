@@ -14,6 +14,16 @@ class CompilerTest extends TestCase {
 
     public function testCompile() {
         $tests = [
+            // Bool constants.
+            '{% let $x = true %}' => [
+                '  LOAD_BOOL slot1 $1',
+                '  RETURN',
+            ],
+            '{% let $x = false %}' => [
+                '  LOAD_BOOL slot1 $0',
+                '  RETURN',
+            ],
+
             // If blocks.
             '{% if 1 %}a{% endif %}' => [
                 '  LOAD_SLOT0_INT_CONST *slot0 1',

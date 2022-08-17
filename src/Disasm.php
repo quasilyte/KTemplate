@@ -59,6 +59,9 @@ class Disasm {
                 case OpInfo::ARG_REL8:
                     $parts[] = $label_by_addr[$pc + $v + 1];
                     break;
+                case OpInfo::ARG_IMM8:
+                    $parts[] = "\$$v";
+                    break;
                 }
                 $arg_shift += 8;
             }

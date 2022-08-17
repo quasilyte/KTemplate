@@ -19,14 +19,13 @@ class Expr {
     public const LT_EQ = 13;
     public const GT_EQ = 14;
     public const NOT = 15;
-    public const TRUE_LIT = 16;
-    public const FALSE_LIT = 17;
-    public const INT_LIT = 18;
-    public const FLOAT_LIT = 19;
-    public const STRING_LIT = 20;
-    public const DOT_ACCESS = 21;
-    public const DOLLAR_IDENT = 22;
-    public const NULL_LIT = 23;
+    public const BOOL_LIT = 16;
+    public const INT_LIT = 17;
+    public const FLOAT_LIT = 18;
+    public const STRING_LIT = 19;
+    public const DOT_ACCESS = 20;
+    public const DOLLAR_IDENT = 21;
+    public const NULL_LIT = 22;
 
     /** @var int */
     public $kind = 0;

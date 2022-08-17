@@ -37,6 +37,8 @@ var rawOpcodes = []opcodeTemplate{
 	{"OUTPUT_VAR_2", "op p1:strindex p2:strindex"},
 	{"OUTPUT_VAR_3", "op p1:strindex p2:strindex p3:strindex"},
 
+	{"LOAD_BOOL", "op dst:wslot val:imm8"},
+	{"LOAD_SLOT0_BOOL", "op *slot0 val:imm8"},
 	{"LOAD_INT_CONST", "op dst:wslot val:intindex"},
 	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex"},
 	{"LOAD_STRING_CONST", "op dst:wslot val:strindex"},
@@ -93,6 +95,8 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 			arg.Kind = "OpInfo::ARG_INT_CONST"
 		case "rel8":
 			arg.Kind = "OpInfo::ARG_REL8"
+		case "imm8":
+			arg.Kind = "OpInfo::ARG_IMM8"
 		default:
 			panic(fmt.Sprintf("%s: unexpected %s arg kind", data.name, kind))
 		}

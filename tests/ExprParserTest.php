@@ -21,10 +21,8 @@ class ExprParserTest extends TestCase {
         switch ($e->kind) {
         case Expr::IDENT:
             return (string)$e->value;
-        case Expr::TRUE_LIT:
-            return 'true';
-        case Expr::FALSE_LIT:
-            return 'false';
+        case Expr::BOOL_LIT:
+            return $e->value ? 'true' : 'false';
 
         case Expr::STRING_LIT:
             return '`' . (string)$e->value . '`';
