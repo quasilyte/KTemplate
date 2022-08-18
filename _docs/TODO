@@ -2,7 +2,6 @@
 * `set` for variables
 * add `for` loops
 * docs: add examples
-* cached external vars lookup with lazy init
 * more end2end tests
 * adjusting frame size for the template
 * nested/partial templates
