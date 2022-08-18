@@ -384,9 +384,9 @@ class Compiler {
             return;
 
         case Expr::FILTER1:
-            // TODO: $rhs could be another filter. Like in x|y|z.
             $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
             $rhs = $this->parser->getExprMember($e, 1);
+            Assert::true($rhs->kind === Expr::IDENT, 'filter1 rhs is not identifier');
             $filter_id = $this->env->getFilter1ID((string)$rhs->value);
             if ($filter_id === -1) {
                 $this->failExpr($rhs, "$rhs->value filter is not defined");
@@ -472,7 +472,7 @@ class Compiler {
      * @param int $func_id - 16bit
      */
     private function emitCall1($op, $arg1, $func_id) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($func_id << 24);
+        $this->result->code[] = $op | ($arg1 << 8) | ($func_id << 16);
     }
 
     /**
@@ -482,7 +482,7 @@ class Compiler {
      * @param int $func_id - 16bit
      */
     private function emitCall2($op, $arg1, $arg2, $func_id) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($func_id << 32);
+        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($func_id << 24);
     }
 
     /**

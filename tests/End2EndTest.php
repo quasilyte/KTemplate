@@ -24,6 +24,8 @@ class End2EndTest extends TestCase {
 
         $env = new Env();
         $env->registerFilter1('strlen', function ($s) { return strlen($s); });
+        $env->registerFilter1('add1', function ($x) { return $x + 1; });
+        $env->registerFilter1('sub1', function ($x) { return $x - 1; });
 
         $compiler = new Compiler();
         $renderer = new Renderer();

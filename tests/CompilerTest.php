@@ -136,6 +136,21 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
+            '{{ 10|add1|add1 }}' => [
+                '  LOAD_INT_CONST slot2 10',
+                '  CALL_FILTER1 slot1 slot2 add1',
+                '  CALL_SLOT0_FILTER1 *slot0 slot1 add1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ 10|add1|sub1|add1 }}' => [
+                '  LOAD_INT_CONST slot3 10',
+                '  CALL_FILTER1 slot2 slot3 add1',
+                '  CALL_FILTER1 slot1 slot2 sub1',
+                '  CALL_SLOT0_FILTER1 *slot0 slot1 add1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
 
             // If blocks.
             '{% if 1 %}a{% endif %}' => [
@@ -203,6 +218,8 @@ class CompilerTest extends TestCase {
 
         $env = new Env();
         $env->registerFilter1('strlen', function ($s) { return strlen($s); });
+        $env->registerFilter1('add1', function ($x) { return $x + 1; });
+        $env->registerFilter1('sub1', function ($x) { return $x - 1; });
         foreach ($tests as $input => $want) {
             $t = self::$compiler->compile($env, 'test', (string)$input);
             $have = Disasm::getBytecode($env, $t);

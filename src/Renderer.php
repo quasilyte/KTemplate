@@ -295,13 +295,13 @@ class Renderer {
 
             case Op::CALL_FILTER1:
                 $arg1 = $state->slots[($opdata >> 16) & 0xff];
-                $filter_id = ($opdata >> 32) & 0xffff;
+                $filter_id = ($opdata >> 24) & 0xffff;
                 $filter = $env->filters1[$filter_id];
                 $state->slots[($opdata >> 8) & 0xff] = $filter($arg1);
                 break;
             case Op::CALL_SLOT0_FILTER1:
                 $arg1 = $state->slots[($opdata >> 8) & 0xff];
-                $filter_id = ($opdata >> 24) & 0xffff;
+                $filter_id = ($opdata >> 16) & 0xffff;
                 $filter = $env->filters1[$filter_id];
                 $slot0 = $filter($arg1);
                 break;

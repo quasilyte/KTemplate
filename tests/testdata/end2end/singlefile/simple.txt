@@ -37,3 +37,11 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ 'a'|strlen }}
 {{ ($s1 ~ $s1)|strlen }}
 {{ $s1|strlen + 1 }}
+{{ 1|add1 }}
+{{ 1|add1|add1 }}
+{{ 1|add1|add1|add1 }}
+{{ 1|sub1|add1 }}
+{{ 1|add1|sub1|add1 }}
+{{ 1|sub1|sub1|sub1 }}
+{{ test_name|strlen }}
+{{ test_name|strlen|add1 }}

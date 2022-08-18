@@ -26,7 +26,11 @@ class ExprParserTest extends TestCase {
 
         case Expr::STRING_LIT:
             return '`' . (string)$e->value . '`';
+        case Expr::INT_LIT:
+            return (string)$e->value;
 
+        case Expr::FILTER1:
+            return self::formatBinaryExpr($p, $e, '|');
         case Expr::DOT_ACCESS:
             return self::formatBinaryExpr($p, $e, '.');
         case Expr::ADD:
@@ -100,6 +104,13 @@ class ExprParserTest extends TestCase {
             ['not true', '(not true)', 2],
             ['not not x', '(not (not x))', 3],
             ['not x and not y', '(and (not x) (not y))', 5],
+
+            ['"a"|strlen', '(| `a` strlen)', 3],
+            ['x|y', '(| x y)', 3],
+            ['x|y|z', '(| (| x y) z)', 5],
+            ['a|b|c|d', '(| (| (| a b) c) d)', 7],
+            ['x+1|add1', '(+ x (| 1 add1))', 5],
+            ['(x+1)|add1', '(| (+ x 1) add1)', 5],
         ];
         $lexer = new Lexer();
         $p = new ExprParser();
