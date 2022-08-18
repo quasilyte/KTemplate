@@ -2,6 +2,7 @@
 
 use KTemplate\Compile\Compiler;
 use KTemplate\Compile\Lexer;
+use KTemplate\Env;
 use KTemplate\Renderer;
 use KTemplate\Template;
 use KTemplate\DataProviderInterface;
@@ -13,12 +14,16 @@ class BenchmarkRenderer {
     private $var_access1_x10_template;
     private $var_access1_x100_template;
 
+    /** @var Env */
+    private $env;
+
     /** @var Renderer */
     private $renderer;
     private $array_data_provider;
     private $null_data_provider;
 
     public function __construct() {
+        $this->env = new Env();
         $this->renderer = new Renderer();
         $this->array_data_provider = new ArrayDataProvider();
         $this->null_data_provider = new NullDataProvider();
@@ -40,19 +45,19 @@ class BenchmarkRenderer {
     }
 
     public function benchmarkVarAccess1() {
-        return $this->renderer->render($this->var_access1_template, $this->array_data_provider);
+        return $this->renderer->render($this->env, $this->var_access1_template, $this->array_data_provider);
     }
 
     public function benchmarkVarAccess1x2() {
-        return $this->renderer->render($this->var_access1_x2_template, $this->array_data_provider);
+        return $this->renderer->render($this->env, $this->var_access1_x2_template, $this->array_data_provider);
     }
 
     public function benchmarkVarAccess1x10() {
-        return $this->renderer->render($this->var_access1_x10_template, $this->array_data_provider);
+        return $this->renderer->render($this->env, $this->var_access1_x10_template, $this->array_data_provider);
     }
 
     public function benchmarkVarAccess1x100() {
-        return $this->renderer->render($this->var_access1_x100_template, $this->array_data_provider);
+        return $this->renderer->render($this->env, $this->var_access1_x100_template, $this->array_data_provider);
     }
 }
 

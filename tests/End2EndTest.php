@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use KTemplate\Compile\Compiler;
+use KTemplate\Env;
 use KTemplate\Renderer;
 use KTemplate\DataKey;
 use KTemplate\DataProviderInterface;
@@ -21,15 +22,18 @@ class End2EndTest extends TestCase {
             $tests[] = $filename;
         }
 
+        $env = new Env();
+        $env->registerFilter1('strlen', function ($s) { return strlen($s); });
+
         $compiler = new Compiler();
         $renderer = new Renderer();
         $data_provider = new SimpleTestDataProvider();
         foreach ($tests as $test) {
             $full_name = "$dir/$test";
             $source = (string)file_get_contents($full_name);
-            $t = $compiler->compile($full_name, $source);
+            $t = $compiler->compile($env, $full_name, $source);
             $data_provider->setTestName($test);
-            $have = $renderer->render($t, $data_provider);
+            $have = $renderer->render($env, $t, $data_provider);
             if (!file_exists("$dir/$test.golden")) {
                 file_put_contents("$dir/$test.golden", $have);
                 $this->fail("$test: no output file found, auto-creating one");

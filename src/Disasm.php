@@ -4,9 +4,10 @@ namespace KTemplate;
 
 class Disasm {
     /**
+     * @param Env $env
      * @param Template $t
      */
-    public static function getBytecode($t) {
+    public static function getBytecode($env, $t) {
         $out = [];
         $code = $t->code;
 
@@ -37,9 +38,13 @@ class Disasm {
                 $parts[] = '*slot0';
             }
             $args = Op::$args[$op];
-            $arg_shift = 8;
+            $arg_shift = 8; // Skip the first 8 bits as they're occupied by the opcode
             foreach ($args as $a) {
-                $v = ($opdata >> $arg_shift) & 0xff;
+                $arg_mask = 0xff;
+                if (OpInfo::argSize($a) == 2) {
+                    $arg_mask = 0xffff;
+                }
+                $v = ($opdata >> $arg_shift) & $arg_mask;
                 switch ($a) {
                 case OpInfo::ARG_SLOT:
                 case OpInfo::ARG_CACHE_SLOT:
@@ -63,6 +68,15 @@ class Disasm {
                 case OpInfo::ARG_IMM8:
                     $parts[] = "\$$v";
                     break;
+                case OpInfo::ARG_FILTER_ID:
+                    $filter_name = '';
+                    switch (OpInfo::filterArity($op)) {
+                    case 1:
+                        $filter_name = $env->getFilter1Name($v);
+                        break;
+                    }
+                    $parts[] = $filter_name;
+                    break;
                 case OpInfo::ARG_KEY_OFFSET:
                     $part = '';
                     $num_parts = OpInfo::numKeyParts($opdata);
@@ -75,7 +89,7 @@ class Disasm {
                     $parts[] = $part;
                     break;
                 }
-                $arg_shift += 8;
+                $arg_shift += OpInfo::argSize($a) * 8;
             }
             $out[] = '  ' . implode(' ', $parts);
             $pc++;

@@ -48,6 +48,7 @@ class Token {
     public const DOLLAR_IDENT = 42;
     public const KEYWORD_NULL = 43;
     public const STRING_LIT_Q2 = 44;
+    public const PIPE = 45; // |
 
     public $kind = 0;
     public $pos_from = 0;
@@ -122,6 +123,8 @@ class Token {
             return '<=';
         case self::GT_EQ:
             return '>=';
+        case self::PIPE:
+            return '|';
         default:
             return strtolower(self::kindString($kind));
         }
@@ -219,6 +222,8 @@ class Token {
             return 'ASSIGN';
         case self::KEYWORD_NULL:
             return 'NULL';
+        case self::PIPE:
+            return 'PIPE';
         default:
             return '<?>';
         }

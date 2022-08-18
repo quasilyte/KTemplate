@@ -10,9 +10,37 @@ class OpInfo {
     public const ARG_IMM8 = 4;
     public const ARG_KEY_OFFSET = 5;
     public const ARG_CACHE_SLOT = 6;
+    public const ARG_FILTER_ID = 7;
 
     public const FLAG_IMPLICIT_SLOT0 = 1 << 0;
     public const FLAG_HAS_SLOT_ARG = 1 << 1;
+
+    /**
+     * @param int $arg
+     * @return int
+     */
+    public static function argSize($arg) {
+        switch ($arg) {
+        case self::ARG_FILTER_ID:
+            return 2;
+        default:
+            return 1;
+        }
+    }
+
+    /**
+     * @param int $op
+     * @return int
+     */
+    public static function filterArity($op) {
+        switch ($op) {
+        case Op::CALL_FILTER1:
+        case Op::CALL_SLOT0_FILTER1:
+            return 1;
+        default:
+            return -1;
+        }
+    }
 
     /**
      * @param int $opdata

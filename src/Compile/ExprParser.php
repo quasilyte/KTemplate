@@ -129,6 +129,9 @@ class ExprParser {
             }
             $tok = $lexer->scan();
             switch ($tok->kind) {
+            case Token::PIPE:
+                $this->parseBinaryExpr($left, Expr::FILTER1, $right_prec);
+                break;
             case Token::DOT:
                 $this->parseBinaryExpr($left, Expr::DOT_ACCESS, $right_prec);
                 break;
@@ -295,8 +298,10 @@ class ExprParser {
         case Token::STAR:
         case Token::SLASH:
             return 6;
+        case Token::PIPE:
+            return 12;
         case Token::DOT:
-            return 7;
+            return 13;
         default:
             return -1;
         }

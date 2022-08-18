@@ -188,6 +188,9 @@ class Lexer {
             case ord(')'):
                 $this->acceptSimpleToken($dst, Token::RPAREN, 1);
                 return;
+            case ord('|'):
+                $this->acceptSimpleToken($dst, Token::PIPE, 1);
+                return;
             case ord('<'):
                 switch ($this->peekChar(1)) {
                 case ord('='):

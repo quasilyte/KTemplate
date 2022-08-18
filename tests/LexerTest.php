@@ -184,6 +184,10 @@ class LexerTest extends TestCase {
                 '{{ not }}',
                 ['ECHO_START', 'NOT', 'ECHO_END'],
             ],
+            [
+                '{{ x|y }}',
+                ['ECHO_START', 'IDENT(x)', 'PIPE', 'IDENT(y)', 'ECHO_END'],
+            ],
 
             // Mixing everything together.
             [

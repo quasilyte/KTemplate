@@ -11,20 +11,22 @@ class Renderer {
     }
 
     /**
+     * @param Env $env
      * @param Template $t
      * @param DataProviderInterface $data_provider
      * @return string
      */
-    public function render($t, $data_provider) {
+    public function render($env, $t, $data_provider) {
         $this->state->reset($data_provider);
-        $this->doRender($t);
+        $this->doRender($env, $t);
         return $this->state->buf;
     }
 
     /**
+     * @param Env $env
      * @param Template $t
      */
-    private function doRender($t) {
+    private function doRender($env, $t) {
         $state = $this->state;
         $key = $this->state->data_key;
         $pc = 0;
@@ -289,6 +291,19 @@ class Renderer {
                 break;
             case Op::MUL_SLOT0:
                 $slot0 = $state->slots[($opdata >> 8) & 0xff] * $state->slots[($opdata >> 16) & 0xff];
+                break;
+
+            case Op::CALL_FILTER1:
+                $arg1 = $state->slots[($opdata >> 16) & 0xff];
+                $filter_id = ($opdata >> 32) & 0xffff;
+                $filter = $env->filters1[$filter_id];
+                $state->slots[($opdata >> 8) & 0xff] = $filter($arg1);
+                break;
+            case Op::CALL_SLOT0_FILTER1:
+                $arg1 = $state->slots[($opdata >> 8) & 0xff];
+                $filter_id = ($opdata >> 24) & 0xffff;
+                $filter = $env->filters1[$filter_id];
+                $slot0 = $filter($arg1);
                 break;
 
             default:

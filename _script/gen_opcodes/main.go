@@ -56,6 +56,9 @@ var rawOpcodes = []opcodeTemplate{
 	{"JUMP_ZERO", "op *slot0 pcdelta:rel8"},
 	{"JUMP_NOT_ZERO", "op *slot0 pcdelta:rel8"},
 
+	{"CALL_FILTER1", "op dst:wslot arg1:rslot fn:filterid"},
+	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid"},
+
 	{"NOT", "op dst:wslot arg:rslot"},
 	{"NOT_SLOT0", "op *slot0 arg:rslot"},
 
@@ -116,6 +119,8 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 			arg.Kind = "OpInfo::ARG_REL8"
 		case "imm8":
 			arg.Kind = "OpInfo::ARG_IMM8"
+		case "filterid":
+			arg.Kind = "OpInfo::ARG_FILTER_ID"
 		default:
 			panic(fmt.Sprintf("%s: unexpected %s arg kind", data.name, kind))
 		}

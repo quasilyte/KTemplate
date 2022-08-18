@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use KTemplate\Compile\Compiler;
+use KTemplate\Env;
 use KTemplate\Disasm;
 
 class CompilerTest extends TestCase {
@@ -117,6 +118,25 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
 
+            // Filters.
+            '{{ s|strlen }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 s',
+                '  CALL_SLOT0_FILTER1 *slot0 slot2 strlen',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ s|strlen + 1 }}{{ s|strlen }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 s',
+                '  CALL_FILTER1 slot2 slot3 strlen',
+                '  LOAD_INT_CONST slot4 1',
+                '  ADD_SLOT0 *slot0 slot2 slot4',
+                '  OUTPUT_SLOT0 *slot0',
+                '  LOAD_EXTDATA_1 slot2 slot1 s',
+                '  CALL_SLOT0_FILTER1 *slot0 slot2 strlen',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
             // If blocks.
             '{% if 1 %}a{% endif %}' => [
                 '  LOAD_SLOT0_INT_CONST *slot0 1',
@@ -181,9 +201,11 @@ class CompilerTest extends TestCase {
             ],
         ];
 
+        $env = new Env();
+        $env->registerFilter1('strlen', function ($s) { return strlen($s); });
         foreach ($tests as $input => $want) {
-            $t = self::$compiler->compile('test', (string)$input);
-            $have = Disasm::getBytecode($t);
+            $t = self::$compiler->compile($env, 'test', (string)$input);
+            $have = Disasm::getBytecode($env, $t);
             $have_pretty = [];
             foreach ($have as $s) {
                 $have_pretty[] = "'$s',";

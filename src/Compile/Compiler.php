@@ -2,9 +2,11 @@
 
 namespace KTemplate\Compile;
 
+use KTemplate\Env;
 use KTemplate\Template;
 use KTemplate\Op;
 use KTemplate\OpInfo;
+use KTemplate\Internal\Assert;
 
 class Compiler {
     /** @var Lexer */
@@ -21,6 +23,9 @@ class Compiler {
 
     /** @var Frame */
     private $frame;
+
+    /** @var Env */
+    private $env;
 
     /** @var int[] */
     private $addr_by_label_id = [];
@@ -40,12 +45,13 @@ class Compiler {
     }
 
     /**
+     * @param Env $env
      * @param string $filename
      * @param string $source
      * @return Template
      */
-    public function compile($filename, $source) {
-        $this->reset($filename, $source);
+    public function compile($env, $filename, $source) {
+        $this->reset($env, $filename, $source);
         /** @var ?\Throwable $exception */
         $exception = null;
 
@@ -376,6 +382,21 @@ class Compiler {
                 $this->emit2(Op::LOAD_INT_CONST, $dst, $this->internInt((int)$e->value));
             }
             return;
+
+        case Expr::FILTER1:
+            // TODO: $rhs could be another filter. Like in x|y|z.
+            $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
+            $rhs = $this->parser->getExprMember($e, 1);
+            $filter_id = $this->env->getFilter1ID((string)$rhs->value);
+            if ($filter_id === -1) {
+                $this->failExpr($rhs, "$rhs->value filter is not defined");
+            }
+            if ($dst === 0) {
+                $this->emitCall1(Op::CALL_SLOT0_FILTER1, $arg1_slot, $filter_id);
+            } else {
+                $this->emitCall2(Op::CALL_FILTER1, $dst, $arg1_slot, $filter_id);
+            }
+            return;
         }
     
         $this->failExpr($e, "compile expr: unexpected $e->kind");
@@ -416,15 +437,18 @@ class Compiler {
      * by releasing the memory that won't be needed anymore.
      */
     private function finish() {
+        $this->env = null;
         $this->string_values = [];
         $this->int_values = [];
     }
 
     /**
+     * @param Env $env
      * @param string $filename
      * @param string $source
      */
-    private function reset($filename, $source) {
+    private function reset($env, $filename, $source) {
+        $this->env = $env;
         $this->result = new Template();
         $this->lexer->setSource($filename, $source);
         $this->frame->reset($this->result);
@@ -440,6 +464,25 @@ class Compiler {
      */
     private function emitJump($op, $label_id) {
         $this->emit1($op, $label_id);
+    }
+
+    /**
+     * @param int $op
+     * @param int $arg1
+     * @param int $func_id - 16bit
+     */
+    private function emitCall1($op, $arg1, $func_id) {
+        $this->result->code[] = $op | ($arg1 << 8) | ($func_id << 24);
+    }
+
+    /**
+     * @param int $op
+     * @param int $arg1
+     * @param int $arg2
+     * @param int $func_id - 16bit
+     */
+    private function emitCall2($op, $arg1, $arg2, $func_id) {
+        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($func_id << 32);
     }
 
     /**
