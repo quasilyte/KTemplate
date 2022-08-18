@@ -387,16 +387,16 @@ class Compiler {
             $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
             $rhs = $this->parser->getExprMember($e, 1);
             Assert::true($rhs->kind === Expr::IDENT, 'filter1 rhs is not identifier');
-            if ($rhs->value === 'length') {
-                if ($dst === 0) {
-                    $this->emit1(Op::LENGTH_SLOT0_FILTER, $arg1_slot);
-                } else {
-                    $this->emit2(Op::LENGTH_FILTER, $dst, $arg1_slot);
-                }
-                return;
-            }
             $filter_id = $this->env->getFilter1ID((string)$rhs->value);
             if ($filter_id === -1) {
+                if ($rhs->value === 'length') {
+                    if ($dst === 0) {
+                        $this->emit1(Op::LENGTH_SLOT0_FILTER, $arg1_slot);
+                    } else {
+                        $this->emit2(Op::LENGTH_FILTER, $dst, $arg1_slot);
+                    }
+                    return;
+                }
                 $this->failExpr($rhs, "$rhs->value filter is not defined");
             }
             if ($dst === 0) {
