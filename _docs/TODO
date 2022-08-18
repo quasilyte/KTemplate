@@ -9,7 +9,6 @@
 * template serialization/deserialization
 * filesystem bytecode cache
 * float literals, values and constants
-* optimize builtin filters, like length
 * filter2 support
 * builtin functions
 * custom functions

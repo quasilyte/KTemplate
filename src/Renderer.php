@@ -305,10 +305,33 @@ class Renderer {
                 $filter = $env->filters1[$filter_id];
                 $slot0 = $filter($arg1);
                 break;
+            case Op::LENGTH_FILTER:
+                $arg = $state->slots[($opdata >> 16) & 0xff];
+                $state->slots[($opdata >> 8) & 0xff] = self::lengthFilter($env, $arg);
+                break;
+            case Op::LENGTH_SLOT0_FILTER:
+                $arg = $state->slots[($opdata >> 8) & 0xff];
+                $slot0 = self::lengthFilter($env, $arg);
+                break;
 
             default:
                 return;
             }
         }
+    }
+
+    /**
+     * @param Env $env
+     * @param mixed $x
+     * @return int
+     */
+    private static function lengthFilter($env, $x) {
+        if (is_string($x)) {
+            return mb_strlen($x, $env->encoding);
+        }
+        if (is_array($x)) {
+            return count($x);
+        }
+        return 0;
     }
 }

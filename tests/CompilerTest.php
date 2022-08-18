@@ -151,6 +151,20 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
+            '{{ s|length }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 s',
+                '  LENGTH_SLOT0_FILTER slot2 slot1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ (s|length) + 1 }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 s',
+                '  LENGTH_FILTER slot2 slot3',
+                '  LOAD_INT_CONST slot4 1',
+                '  ADD_SLOT0 *slot0 slot2 slot4',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
 
             // If blocks.
             '{% if 1 %}a{% endif %}' => [

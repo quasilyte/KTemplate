@@ -45,3 +45,5 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ 1|sub1|sub1|sub1 }}
 {{ test_name|strlen }}
 {{ test_name|strlen|add1 }}
+{{ 'aaaa'|length }}
+{{ x.y|length }}

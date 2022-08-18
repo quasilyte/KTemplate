@@ -13,6 +13,7 @@ class BenchmarkRenderer {
     private $var_access1_x2_template;
     private $var_access1_x10_template;
     private $var_access1_x100_template;
+    private $length_template;
 
     /** @var Env */
     private $env;
@@ -23,25 +24,34 @@ class BenchmarkRenderer {
     private $null_data_provider;
 
     public function __construct() {
-        $this->env = new Env();
+        $env = new Env();
+        $this->env = $env;
+        $this->env->registerFilter1('length', function ($x) { return strlen($x); });
+
         $this->renderer = new Renderer();
         $this->array_data_provider = new ArrayDataProvider();
         $this->null_data_provider = new NullDataProvider();
 
         $c = new Compiler();
 
-        $this->var_access1_template = $c->compile('test', '{{ test_name }}');
+        $this->var_access1_template = $c->compile($env, 'test', '{{ test_name }}');
 
         $var_access1_src = '';
         for ($i = 0; $i < 100; $i++) {
             if ($i == 2) {
-                $this->var_access1_x2_template = $c->compile('test', $var_access1_src);
+                $this->var_access1_x2_template = $c->compile($env, 'test', $var_access1_src);
             } else if ($i == 10) {
-                $this->var_access1_x10_template = $c->compile('test', $var_access1_src);
+                $this->var_access1_x10_template = $c->compile($env, 'test', $var_access1_src);
             }
             $var_access1_src .= '{{ test_name }}';
         }
-        $this->var_access1_x100_template = $c->compile('test', $var_access1_src);
+        $this->var_access1_x100_template = $c->compile($env, 'test', $var_access1_src);
+
+        $this->length_template = $c->compile($env, 'test', '{% let $s = "" %}{{ $s|length }}{{ $s|length }}{{ $s|length }}{{ $s|length }}');
+    }
+
+    public function benchmarkLength() {
+        return $this->renderer->render($this->env, $this->length_template, $this->array_data_provider);
     }
 
     public function benchmarkVarAccess1() {
