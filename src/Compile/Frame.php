@@ -2,12 +2,18 @@
 
 namespace KTemplate\Compile;
 
+use KTemplate\Template;
 use KTemplate\Internal\Assert;
 
 class Frame {
     /** @var int */
     public $num_locals;
+    
+    /** @var int[] */
+    public $cache_slots = [];
 
+    /** @var Template */
+    private $template;
     /** @var int */
     private $num_temps;
     /** @var bool */
@@ -21,8 +27,13 @@ class Frame {
     /** @var int[] */
     private $depths = [];
 
-    public function reset() {
+    /**
+     * @param Template $template
+     */
+    public function reset($template) {
+        $this->template = $template;
         $this->num_locals = 1;
+        $this->cache_slots = [];
         $this->id_seq = 1;
         $this->num_temps;
         $this->in_temp_block = false;
@@ -81,6 +92,37 @@ class Frame {
             }
         }
         return -1;
+    }
+
+    /**
+     * @param string $p1
+     * @param string $p2
+     * @param string $p3
+     * @return int
+     */
+    public function getCacheSlotInfo($p1, $p2, $p3) {
+        $key = $p1;
+        if ($p2 !== '' && $p3 !== '') {
+            $key = "$p1.$p2.$p3";
+        } else if ($p2 !== '') {
+            $key = "$p1.$p2";
+        }
+
+        if (array_key_exists($key, $this->cache_slots)) {
+            return $this->cache_slots[$key];
+        }
+        $id = count($this->cache_slots) + 1;
+        $key_offset = count($this->template->keys);
+        $slot_info = $id | ($key_offset << 8);
+        $this->cache_slots[$key] = $slot_info;
+        $this->template->keys[] = $p1;
+        if ($p2 !== '') {
+            $this->template->keys[] = $p2;
+        }
+        if ($p3 !== '') {
+            $this->template->keys[] = $p3;
+        }
+        return $slot_info;
     }
 
     /**

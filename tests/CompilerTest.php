@@ -21,6 +21,57 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
 
+            // Extdata.
+            '{{ x }}{% let $y = 2 %}{{ x }}{{ $y }}' => [
+                '  OUTPUT_EXTDATA_1 slot1 x',
+                '  LOAD_INT_CONST slot2 2',
+                '  OUTPUT_EXTDATA_1 slot1 x',
+                '  OUTPUT slot2',
+                '  RETURN',
+            ],
+            '{{ x }}{% let $s = "a" %}{{ $s == "a" }}' => [
+                '  OUTPUT_EXTDATA_1 slot1 x',
+                '  LOAD_STRING_CONST slot2 `a`',
+                '  LOAD_STRING_CONST slot3 `a`',
+                '  EQ_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x + x }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  ADD_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{% let $i=1 %}{{ x.y }}{{$i}}' => [
+                '  LOAD_INT_CONST slot2 1',
+                '  OUTPUT_EXTDATA_2 slot1 x.y',
+                '  OUTPUT slot2',
+                '  RETURN',
+            ],
+            '{% let $i=1 %}{{ x.y.z }}{{$i}}' => [
+                '  LOAD_INT_CONST slot2 1',
+                '  OUTPUT_EXTDATA_3 slot1 x.y.z',
+                '  OUTPUT slot2',
+                '  RETURN',
+            ],
+            '{{ x }}{{ x.y }}{{ x.y.z }}{{ x }}{{ x.y }}' => [
+                '  OUTPUT_EXTDATA_1 slot1 x',
+                '  OUTPUT_EXTDATA_2 slot2 x.y',
+                '  OUTPUT_EXTDATA_3 slot3 x.y.z',
+                '  OUTPUT_EXTDATA_1 slot1 x',
+                '  OUTPUT_EXTDATA_2 slot2 x.y',
+                '  RETURN',
+            ],
+            '{{ x.y + x.y.z }}' => [
+                '  LOAD_EXTDATA_2 slot3 slot1 x.y',
+                '  LOAD_EXTDATA_3 slot4 slot2 x.y.z',
+                '  ADD_SLOT0 *slot0 slot3 slot4',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
             // Operators.
             '{% let $x = 1 %}{{ $x + $x }}' => [
                 '  LOAD_INT_CONST slot1 1',

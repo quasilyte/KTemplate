@@ -54,23 +54,53 @@ class Renderer {
             case Op::OUTPUT_INT_CONST:
                 $state->buf .= $t->int_values[($opdata >> 8) & 0xff];
                 break;
-            case Op::OUTPUT_VAR_1:
+            case Op::OUTPUT_EXTDATA_1:
+                $cache_slot = ($opdata >> 8) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $state->buf .= $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 16) & 0xff;
                 $key->num_parts = 1;
-                $key->part1 = $t->string_values[($opdata >> 8) & 0xff];
-                $state->buf .= $state->data_provider->getData($key);
+                $key->part1 = $t->keys[$key_offset];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $state->buf .= $v;
                 break;
-            case Op::OUTPUT_VAR_2:
+            case Op::OUTPUT_EXTDATA_2:
+                $cache_slot = ($opdata >> 8) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $state->buf .= $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 16) & 0xff;
                 $key->num_parts = 2;
-                $key->part1 = $t->string_values[($opdata >> 8) & 0xff];
-                $key->part2 = $t->string_values[($opdata >> 16) & 0xff];
-                $state->buf .= $state->data_provider->getData($key);
+                $key->part1 = $t->keys[$key_offset];
+                $key->part2 = $t->keys[$key_offset+1];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $state->buf .= $v;
                 break;
-            case Op::OUTPUT_VAR_3:
+            case Op::OUTPUT_EXTDATA_3:
+                $cache_slot = ($opdata >> 8) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $state->buf .= $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 16) & 0xff;
                 $key->num_parts = 3;
-                $key->part1 = $t->string_values[($opdata >> 8) & 0xff];
-                $key->part2 = $t->string_values[($opdata >> 16) & 0xff];
-                $key->part3 = $t->string_values[($opdata >> 24) & 0xff];
-                $state->buf .= $state->data_provider->getData($key);
+                $key->part1 = $t->keys[$key_offset];
+                $key->part2 = $t->keys[$key_offset+1];
+                $key->part3 = $t->keys[$key_offset+2];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $state->buf .= $v;
                 break;
 
             case Op::LOAD_BOOL:
@@ -96,6 +126,105 @@ class Renderer {
                 break;
             case Op::LOAD_SLOT0_NULL:
                 $slot0 = null;
+                break;
+            case Op::LOAD_EXTDATA_1:
+                $dst_slot = ($opdata >> 8) & 0xff;
+                $cache_slot = ($opdata >> 16) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $state->slots[$dst_slot] = $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 24) & 0xff;
+                $key->num_parts = 1;
+                $key->part1 = $t->keys[$key_offset];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $state->slots[$dst_slot] = $v;
+                break;
+            case Op::LOAD_SLOT0_EXTDATA_1:
+                $cache_slot = ($opdata >> 8) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $slot0 = $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 16) & 0xff;
+                $key->num_parts = 1;
+                $key->part1 = $t->keys[$key_offset];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $slot0 = $v;
+                break;
+            case Op::LOAD_EXTDATA_2:
+                $dst_slot = ($opdata >> 8) & 0xff;
+                $cache_slot = ($opdata >> 16) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $state->slots[$dst_slot] = $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 24) & 0xff;
+                $key->num_parts = 2;
+                $key->part1 = $t->keys[$key_offset];
+                $key->part2 = $t->keys[$key_offset+1];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $state->slots[$dst_slot] = $v;
+                break;
+            case Op::LOAD_SLOT0_EXTDATA_2:
+                $cache_slot = ($opdata >> 8) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $slot0 = $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 16) & 0xff;
+                $key->num_parts = 2;
+                $key->part1 = $t->keys[$key_offset];
+                $key->part2 = $t->keys[$key_offset+1];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $slot0 = $v;
+                break;
+            case Op::LOAD_EXTDATA_3:
+                $dst_slot = ($opdata >> 8) & 0xff;
+                $cache_slot = ($opdata >> 16) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $state->slots[$dst_slot] = $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 24) & 0xff;
+                $key->num_parts = 3;
+                $key->part1 = $t->keys[$key_offset];
+                $key->part2 = $t->keys[$key_offset+1];
+                $key->part3 = $t->keys[$key_offset+2];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $state->slots[$dst_slot] = $v;
+                break;
+            case Op::LOAD_SLOT0_EXTDATA_3:
+                $cache_slot = ($opdata >> 8) & 0xff;
+                $cache_mask = 1 << ($cache_slot - 1);
+                if (($state->cache_bitset & $cache_mask) !== 0) {
+                    $slot0 = $state->slots[$cache_slot];
+                    break;
+                }
+                $key_offset = ($opdata >> 16) & 0xff;
+                $key->num_parts = 3;
+                $key->part1 = $t->keys[$key_offset];
+                $key->part2 = $t->keys[$key_offset+1];
+                $key->part3 = $t->keys[$key_offset+2];
+                $v = $state->data_provider->getData($key);
+                $state->cache_bitset |= $cache_mask;
+                $state->slots[$cache_slot] = $v;
+                $slot0 = $v;
                 break;
             
             case Op::JUMP:

@@ -35,15 +35,28 @@ class End2EndTest extends TestCase {
                 $this->fail("$test: no output file found, auto-creating one");
             }
             $want = file_get_contents("$dir/$test.golden");
-            $this->assertEquals($have, $want);
+            $this->assertEquals($want, $have);
         }
     }
 }
 
 class SimpleTestDataProvider implements DataProviderInterface {
     private $test_name;
+    private $arr;
+    private $time;
 
     public function __construct() {
+        $this->arr = [
+            'x' => [
+                'y' => [
+                    'z' => 111,
+                ],
+            ],
+        ];
+        $this->time = [
+            'year' => 2022,
+            'month' => 'August',
+        ];
     }
 
     public function setTestName($name) {
@@ -54,6 +67,20 @@ class SimpleTestDataProvider implements DataProviderInterface {
         switch ($key->part1) {
         case 'test_name':
             return $key->num_parts === 1 ? $this->test_name : null;
+        case 'time':
+            if ($key->num_parts === 2) {
+                return $this->time[$key->part2];
+            }
+            return null;
+        default:
+            switch ($key->num_parts) {
+            case 1:
+                return $this->arr[$key->part1];
+            case 2:
+                return $this->arr[$key->part1][$key->part2];
+            default:
+                return $this->arr[$key->part1][$key->part2][$key->part3];
+            }
         }
         return null;
     }

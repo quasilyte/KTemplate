@@ -8,6 +8,9 @@ class RendererState {
     /** @var mixed[] */
     public $slots = [];
 
+    /** @var int */
+    public $cache_bitset = 0;
+
     /** @var DataKey */
     public $data_key;
 
@@ -15,7 +18,7 @@ class RendererState {
     public $data_provider;
 
     public function __construct() {
-        for ($i = 0; $i < 16; $i++) {
+        for ($i = 0; $i < 32; $i++) {
             $this->slots[] = null;
         }
         $this->data_key = new DataKey();
@@ -26,5 +29,7 @@ class RendererState {
      */
     public function reset($data_provider) {
         $this->data_provider = $data_provider;
+        $this->cache_bitset = 0;
+        $this->buf = '';
     }
 }

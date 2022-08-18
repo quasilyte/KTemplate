@@ -25,3 +25,9 @@ $i1 > $i2->{{ $i1 > $i2 }}
 $i1 < $i2->{{ $i1 < $i2 }}
 $i2 > $i1->{{ $i2 > $i1 }}
 $i2 < $i1->{{ $i2 < $i1 }}
+{{ time.year }} {{ time.month }}
+{{ time.year ~ ':' ~ time.month }}
+{{ time.year }} {{ time.month }}
+{{ time.year ~ ':' ~ time.month }}
+{{ x.y.z }}/{{ x.y.z + x.y.z }}
+{{ x.y.z + x.y.z }}/{{ x.y.z }}

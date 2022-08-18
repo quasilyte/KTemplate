@@ -42,6 +42,7 @@ class Disasm {
                 $v = ($opdata >> $arg_shift) & 0xff;
                 switch ($a) {
                 case OpInfo::ARG_SLOT:
+                case OpInfo::ARG_CACHE_SLOT:
                     $parts[] = "slot$v";
                     break;
                 case OpInfo::ARG_STRING_CONST:
@@ -61,6 +62,17 @@ class Disasm {
                     break;
                 case OpInfo::ARG_IMM8:
                     $parts[] = "\$$v";
+                    break;
+                case OpInfo::ARG_KEY_OFFSET:
+                    $part = '';
+                    $num_parts = OpInfo::numKeyParts($opdata);
+                    for ($i = 0; $i < $num_parts; $i++) {
+                        if ($i != 0) {
+                            $part .= '.';
+                        }
+                        $part .= $t->keys[$v + $i];
+                    }
+                    $parts[] = $part;
                     break;
                 }
                 $arg_shift += 8;

@@ -33,9 +33,9 @@ var rawOpcodes = []opcodeTemplate{
 	{"OUTPUT", "op arg:rslot"},
 	{"OUTPUT_INT_CONST", "op val:intindex"},
 	{"OUTPUT_STRING_CONST", "op val:strindex"},
-	{"OUTPUT_VAR_1", "op p1:strindex"},
-	{"OUTPUT_VAR_2", "op p1:strindex p2:strindex"},
-	{"OUTPUT_VAR_3", "op p1:strindex p2:strindex p3:strindex"},
+	{"OUTPUT_EXTDATA_1", "op cache:cacheslot k:keyoffset"},
+	{"OUTPUT_EXTDATA_2", "op cache:cacheslot k:keyoffset"},
+	{"OUTPUT_EXTDATA_3", "op cache:cacheslot k:keyoffset"},
 
 	{"LOAD_BOOL", "op dst:wslot val:imm8"},
 	{"LOAD_SLOT0_BOOL", "op *slot0 val:imm8"},
@@ -43,9 +43,12 @@ var rawOpcodes = []opcodeTemplate{
 	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex"},
 	{"LOAD_STRING_CONST", "op dst:wslot val:strindex"},
 	{"LOAD_SLOT0_STRING_CONST", "op *slot0 val:strindex"},
-	{"LOAD_VAR_1", "op dst:wslot p1:strindex"},
-	{"LOAD_VAR_2", "op dst:wslot p1:strindex p2:strindex"},
-	{"LOAD_VAR_3", "op dst:wslot p1:strindex p2:strindex p3:strindex"},
+	{"LOAD_EXTDATA_1", "op dst:wslot cache:cacheslot k:keyoffset"},
+	{"LOAD_SLOT0_EXTDATA_1", "op *slot0 cache:cacheslot k:keyoffset"},
+	{"LOAD_EXTDATA_2", "op dst:wslot cache:cacheslot k:keyoffset"},
+	{"LOAD_SLOT0_EXTDATA_2", "op *slot0 cache:cacheslot k:keyoffset"},
+	{"LOAD_EXTDATA_3", "op dst:wslot cache:cacheslot k:keyoffset"},
+	{"LOAD_SLOT0_EXTDATA_3", "op *slot0 cache:cacheslot k:keyoffset"},
 	{"LOAD_NULL", "op dst:wslot"},
 	{"LOAD_SLOT0_NULL", "op"},
 
@@ -85,6 +88,7 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 	}
 	var flagparts []string
 	var encparts []string
+	hasSlotArg := false
 	for _, p := range strings.Split(desc, " ") {
 		if p == "*slot0" {
 			flagparts = append(flagparts, "OpInfo::FLAG_IMPLICIT_SLOT0")
@@ -98,7 +102,12 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 		kind := parts[1]
 		switch kind {
 		case "wslot", "rslot":
+			hasSlotArg = true
 			arg.Kind = "OpInfo::ARG_SLOT"
+		case "cacheslot":
+			arg.Kind = "OpInfo::ARG_CACHE_SLOT"
+		case "keyoffset":
+			arg.Kind = "OpInfo::ARG_KEY_OFFSET"
 		case "strindex":
 			arg.Kind = "OpInfo::ARG_STRING_CONST"
 		case "intindex":
@@ -112,6 +121,10 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 		}
 		result.Args = append(result.Args, arg)
 		encparts = append(encparts, p)
+	}
+
+	if hasSlotArg {
+		flagparts = append(flagparts, "OpInfo::FLAG_HAS_SLOT_ARG")
 	}
 
 	result.Enc = strings.Join(encparts, " ")

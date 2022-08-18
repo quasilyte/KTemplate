@@ -59,7 +59,7 @@ class Compiler {
                 $this->compileToken($tok);
             }
             $this->emit(Op::RETURN);
-            $this->linkJumps();
+            $this->finalizeTemplate();
             return $this->result;
         } catch (\Throwable $e) {
             $exception = $e;
@@ -200,18 +200,21 @@ class Compiler {
             $this->emit1(Op::OUTPUT, $this->lookupLocalVar($e));
             return true;
         case Expr::IDENT:
-            $this->emit1(Op::OUTPUT_VAR_1, $this->internString((string)$e->value));
+            $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
+            $cache_slot = $cache_slot_info & 0xff;
+            $key_offset = ($cache_slot_info >> 8) & 0xff;
+            $this->emit2(Op::OUTPUT_EXTDATA_1, $cache_slot, $key_offset);
             return true;
         case Expr::DOT_ACCESS:
             [$p1, $p2, $p3] = $this->decodeDotAccess($e);
             if ($p1 === '') {
                 $this->failExpr($e, 'dot access expression is too complex');
             }
-            if ($p3 === '') {
-                $this->emit2(Op::OUTPUT_VAR_2, $this->internString($p1), $this->internString($p2));
-            } else {
-                $this->emit3(Op::OUTPUT_VAR_3, $this->internString($p1), $this->internString($p2), $this->internString($p3));
-            }
+            $cache_slot_info = $this->frame->getCacheSlotInfo($p1, $p2, $p3);
+            $cache_slot = $cache_slot_info & 0xff;
+            $key_offset = ($cache_slot_info >> 8) & 0xff;
+            $op = $p3 === '' ? Op::OUTPUT_EXTDATA_2 : Op::OUTPUT_EXTDATA_3;
+            $this->emit2($op, $cache_slot, $key_offset);
             return true;
         }
         return false;
@@ -290,7 +293,30 @@ class Compiler {
     private function compileExpr($dst, $e) {
         switch ($e->kind) {
         case Expr::IDENT:
-            $this->failExpr($e, 'TODO');
+            $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
+            $cache_slot = $cache_slot_info & 0xff;
+            $key_offset = ($cache_slot_info >> 8) & 0xff;
+            if ($dst === 0) {
+                $this->emit2(Op::LOAD_SLOT0_EXTDATA_1, $cache_slot, $key_offset);
+            } else {
+                $this->emit3(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
+            }
+            return;
+
+        case Expr::DOT_ACCESS:
+            [$p1, $p2, $p3] = $this->decodeDotAccess($e);
+            if ($p1 === '') {
+                $this->failExpr($e, 'dot access expression is too complex');
+            }
+            $slot_info = $this->frame->getCacheSlotInfo($p1, $p2, $p3);
+            $cache_slot = $slot_info & 0xff;
+            $key_offset = ($slot_info >> 8) & 0xff;
+            $op = $p3 === '' ? Op::LOAD_EXTDATA_2 : Op::LOAD_EXTDATA_3;
+            if ($dst === 0) {
+                $this->emit2($op + 1, $cache_slot, $key_offset);
+            } else {
+                $this->emit3($op, $dst, $cache_slot, $key_offset);
+            }
             return;
 
         case Expr::NOT:
@@ -401,7 +427,7 @@ class Compiler {
     private function reset($filename, $source) {
         $this->result = new Template();
         $this->lexer->setSource($filename, $source);
-        $this->frame->reset();
+        $this->frame->reset($this->result);
         $this->string_values = [];
         $this->int_values = [];
         $this->addr_by_label_id = [];
@@ -514,6 +540,40 @@ class Compiler {
         $e->source_line = $line;
         $e->source_filename = $this->lexer->getFilename();
         throw $e;
+    }
+
+    private function finalizeTemplate() {
+        $this->linkJumps();
+        $this->reallocateSlots();
+    }
+
+    private function reallocateSlots() {
+        $num_cache_slots = count($this->frame->cache_slots);
+        if ($num_cache_slots === 0) {
+            // Nothing to do: all slots are OK as they are.
+            return;
+        }
+        foreach ($this->result->code as $pc => $opdata) {
+            $op = $opdata & 0xff;
+            $op_flags = Op::opcodeFlags($op);
+            if (($op_flags & OpInfo::FLAG_HAS_SLOT_ARG) === 0) {
+                // Skip non-interesting opcodes to make compilation faster.
+                continue;
+            }
+            $args = Op::$args[$op];
+            $arg_shift = 8;
+            $new_opdata = $opdata;
+            foreach ($args as $a) {
+                if ($a == OpInfo::ARG_SLOT) {
+                    $orig_slot = ($opdata >> $arg_shift) & 0xff;
+                    $new_slot = $orig_slot + $num_cache_slots;
+                    $arg_mask = 0xff << $arg_shift;
+                    $new_opdata = ($new_opdata & (~$arg_mask)) | ($new_slot << $arg_shift);
+                }
+                $arg_shift += 8;
+            }
+            $this->result->code[$pc] = $new_opdata;
+        }
     }
 
     private function linkJumps() {
