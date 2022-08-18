@@ -10,7 +10,6 @@
 * filesystem bytecode cache
 * float literals, values and constants
 * optimize builtin filters, like length
-* filter chaining support
 * filter2 support
 * builtin functions
 * custom functions
