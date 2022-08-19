@@ -10,6 +10,5 @@
 * filesystem bytecode cache
 * float literals, values and constants
 * builtin functions
-* custom functions
 * output escaping settings
 * macros system

@@ -286,6 +286,12 @@ class Renderer {
             case Op::ADD_SLOT0:
                 $slot0 = $state->slots[($opdata >> 8) & 0xff] + $state->slots[($opdata >> 16) & 0xff];
                 break;
+            case Op::SUB:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] - $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::SUB_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] - $state->slots[($opdata >> 16) & 0xff];
+                break;
             case Op::MUL:
                 $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] * $state->slots[($opdata >> 24) & 0xff];
                 break;
@@ -318,6 +324,58 @@ class Renderer {
                 $filter_id = ($opdata >> 24) & 0xffff;
                 $filter2 = $env->filters2[$filter_id];
                 $slot0 = $filter2($arg1, $arg2);
+                break;
+            case Op::CALL_FUNC0:
+                $func_id = ($opdata >> 16) & 0xffff;
+                $func0 = $env->funcs0[$func_id];
+                $state->slots[($opdata >> 8) & 0xff] = $func0();
+                break;
+            case Op::CALL_SLOT0_FUNC0:
+                $func_id = ($opdata >> 8) & 0xffff;
+                $func0 = $env->funcs0[$func_id];
+                $slot0 = $func0();
+                break;
+            case Op::CALL_FUNC1:
+                $arg1 = $state->slots[($opdata >> 16) & 0xff];
+                $func_id = ($opdata >> 24) & 0xffff;
+                $func1 = $env->funcs1[$func_id];
+                $state->slots[($opdata >> 8) & 0xff] = $func1($arg1);
+                break;
+            case Op::CALL_SLOT0_FUNC1:
+                $arg1 = $state->slots[($opdata >> 8) & 0xff];
+                $func_id = ($opdata >> 16) & 0xffff;
+                $func1 = $env->funcs1[$func_id];
+                $slot0 = $func1($arg1);
+                break;
+            case Op::CALL_FUNC2:
+                $arg1 = $state->slots[($opdata >> 16) & 0xff];
+                $arg2 = $state->slots[($opdata >> 24) & 0xff];
+                $func_id = ($opdata >> 32) & 0xffff;
+                $func2 = $env->funcs2[$func_id];
+                $state->slots[($opdata >> 8) & 0xff] = $func2($arg1, $arg2);
+                break;
+            case Op::CALL_SLOT0_FUNC2:
+                $arg1 = $state->slots[($opdata >> 8) & 0xff];
+                $arg2 = $state->slots[($opdata >> 16) & 0xff];
+                $func_id = ($opdata >> 24) & 0xffff;
+                $func2 = $env->funcs2[$func_id];
+                $slot0 = $func2($arg1, $arg2);
+                break;
+            case Op::CALL_FUNC3:
+                $arg1 = $state->slots[($opdata >> 16) & 0xff];
+                $arg2 = $state->slots[($opdata >> 24) & 0xff];
+                $arg3 = $state->slots[($opdata >> 32) & 0xff];
+                $func_id = ($opdata >> 40) & 0xffff;
+                $func3 = $env->funcs3[$func_id];
+                $state->slots[($opdata >> 8) & 0xff] = $func3($arg1, $arg2, $arg3);
+                break;
+            case Op::CALL_SLOT0_FUNC3:
+                $arg1 = $state->slots[($opdata >> 8) & 0xff];
+                $arg2 = $state->slots[($opdata >> 16) & 0xff];
+                $arg3 = $state->slots[($opdata >> 24) & 0xff];
+                $func_id = ($opdata >> 32) & 0xffff;
+                $func3 = $env->funcs3[$func_id];
+                $slot0 = $func3($arg1, $arg2, $arg3);
                 break;
             case Op::LENGTH_FILTER:
                 $arg = $state->slots[($opdata >> 16) & 0xff];

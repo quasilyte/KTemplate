@@ -30,6 +30,11 @@ class End2EndTest extends TestCase {
 
         $env->registerFilter2('add', function ($x, $delta) { return $x + $delta; });
 
+        $env->registerFunction0('zero', function () { return 0; });
+        $env->registerFunction1('abs', function ($x) { return abs($x); });
+        $env->registerFunction2('fmt', function ($format, $x) { return sprintf($format, $x); });
+        $env->registerFunction3('concat3', function ($s1, $s2, $s3) { return "$s1$s2$s3"; });
+
         $compiler = new Compiler();
         $renderer = new Renderer();
         $data_provider = new SimpleTestDataProvider();

@@ -118,6 +118,36 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
 
+            // Funcs.
+            '{{ testfunc0() }}' => [
+                '  CALL_SLOT0_FUNC0 *slot0 testfunc0',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ testfunc1(testfunc0()) }}' => [
+                '  CALL_FUNC0 slot1 testfunc0',
+                '  CALL_SLOT0_FUNC1 *slot0 slot1 testfunc1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ testfunc3(1, 2, 3) }}' => [
+                '  LOAD_INT_CONST slot1 1',
+                '  LOAD_INT_CONST slot2 2',
+                '  LOAD_INT_CONST slot3 3',
+                '  CALL_SLOT0_FUNC3 *slot0 slot1 slot2 slot3 testfunc3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ testfunc1(testfunc3(1, 2, 3)) }}' => [
+                '  LOAD_INT_CONST slot2 1',
+                '  LOAD_INT_CONST slot3 2',
+                '  LOAD_INT_CONST slot4 3',
+                '  CALL_FUNC3 slot1 slot2 slot3 slot4 testfunc3',
+                '  CALL_SLOT0_FUNC1 *slot0 slot1 testfunc1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
             // Filters.
             '{{ s|strlen }}' => [
                 '  LOAD_EXTDATA_1 slot2 slot1 s',
@@ -265,6 +295,10 @@ class CompilerTest extends TestCase {
         $env->registerFilter1('add1', function ($x) { return $x + 1; });
         $env->registerFilter1('sub1', function ($x) { return $x - 1; });
         $env->registerFilter2('default', function ($x, $or_else) { return $x ?? $or_else; });
+        $env->registerFunction0('testfunc0', function () { return 10; });
+        $env->registerFunction1('testfunc1', function ($x) { return $x; });
+        $env->registerFunction2('testfunc2', function ($x, $y) { return $x + $y; });
+        $env->registerFunction3('testfunc3', function ($x, $y, $z) { return $x + $y + $z; });
         foreach ($tests as $input => $want) {
             $t = self::$compiler->compile($env, 'test', (string)$input);
             $have = Disasm::getBytecode($env, $t);
@@ -272,7 +306,7 @@ class CompilerTest extends TestCase {
             foreach ($have as $s) {
                 $have_pretty[] = "'$s',";
             }
-            $this->assertEquals($have, $want, "input=$input\n" . implode("\n", $have_pretty));
+            $this->assertEquals($want, $have, "input=$input\n" . implode("\n", $have_pretty));
         }
     }
 }

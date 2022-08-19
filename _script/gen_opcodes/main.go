@@ -60,6 +60,14 @@ var rawOpcodes = []opcodeTemplate{
 	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid"},
 	{"CALL_FILTER2", "op dst:wslot arg1:rslot arg2:rslot fn:filterid"},
 	{"CALL_SLOT0_FILTER2", "op *slot0 arg1:rslot arg2:rslot fn:filterid"},
+	{"CALL_FUNC0", "op dst:wslot fn:funcid"},
+	{"CALL_SLOT0_FUNC0", "op *slot0 fn:funcid"},
+	{"CALL_FUNC1", "op dst:wslot arg1:rslot fn:funcid"},
+	{"CALL_SLOT0_FUNC1", "op *slot0 arg1:rslot fn:funcid"},
+	{"CALL_FUNC2", "op dst:wslot arg1:rslot arg2:rslot fn:funcid"},
+	{"CALL_SLOT0_FUNC2", "op *slot0 arg1:rslot arg2:rslot fn:funcid"},
+	{"CALL_FUNC3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid"},
+	{"CALL_SLOT0_FUNC3", "op *slot0 arg1:rslot arg2:rslot arg3:rslot fn:funcid"},
 	{"LENGTH_FILTER", "op dst:wslot arg1:rslot"},
 	{"LENGTH_SLOT0_FILTER", "op dst:wslot arg1:rslot"},
 
@@ -78,6 +86,8 @@ var rawOpcodes = []opcodeTemplate{
 	{"NOT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 	{"ADD", "op dst:wslot arg1:rslot arg2:rslot"},
 	{"ADD_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
+	{"SUB", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"SUB_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 	{"MUL", "op dst:wslot arg1:rslot arg2:rslot"},
 	{"MUL_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 }
@@ -125,6 +135,8 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 			arg.Kind = "OpInfo::ARG_IMM8"
 		case "filterid":
 			arg.Kind = "OpInfo::ARG_FILTER_ID"
+		case "funcid":
+			arg.Kind = "OpInfo::ARG_FUNC_ID"
 		default:
 			panic(fmt.Sprintf("%s: unexpected %s arg kind", data.name, kind))
 		}

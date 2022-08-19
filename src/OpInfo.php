@@ -11,6 +11,7 @@ class OpInfo {
     public const ARG_KEY_OFFSET = 5;
     public const ARG_CACHE_SLOT = 6;
     public const ARG_FILTER_ID = 7;
+    public const ARG_FUNC_ID = 8;
 
     public const FLAG_IMPLICIT_SLOT0 = 1 << 0;
     public const FLAG_HAS_SLOT_ARG = 1 << 1;
@@ -22,6 +23,7 @@ class OpInfo {
     public static function argSize($arg) {
         switch ($arg) {
         case self::ARG_FILTER_ID:
+        case self::ARG_FUNC_ID:
             return 2;
         default:
             return 1;
@@ -34,12 +36,26 @@ class OpInfo {
      */
     public static function callArity($op) {
         switch ($op) {
+        case Op::CALL_FUNC0:
+        case Op::CALL_SLOT0_FUNC0:
+            return 0;
+
         case Op::CALL_FILTER1:
         case Op::CALL_SLOT0_FILTER1:
+        case Op::CALL_FUNC1:
+        case Op::CALL_SLOT0_FUNC1:
             return 1;
+
         case Op::CALL_FILTER2:
         case Op::CALL_SLOT0_FILTER2:
+        case Op::CALL_FUNC2:
+        case Op::CALL_SLOT0_FUNC2:
             return 2;
+
+        case Op::CALL_FUNC3:
+        case Op::CALL_SLOT0_FUNC3:
+            return 3;
+
         default:
             return -1;
         }

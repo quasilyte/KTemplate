@@ -81,6 +81,46 @@ class Env {
 
     /**
      * @param string $name
+     * @param int $arity
+     * @return int
+     */
+    public function getFunctionID($name, $arity) {
+        switch ($arity) {
+        case 0:
+            return $this->func0_id_by_name[$name] ?? -1;
+        case 1:
+            return $this->func1_id_by_name[$name] ?? -1;
+        case 2:
+            return $this->func2_id_by_name[$name] ?? -1;
+        case 3:
+            return $this->func3_id_by_name[$name] ?? -1;
+        default:
+            return -1;
+        }
+    }
+
+    /**
+     * @param int $id
+     * @param int $arity
+     * @return string
+     */
+    public function getFunctionName($id, $arity) {
+        switch ($arity) {
+            case 0:
+                return (string)array_search($id, $this->func0_id_by_name);
+            case 1:
+                return (string)array_search($id, $this->func1_id_by_name);
+            case 2:
+                return (string)array_search($id, $this->func2_id_by_name);
+            case 3:
+                return (string)array_search($id, $this->func3_id_by_name);
+            default:
+                return '';
+            }
+    }
+
+    /**
+     * @param string $name
      * @param callable(mixed):mixed $fn
      */
     public function registerFilter1($name, $fn) {
@@ -101,33 +141,33 @@ class Env {
 
     /**
      * @param int $id
+     * @param int $arity
      * @return string
      */
-    public function getFilter1Name($id) {
-        return (string)array_search($id, $this->filter1_id_by_name);
-    }
-
-    /**
-     * @param int $id
-     * @return string
-     */
-    public function getFilter2Name($id) {
-        return (string)array_search($id, $this->filter2_id_by_name);
+    public function getFilterName($id, $arity) {
+        switch ($arity) {
+        case 1:
+            return (string)array_search($id, $this->filter1_id_by_name);
+        case 2:
+            return (string)array_search($id, $this->filter2_id_by_name);
+        default:
+            return '';
+        }
     }
 
     /**
      * @param string $name
+     * @param int $arity
      * @return int
      */
-    public function getFilter1ID($name) {
-        return $this->filter1_id_by_name[$name] ?? -1;
-    }
-
-    /**
-     * @param string $name
-     * @return int
-     */
-    public function getFilter2ID($name) {
-        return $this->filter2_id_by_name[$name] ?? -1;
+    public function getFilterID($name, $arity) {
+        switch ($arity) {
+        case 1:
+            return $this->filter1_id_by_name[$name] ?? -1;
+        case 2:
+            return $this->filter2_id_by_name[$name] ?? -1;
+        default:
+            return -1;
+        }
     }
 }

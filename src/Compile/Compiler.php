@@ -347,6 +347,9 @@ class Compiler {
         case Expr::ADD:
             $this->compileBinaryExpr($dst, Op::ADD, $e);
             return;
+        case Expr::SUB:
+            $this->compileBinaryExpr($dst, Op::SUB, $e);
+            return;
         case Expr::MUL:
             $this->compileBinaryExpr($dst, Op::MUL, $e);
             return;
@@ -383,6 +386,10 @@ class Compiler {
             }
             return;
 
+        case Expr::CALL:
+            $this->compileCall($dst, $e);
+            return;
+
         case Expr::FILTER:
             if ($this->parser->getExprMember($e, 1)->kind === Expr::IDENT) {
                 $this->compileFilter1($dst, $e);
@@ -398,6 +405,63 @@ class Compiler {
         $this->failExpr($e, "compile expr: unexpected $e->kind");
     }
 
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
+    private function compileCall($dst, $e) {
+        // Parser should take care of that already.
+        // We have opcodes for CALL0, CALL1, CALL2, CALL3 and that's it.
+        Assert::true($e->value >= 0 && $e->value <= 3, 'unexpected call args count');
+
+        $fn_ident = $this->parser->getExprMember($e, 0);
+        $func_id = $this->env->getFunctionID((string)$fn_ident->value, (int)$e->value);
+        if ($func_id === -1) {
+            $this->failExpr($fn_ident, "$fn_ident->value function is not defined");
+        }
+
+        switch ($e->value) {
+        case 0:
+            if ($dst === 0) {
+                $this->emitCall0(Op::CALL_SLOT0_FUNC0, $func_id);
+            } else {
+                $this->emitCall1(Op::CALL_FUNC0, $dst, $func_id);
+            }
+            break;
+        case 1:
+            $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
+            if ($dst === 0) {
+                $this->emitCall1(Op::CALL_SLOT0_FUNC1, $arg1_slot, $func_id);
+            } else {
+                $this->emitCall2(Op::CALL_FUNC1, $dst, $arg1_slot, $func_id);
+            }
+            break;
+        case 2:
+            $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
+            $arg2_slot = $this->compileTempExpr($this->parser->getExprMember($e, 2));
+            if ($dst === 0) {
+                $this->emitCall2(Op::CALL_SLOT0_FUNC2, $arg1_slot, $arg2_slot, $func_id);
+            } else {
+                $this->emitCall3(Op::CALL_FUNC2, $dst, $arg1_slot, $arg2_slot, $func_id);
+            }
+            break;
+        case 3:
+            $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
+            $arg2_slot = $this->compileTempExpr($this->parser->getExprMember($e, 2));
+            $arg3_slot = $this->compileTempExpr($this->parser->getExprMember($e, 3));
+            if ($dst === 0) {
+                $this->emitCall3(Op::CALL_SLOT0_FUNC3, $arg1_slot, $arg2_slot, $arg3_slot, $func_id);
+            } else {
+                $this->emitCall4(Op::CALL_FUNC3, $dst, $arg1_slot, $arg2_slot, $arg3_slot, $func_id);
+            }
+            break;
+        }
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
     private function compileFilter2($dst, $e) {
         $rhs = $this->parser->getExprMember($e, 1);
         if ($rhs->value > 1) {
@@ -406,7 +470,7 @@ class Compiler {
         $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
         $arg2_slot = $this->compileTempExpr($this->parser->getExprMember($rhs, 1));
         $filter_name = (string)$this->parser->getExprMember($rhs, 0)->value;
-        $filter_id = $this->env->getFilter2ID($filter_name);
+        $filter_id = $this->env->getFilterID($filter_name, 2);
         if ($filter_id === -1) {
             $this->failExpr($this->parser->getExprMember($rhs, 0), "$filter_name filter is not defined");
         }
@@ -424,7 +488,7 @@ class Compiler {
     private function compileFilter1($dst, $e) {
         $rhs = $this->parser->getExprMember($e, 1);
         $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
-        $filter_id = $this->env->getFilter1ID((string)$rhs->value);
+        $filter_id = $this->env->getFilterID((string)$rhs->value, 1);
         if ($filter_id === -1) {
             if ($rhs->value === 'length') {
                 if ($dst === 0) {
@@ -509,6 +573,14 @@ class Compiler {
 
     /**
      * @param int $op
+     * @param int $func_id - 16bit
+     */
+    private function emitCall0($op, $func_id) {
+        $this->result->code[] = $op | ($func_id << 8);
+    }
+
+    /**
+     * @param int $op
      * @param int $arg1
      * @param int $func_id - 16bit
      */
@@ -535,6 +607,18 @@ class Compiler {
      */
     private function emitCall3($op, $arg1, $arg2, $arg3, $func_id) {
         $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($func_id << 32);
+    }
+
+    /**
+     * @param int $op
+     * @param int $arg1
+     * @param int $arg2
+     * @param int $arg3
+     * @param int $arg4
+     * @param int $func_id - 16bit
+     */
+    private function emitCall4($op, $arg1, $arg2, $arg3, $arg4, $func_id) {
+        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32) | ($func_id << 40);
     }
 
     /**

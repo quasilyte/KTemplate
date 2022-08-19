@@ -68,17 +68,11 @@ class Disasm {
                 case OpInfo::ARG_IMM8:
                     $parts[] = "\$$v";
                     break;
+                case OpInfo::ARG_FUNC_ID:
+                    $parts[] = $env->getFunctionName($v, OpInfo::callArity($op));
+                    break;
                 case OpInfo::ARG_FILTER_ID:
-                    $filter_name = '';
-                    switch (OpInfo::callArity($op)) {
-                    case 1:
-                        $filter_name = $env->getFilter1Name($v);
-                        break;
-                    case 2:
-                        $filter_name = $env->getFilter2Name($v);
-                        break;
-                    }
-                    $parts[] = $filter_name;
+                    $parts[] = $env->getFilterName($v, OpInfo::callArity($op));
                     break;
                 case OpInfo::ARG_KEY_OFFSET:
                     $part = '';
