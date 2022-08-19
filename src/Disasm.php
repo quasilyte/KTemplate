@@ -70,9 +70,12 @@ class Disasm {
                     break;
                 case OpInfo::ARG_FILTER_ID:
                     $filter_name = '';
-                    switch (OpInfo::filterArity($op)) {
+                    switch (OpInfo::callArity($op)) {
                     case 1:
                         $filter_name = $env->getFilter1Name($v);
+                        break;
+                    case 2:
+                        $filter_name = $env->getFilter2Name($v);
                         break;
                     }
                     $parts[] = $filter_name;

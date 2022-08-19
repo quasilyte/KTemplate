@@ -47,3 +47,6 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ test_name|strlen|add1 }}
 {{ 'aaaa'|length }}
 {{ x.y|length }}
+{{ $i1|add(1) }}
+{{ 1|add(10)|add1 }}
+{{ $i1|add($i2) }}

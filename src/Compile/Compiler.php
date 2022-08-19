@@ -383,31 +383,64 @@ class Compiler {
             }
             return;
 
-        case Expr::FILTER1:
-            $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
-            $rhs = $this->parser->getExprMember($e, 1);
-            Assert::true($rhs->kind === Expr::IDENT, 'filter1 rhs is not identifier');
-            $filter_id = $this->env->getFilter1ID((string)$rhs->value);
-            if ($filter_id === -1) {
-                if ($rhs->value === 'length') {
-                    if ($dst === 0) {
-                        $this->emit1(Op::LENGTH_SLOT0_FILTER, $arg1_slot);
-                    } else {
-                        $this->emit2(Op::LENGTH_FILTER, $dst, $arg1_slot);
-                    }
-                    return;
-                }
-                $this->failExpr($rhs, "$rhs->value filter is not defined");
+        case Expr::FILTER:
+            if ($this->parser->getExprMember($e, 1)->kind === Expr::IDENT) {
+                $this->compileFilter1($dst, $e);
+                return;
             }
-            if ($dst === 0) {
-                $this->emitCall1(Op::CALL_SLOT0_FILTER1, $arg1_slot, $filter_id);
-            } else {
-                $this->emitCall2(Op::CALL_FILTER1, $dst, $arg1_slot, $filter_id);
+            if ($this->parser->getExprMember($e, 1)->kind === Expr::CALL) {
+                $this->compileFilter2($dst, $e);
+                return;
             }
-            return;
+            $this->failExpr($e, 'compile expr: invalid filter, expected a call or ident');
         }
     
         $this->failExpr($e, "compile expr: unexpected $e->kind");
+    }
+
+    private function compileFilter2($dst, $e) {
+        $rhs = $this->parser->getExprMember($e, 1);
+        if ($rhs->value > 1) {
+            $this->failExpr($e, 'too many arguments for a filter');
+        }
+        $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
+        $arg2_slot = $this->compileTempExpr($this->parser->getExprMember($rhs, 1));
+        $filter_name = (string)$this->parser->getExprMember($rhs, 0)->value;
+        $filter_id = $this->env->getFilter2ID($filter_name);
+        if ($filter_id === -1) {
+            $this->failExpr($this->parser->getExprMember($rhs, 0), "$filter_name filter is not defined");
+        }
+        if ($dst === 0) {
+            $this->emitCall2(Op::CALL_SLOT0_FILTER2, $arg1_slot, $arg2_slot, $filter_id);
+        } else {
+            $this->emitCall3(Op::CALL_FILTER2, $dst, $arg1_slot, $arg2_slot, $filter_id);
+        }
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
+    private function compileFilter1($dst, $e) {
+        $rhs = $this->parser->getExprMember($e, 1);
+        $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
+        $filter_id = $this->env->getFilter1ID((string)$rhs->value);
+        if ($filter_id === -1) {
+            if ($rhs->value === 'length') {
+                if ($dst === 0) {
+                    $this->emit1(Op::LENGTH_SLOT0_FILTER, $arg1_slot);
+                } else {
+                    $this->emit2(Op::LENGTH_FILTER, $dst, $arg1_slot);
+                }
+                return;
+            }
+            $this->failExpr($rhs, "$rhs->value filter is not defined");
+        }
+        if ($dst === 0) {
+            $this->emitCall1(Op::CALL_SLOT0_FILTER1, $arg1_slot, $filter_id);
+        } else {
+            $this->emitCall2(Op::CALL_FILTER1, $dst, $arg1_slot, $filter_id);
+        }
     }
 
     /**
@@ -491,6 +524,17 @@ class Compiler {
      */
     private function emitCall2($op, $arg1, $arg2, $func_id) {
         $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($func_id << 24);
+    }
+
+    /**
+     * @param int $op
+     * @param int $arg1
+     * @param int $arg2
+     * @param int $arg3
+     * @param int $func_id - 16bit
+     */
+    private function emitCall3($op, $arg1, $arg2, $arg3, $func_id) {
+        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($func_id << 32);
     }
 
     /**

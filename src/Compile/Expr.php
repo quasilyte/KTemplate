@@ -26,7 +26,7 @@ class Expr {
     public const DOT_ACCESS = 20;
     public const DOLLAR_IDENT = 21;
     public const NULL_LIT = 22;
-    public const FILTER1 = 23;
+    public const FILTER = 23;
     public const CALL = 24;
 
     /** @var int */

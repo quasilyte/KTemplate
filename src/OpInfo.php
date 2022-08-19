@@ -32,11 +32,14 @@ class OpInfo {
      * @param int $op
      * @return int
      */
-    public static function filterArity($op) {
+    public static function callArity($op) {
         switch ($op) {
         case Op::CALL_FILTER1:
         case Op::CALL_SLOT0_FILTER1:
             return 1;
+        case Op::CALL_FILTER2:
+        case Op::CALL_SLOT0_FILTER2:
+            return 2;
         default:
             return -1;
         }
