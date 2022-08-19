@@ -14,6 +14,7 @@ class BenchmarkRenderer {
     private $var_access1_x10_template;
     private $var_access1_x100_template;
     private $length_template;
+    private $slot0_template;
 
     /** @var Env */
     private $env;
@@ -48,6 +49,11 @@ class BenchmarkRenderer {
         $this->var_access1_x100_template = $c->compile($env, 'test', $var_access1_src);
 
         $this->length_template = $c->compile($env, 'test', '{% let $s = "" %}{{ $s|length }}{{ $s|length }}{{ $s|length }}{{ $s|length }}');
+        $this->slot0_template = $c->compile($env, 'test', '{{null}}{{null}}{{null}}{{null}}');
+    }
+
+    public function benchmarkSlot0() {
+        return $this->renderer->render($this->env, $this->slot0_template, $this->array_data_provider);
     }
 
     public function benchmarkLength() {

@@ -228,6 +228,12 @@ class CompilerTest extends TestCase {
                 'L1:',
                 '  RETURN',
             ],
+
+            '{{ null }}' => [
+                '  LOAD_SLOT0_NULL',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
         ];
 
         $env = new Env();
