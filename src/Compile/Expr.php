@@ -27,20 +27,18 @@ class Expr {
     public const DOLLAR_IDENT = 21;
     public const NULL_LIT = 22;
     public const FILTER1 = 23;
+    public const CALL = 24;
 
     /** @var int */
     public $kind = 0;
     /** @var mixed */
     public $value;
     /** @var int */
-    public $num_members = 0;
-    /** @var int */
     public $members_offset = 0;
 
     public function assign(Expr $other) {
         $this->kind = $other->kind;
         $this->value = $other->value;
-        $this->num_members = $other->num_members;
         $this->members_offset = $other->members_offset;
     }
 }

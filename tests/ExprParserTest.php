@@ -29,6 +29,21 @@ class ExprParserTest extends TestCase {
         case Expr::INT_LIT:
             return (string)$e->value;
 
+        case Expr::BAD:
+            return '(bad `' . $e->value . '`)';
+
+        case Expr::CALL:
+            $num_args = (int)$e->value;
+            $fn = self::formatExpr($p, $p->getExprMember($e, 0));
+            if ($num_args === 0) {
+                return "(call $fn)";
+            }
+            $args = [];
+            for ($i = 0; $i < $num_args; $i++) {
+                $args[] = self::formatExpr($p, $p->getExprMember($e, $i + 1));
+            }
+            return '(call ' . $fn . ' ' . implode(' ', $args) . ')';
+
         case Expr::FILTER1:
             return self::formatBinaryExpr($p, $e, '|');
         case Expr::DOT_ACCESS:
@@ -111,6 +126,14 @@ class ExprParserTest extends TestCase {
             ['a|b|c|d', '(| (| (| a b) c) d)', 7],
             ['x+1|add1', '(+ x (| 1 add1))', 5],
             ['(x+1)|add1', '(| (+ x 1) add1)', 5],
+
+            ['f()', '(call f)', 2],
+            ['f(1)', '(call f 1)', 5],
+            ['f(1, 2)', '(call f 1 2)', 5],
+            ['f(1, 2, 3)', '(call f 1 2 3)', 5],
+            ['f(g(1, 2), 3, 4)', '(call f (call g 1 2) 3 4)', 9],
+            ['f(1, g(2), g(3, 4, 5))', '(call f 1 (call g 2) (call g 3 4 5))', 13],
+            ['f1(f2(f3()))', '(call f1 (call f2 (call f3)))', 10],
         ];
         $lexer = new Lexer();
         $p = new ExprParser();

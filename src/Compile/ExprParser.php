@@ -14,7 +14,7 @@ class ExprParser {
     private $tmp;
 
     public function __construct() {
-        $this->growPool(10);
+        $this->growPool(16);
         $this->tmp = new Expr();
     }
 
@@ -93,6 +93,9 @@ class ExprParser {
         case Token::IDENT:
             $left->kind = Expr::IDENT;
             $left->value = $lexer->tokenText($tok);
+            if ($lexer->consume(Token::LPAREN)) {
+                $this->parseCallExpr($left);
+            }
             break;
         case Token::INT_LIT:
             $left->kind = Expr::INT_LIT;
@@ -178,6 +181,43 @@ class ExprParser {
         }
 
         return $left;
+    }
+
+    /**
+     * @param Expr $left
+     */
+    private function parseCallExpr($left) {
+        $this->tmp->assign($left);
+        $left->kind = Expr::CALL;
+        $left->value = 0; // Number of arguments
+        if ($this->lexer->consume(Token::RPAREN)) {
+            // A small optimization: we can allocate exactly 1 member
+            // for empty argument list.
+            $this->allocateExprMembers($left, 1);
+            $this->getExprMember($left, 0);
+            $this->getExprMember($left, 0)->assign($this->tmp);
+            return;
+        }
+        $max_call_args = 3;
+        $this->allocateExprMembers($left, 1 + $max_call_args);
+        $this->getExprMember($left, 0)->assign($this->tmp);
+        $this->parseExpr($this->getExprMember($left, 1), 0);
+        $left->value++;
+        while (true) {
+            if (!$this->lexer->consume(Token::COMMA)) {
+                break;
+            }
+            if ($left->value >= $max_call_args) {
+                $this->setError($left, "call expr is limited to $max_call_args arguments");
+                return;
+            }
+            $this->parseExpr($this->getExprMember($left, (int)$left->value + 1), 0);
+            $left->value++;
+        }
+        if (!$this->lexer->consume(Token::RPAREN)) {
+            $tok = $this->lexer->peek();
+            $this->setError($left, 'expected ) to close a call expr argument list, found ' . Token::prettyKindString($tok->kind));
+        }
     }
 
     private function parseUnaryExpr(Expr $left, int $kind, int $prec) {

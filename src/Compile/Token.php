@@ -49,6 +49,7 @@ class Token {
     public const KEYWORD_NULL = 43;
     public const STRING_LIT_Q2 = 44;
     public const PIPE = 45; // |
+    public const COMMA = 46; // ,
 
     public $kind = 0;
     public $pos_from = 0;
@@ -125,6 +126,8 @@ class Token {
             return '>=';
         case self::PIPE:
             return '|';
+        case self::COMMA:
+            return ',';
         default:
             return strtolower(self::kindString($kind));
         }
@@ -224,6 +227,8 @@ class Token {
             return 'NULL';
         case self::PIPE:
             return 'PIPE';
+        case self::COMMA:
+            return 'COMMA';
         default:
             return '<?>';
         }
