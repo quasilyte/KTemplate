@@ -15,6 +15,12 @@ class CompilerTest extends TestCase {
 
     public function testCompile() {
         $tests = [
+            // Numeric constants.
+            '{{ -1 }}' => [
+                '  OUTPUT_INT_CONST -1',
+                '  RETURN',
+            ],
+
             // Local variables.
             '{% let $s = "abc" %}{{ $s }}' => [
                 '  LOAD_STRING_CONST slot1 `abc`',
@@ -104,6 +110,20 @@ class CompilerTest extends TestCase {
                 '  LOAD_BOOL slot1 $1',
                 '  NOT slot2 slot1',
                 '  NOT_SLOT0 *slot0 slot2',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ -x }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  NEG_SLOT0 *slot0 slot2',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ -x - 10 }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  NEG slot2 slot3',
+                '  LOAD_INT_CONST slot4 10',
+                '  SUB_SLOT0 *slot0 slot2 slot4',
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
@@ -286,6 +306,16 @@ class CompilerTest extends TestCase {
             '{{ null }}' => [
                 '  LOAD_SLOT0_NULL',
                 '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
+            // Const folding.
+            '{{ -(-1) }}' => [
+                '  OUTPUT_INT_CONST 1',
+                '  RETURN',
+            ],
+            '{{ "a" ~ "b" }}' => [
+                '  OUTPUT_STRING_CONST `ab`',
                 '  RETURN',
             ],
         ];

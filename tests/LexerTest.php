@@ -69,6 +69,12 @@ class LexerTest extends TestCase {
                 ['CONTROL_START', 'ELSEIF', 'CONTROL_END'],
             ],
 
+            // Numeric literals.
+            [
+                '{{ -1 }}',
+                ['ECHO_START', 'INT_LIT(-1)', 'ECHO_END'],
+            ],
+
             // String literals.
             [
                 '{{ "" }}',

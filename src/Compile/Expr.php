@@ -28,6 +28,7 @@ class Expr {
     public const NULL_LIT = 22;
     public const FILTER = 23;
     public const CALL = 24;
+    public const NEG = 25;
 
     /** @var int */
     public $kind = 0;

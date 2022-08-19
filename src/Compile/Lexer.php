@@ -168,6 +168,10 @@ class Lexer {
                 $this->acceptSimpleToken($dst, Token::PLUS, 1);
                 return;
             case ord('-'):
+                if (self::isDigitChar($this->peekChar(1))) {
+                    $this->scanNumberInto($dst, true);
+                    return;
+                }
                 $this->acceptSimpleToken($dst, Token::MINUS, 1);
                 return;
             case ord('*'):
@@ -308,10 +312,17 @@ class Lexer {
         $dst->pos_to = $this->pos;
     }
 
-    private function scanNumberInto(Token $dst) {
+    /**
+     * @param Token $dst
+     * @param bool $minus
+     */
+    private function scanNumberInto($dst, $minus = false) {
         $dst->kind = Token::INT_LIT;
         $dst->pos_from = $this->pos;
         $this->pos++;
+        if ($minus) {
+            $this->pos++;   
+        }
         while ($this->pos < $this->src_len && self::isDigitChar(ord($this->src[$this->pos]))) {
             $this->pos++;
         }

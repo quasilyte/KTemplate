@@ -328,6 +328,9 @@ class Compiler {
         case Expr::NOT:
             $this->compileUnaryExpr($dst, Op::NOT, $e);
             return;
+        case Expr::NEG:
+            $this->compileUnaryExpr($dst, Op::NEG, $e);
+            return;
 
         case Expr::CONCAT:
             $this->compileBinaryExpr($dst, Op::CONCAT, $e);

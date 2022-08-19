@@ -121,6 +121,9 @@ class ExprParser {
         case Token::KEYWORD_NOT:
             $this->parseUnaryExpr($left, Expr::NOT, $this->unaryPrecedence(Token::KEYWORD_NOT));
             break;
+        case Token::MINUS:
+            $this->parseUnaryExpr($left, Expr::NEG, $this->unaryPrecedence(Token::MINUS));
+            break;
         default:
             $this->setError($left, 'unexpected token ' . Token::prettyKindString($tok->kind));
         }

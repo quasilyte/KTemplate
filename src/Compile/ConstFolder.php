@@ -23,7 +23,24 @@ class ConstFolder {
             return $e->value;
         case Expr::STRING_LIT:
             return $e->value;
+        
+        case Expr::NEG:
+            $arg = self::fold($this->getExprMember($e, 0));
+            if (!is_numeric($arg)) {
+                return null;
+            }
+            return -$arg;
 
+        case Expr::CONCAT:
+            $lhs = self::fold($this->getExprMember($e, 0));
+            if (!is_string($lhs)) {
+                return null;
+            }
+            $rhs = self::fold($this->getExprMember($e, 1));
+            if (!is_string($rhs)) {
+                return null;
+            }
+            return $lhs . $rhs;
         case Expr::ADD:
             $lhs = self::fold($this->getExprMember($e, 0));
             if (!is_numeric($lhs)) {
@@ -34,6 +51,16 @@ class ConstFolder {
                 return null;
             }
             return $lhs + $rhs;
+        case Expr::SUB:
+            $lhs = self::fold($this->getExprMember($e, 0));
+            if (!is_numeric($lhs)) {
+                return null;
+            }
+            $rhs = self::fold($this->getExprMember($e, 1));
+            if (!is_numeric($rhs)) {
+                return null;
+            }
+            return $lhs - $rhs;
 
         default:
             return null;

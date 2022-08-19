@@ -73,6 +73,8 @@ var rawOpcodes = []opcodeTemplate{
 
 	{"NOT", "op dst:wslot arg:rslot"},
 	{"NOT_SLOT0", "op *slot0 arg:rslot"},
+	{"NEG", "op dst:wslot arg:rslot"},
+	{"NEG_SLOT0", "op *slot0 arg:rslot"},
 
 	{"CONCAT", "op dst:wslot arg1:rslot arg2:rslot"},
 	{"CONCAT_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
