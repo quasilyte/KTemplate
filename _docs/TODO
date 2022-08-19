@@ -11,3 +11,4 @@
 * builtin functions
 * output escaping settings
 * macros system
+* compile errors for long jumps/too many consts and vars, etc
