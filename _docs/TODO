@@ -6,7 +6,6 @@
 * adjusting frame size for the template
 * nested/partial templates
 * full double quote strings support
-* template serialization/deserialization
 * filesystem bytecode cache
 * float literals, values and constants
 * builtin functions
