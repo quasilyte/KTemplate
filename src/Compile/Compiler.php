@@ -294,9 +294,92 @@ class Compiler {
 
     /**
      * @param int $dst
+     * @param string $value
+     */
+    private function compileStringConst($dst, $value) {
+        if ($dst === 0) {
+            $this->emit1(Op::LOAD_SLOT0_STRING_CONST, $this->internString($value));
+        } else {
+            $this->emit2(Op::LOAD_STRING_CONST, $dst, $this->internString($value));
+        }
+    }
+
+    /**
+     * @param int $dst
+     * @param int $value
+     */
+    private function compileIntConst($dst, $value) {
+        if ($dst === 0) {
+            $this->emit1(Op::LOAD_SLOT0_INT_CONST, $this->internInt($value));
+        } else {
+            $this->emit2(Op::LOAD_INT_CONST, $dst, $this->internInt($value));
+        }
+    }
+
+    /**
+     * @param Expr $e
+     * @return bool
+     */
+    private function isAdditiveBinaryExpr($e) {
+        switch ($e->kind) {
+        case Expr::CONCAT:
+        case Expr::ADD:
+        case Expr::MUL:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    /**
+     * @param int $dst
      * @param Expr $e
      */
     private function compileExpr($dst, $e) {
+        // First try to constant-fold the expression.
+        $const_value = $this->const_folder->fold($e);
+        if (is_int($const_value)) {
+            $this->compileIntConst($dst, (int)$const_value);
+            return;
+        }
+        if (is_string($const_value)) {
+            $this->compileStringConst($dst, (string)$const_value);
+            return;
+        }
+        // Binary expressions are parsed like this:
+        // `x + 1 + 2` => `(+ (+ x 1) 2)`
+        // The const folder won't be able to fold this expression.
+        // To fix that, we try to see whether we can do a partial
+        // const folding.
+        // If we fold `(+ 1 2)` separately, we'll get `(+ x 3)`.
+        // This approach is not perfect as it won't fold the expression entirely.
+        // We may want to do something more generic in the future.
+        // Also, checking for the same $kind is usually excessive as it
+        // limits the folding to the same operation.
+        if ($this->isAdditiveBinaryExpr($e)) {
+            $lhs = $this->parser->getExprMember($e, 0);
+            if ($lhs->kind === $e->kind) {
+                $lhs_lhs = $this->parser->getExprMember($lhs, 0);
+                $lhs_rhs = $this->parser->getExprMember($lhs, 1);
+                $rhs = $this->parser->getExprMember($e, 1);
+                $const_value = $this->const_folder->foldBinaryExpr($e->kind, $lhs_rhs, $rhs);
+                if ($const_value !== null) {
+                    $lhs_lhs_slot = $this->compileTempExpr($lhs_lhs);
+                    $rhs_slot = $this->frame->allocTempSlot();
+                    $op = $this->opByBinaryExprKind($e->kind);
+                    if (is_string($const_value)) {
+                        $this->compileStringConst($rhs_slot, (string)$const_value);
+                    } else if (is_int($const_value)) {
+                        $this->compileIntConst($rhs_slot, (int)$const_value);
+                    } else {
+                        Assert::unreachable('unexpected const-folded value type');
+                    }
+                    $this->compileBinaryExpr($dst, $op, $lhs_lhs_slot, $rhs_slot);
+                    return;
+                }
+            }
+        }
+
         switch ($e->kind) {
         case Expr::IDENT:
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
@@ -333,28 +416,14 @@ class Compiler {
             return;
 
         case Expr::CONCAT:
-            $this->compileBinaryExpr($dst, Op::CONCAT, $e);
-            return;
         case Expr::EQ:
-            $this->compileBinaryExpr($dst, Op::EQ, $e);
-            return;
         case Expr::GT:
-            $this->compileBinaryExpr($dst, Op::GT, $e);
-            return;
         case Expr::LT:
-            $this->compileBinaryExpr($dst, Op::LT, $e);
-            return;
         case Expr::NOT_EQ:
-            $this->compileBinaryExpr($dst, Op::NOT_EQ, $e);
-            return;
         case Expr::ADD:
-            $this->compileBinaryExpr($dst, Op::ADD, $e);
-            return;
         case Expr::SUB:
-            $this->compileBinaryExpr($dst, Op::SUB, $e);
-            return;
         case Expr::MUL:
-            $this->compileBinaryExpr($dst, Op::MUL, $e);
+            $this->compileBinaryExprNode($dst, $e);
             return;
 
         case Expr::NULL_LIT:
@@ -366,11 +435,7 @@ class Compiler {
             return;
 
         case Expr::STRING_LIT:
-            if ($dst === 0) {
-                $this->emit1(Op::LOAD_SLOT0_STRING_CONST, $this->internString((string)$e->value));
-            } else {
-                $this->emit2(Op::LOAD_STRING_CONST, $dst, $this->internString((string)$e->value));
-            }
+            $this->compileStringConst($dst, (string)$e->value);
             return;
 
         case Expr::BOOL_LIT:
@@ -382,11 +447,7 @@ class Compiler {
             return;
 
         case Expr::INT_LIT:
-            if ($dst === 0) {
-                $this->emit1(Op::LOAD_SLOT0_INT_CONST, $this->internInt((int)$e->value));
-            } else {
-                $this->emit2(Op::LOAD_INT_CONST, $dst, $this->internInt((int)$e->value));
-            }
+            $this->compileIntConst($dst, (int)$e->value);
             return;
 
         case Expr::CALL:
@@ -513,16 +574,55 @@ class Compiler {
     /**
      * @param int $dst
      * @param int $op
-     * @param Expr $e
+     * @param int $lhs_slot
+     * @param int $rhs_slot
      */
-    private function compileBinaryExpr($dst, $op, $e) {
-        $lhs = $this->compileTempExpr($this->parser->getExprMember($e, 0));
-        $rhs = $this->compileTempExpr($this->parser->getExprMember($e, 1));
+    private function compileBinaryExpr($dst, $op, $lhs_slot, $rhs_slot) {
         if ($dst === 0) {
-            $this->emit2($op + 1, $lhs, $rhs);
+            $this->emit2($op + 1, $lhs_slot, $rhs_slot);
             return;
         }
-        $this->emit3($op, $dst, $lhs, $rhs);
+        $this->emit3($op, $dst, $lhs_slot, $rhs_slot);
+    }
+
+    /**
+     * @param int $kind
+     * @return int
+     */
+    private function opByBinaryExprKind($kind) {
+        switch ($kind) {
+        case Expr::CONCAT:
+            return Op::CONCAT;
+        case Expr::EQ:
+            return Op::EQ;
+        case Expr::GT:
+            return Op::GT;
+        case Expr::LT:
+            return Op::LT;
+        case Expr::NOT_EQ:
+            return Op::NOT_EQ;
+        case Expr::ADD:
+            return Op::ADD;
+        case Expr::SUB:
+            return Op::SUB;
+        case Expr::MUL:
+            return Op::MUL;
+
+        default:
+            Assert::unreachable("can't map expr kind to bytecode op");
+            return 0;
+        }
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
+    private function compileBinaryExprNode($dst, $e) {
+        $lhs_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
+        $rhs_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
+        $op = $this->opByBinaryExprKind($e->kind);
+        $this->compileBinaryExpr($dst, $op, $lhs_slot, $rhs_slot);
     }
 
     /**

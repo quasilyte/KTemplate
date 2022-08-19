@@ -14,6 +14,69 @@ class ConstFolder {
     }
 
     /**
+     * @param Expr $x
+     * @param Expr $y
+     * @return mixed
+     */
+    public function foldBinaryExpr($kind, $x, $y) {
+        switch ($kind) {
+        case Expr::CONCAT:
+            $lhs = self::fold($x);
+            if (!is_string($lhs)) {
+                return null;
+            }
+            $rhs = self::fold($y);
+            if (!is_string($rhs)) {
+                return null;
+            }
+            return $lhs . $rhs;
+        case Expr::MUL:
+            $lhs = self::fold($x);
+            if (!is_numeric($lhs)) {
+                return null;
+            }
+            $rhs = self::fold($y);
+            if (!is_numeric($rhs)) {
+                return null;
+            }
+            return $lhs * $rhs;
+        case Expr::DIV:
+            $lhs = self::fold($x);
+            if (!is_numeric($lhs)) {
+                return null;
+            }
+            $rhs = self::fold($y);
+            if (!is_numeric($rhs)) {
+                return null;
+            }
+            return $lhs / $rhs;
+        case Expr::ADD:
+            $lhs = self::fold($x);
+            if (!is_numeric($lhs)) {
+                return null;
+            }
+            $rhs = self::fold($y);
+            if (!is_numeric($rhs)) {
+                return null;
+            }
+            return $lhs + $rhs;
+        case Expr::SUB:
+            $lhs = self::fold($x);
+            if (!is_numeric($lhs)) {
+                return null;
+            }
+            $rhs = self::fold($y);
+            if (!is_numeric($rhs)) {
+                return null;
+            }
+            return $lhs - $rhs;
+
+        default:
+            return null;
+        }
+    }
+
+    /**
      * @param Expr $e
      * @return mixed
      */
@@ -32,39 +95,25 @@ class ConstFolder {
             return -$arg;
 
         case Expr::CONCAT:
-            $lhs = self::fold($this->getExprMember($e, 0));
-            if (!is_string($lhs)) {
-                return null;
-            }
-            $rhs = self::fold($this->getExprMember($e, 1));
-            if (!is_string($rhs)) {
-                return null;
-            }
-            return $lhs . $rhs;
         case Expr::ADD:
-            $lhs = self::fold($this->getExprMember($e, 0));
-            if (!is_numeric($lhs)) {
-                return null;
-            }
-            $rhs = self::fold($this->getExprMember($e, 1));
-            if (!is_numeric($rhs)) {
-                return null;
-            }
-            return $lhs + $rhs;
         case Expr::SUB:
-            $lhs = self::fold($this->getExprMember($e, 0));
-            if (!is_numeric($lhs)) {
-                return null;
-            }
-            $rhs = self::fold($this->getExprMember($e, 1));
-            if (!is_numeric($rhs)) {
-                return null;
-            }
-            return $lhs - $rhs;
+        case Expr::MUL:
+        case Expr::DIV:
+            return $this->foldBinaryExprNode($e);
 
         default:
             return null;
         }
+    }
+
+    /**
+     * @param Expr $e
+     * @return mixed
+     */
+    private function foldBinaryExprNode($e) {
+        $lhs = $this->getExprMember($e, 0);
+        $rhs = $this->getExprMember($e, 1);
+        return $this->foldBinaryExpr($e->kind, $lhs, $rhs);
     }
 
     /**

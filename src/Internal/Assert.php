@@ -18,4 +18,11 @@ class Assert {
             critical_error("internal KTemplate error: $message");
         }
     }
+
+    /**
+     * @param string $message
+     */
+    public static function unreachable($message) {
+        self::true(false, "unreachable: $message");
+    }
 }

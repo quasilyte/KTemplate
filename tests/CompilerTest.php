@@ -318,6 +318,40 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_STRING_CONST `ab`',
                 '  RETURN',
             ],
+            '{{ "a" ~ "b" ~ x }}' => [
+                '  LOAD_STRING_CONST slot2 `ab`',
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  CONCAT_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ testfunc1(1 + 2) }}' => [
+                '  LOAD_INT_CONST slot1 3',
+                '  CALL_SLOT0_FUNC1 *slot0 slot1 testfunc1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x ~ "a" ~ "b" }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_STRING_CONST slot3 `ab`',
+                '  CONCAT_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x + 10 + 20 }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_INT_CONST slot3 30',
+                '  ADD_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x * 10 * 20 }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_INT_CONST slot3 200',
+                '  MUL_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
         ];
 
         $env = new Env();
