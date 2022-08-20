@@ -22,8 +22,10 @@ class CompilerTest extends TestCase {
             ],
 
             // Local variables.
-            '{% let $s = "abc" %}{{ $s }}' => [
+            '{% let $s = "abc" %}{{ $s }}{% set $s = "a" %}{{ $s }}' => [
                 '  LOAD_STRING_CONST slot1 `abc`',
+                '  OUTPUT slot1',
+                '  LOAD_STRING_CONST slot1 `a`',
                 '  OUTPUT slot1',
                 '  RETURN',
             ],

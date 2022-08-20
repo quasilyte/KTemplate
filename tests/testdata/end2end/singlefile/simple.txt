@@ -79,3 +79,7 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ assert_false(1 and 2) }}
 {{ assert_true($i1 and $i1) }}
 {{ assert_true($i1 and $bool_false) }}
+{% let $myvar = 10 %}
+{{ $myvar }}
+{% set $myvar = 20 %}
+{{ $myvar }}

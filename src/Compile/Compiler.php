@@ -109,12 +109,31 @@ class Compiler {
         case Token::KEYWORD_LET:
             $this->compileLet();
             return;
+        case Token::KEYWORD_SET:
+            $this->compileSet();
+            return;
         }
 
         if ($tok->kind === Token::IDENT) {
             $this->failToken($tok, 'unexpected control token: ' . $this->lexer->tokenText($tok));
         }
         $this->failToken($tok, 'unexpected control token: ' . Token::prettyKindString($tok->kind));
+    }
+
+    private function compileSet() {
+        $tok = $this->lexer->scan();
+        if ($tok->kind !== Token::DOLLAR_IDENT) {
+            $this->failToken($tok, 'set names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
+        }
+        $var_name = $this->lexer->dollarVarName($tok);
+        $var_slot = $this->frame->lookupLocal($var_name);
+        if ($var_slot === -1) {
+            $this->failToken($tok, "assigning to undefined local var $var_name");
+        }
+        $this->expectToken(Token::ASSIGN);
+        $e = $this->parser->parseRootExpr($this->lexer);
+        $this->compileRootExpr($var_slot, $e);
+        $this->expectToken(Token::CONTROL_END);
     }
 
     private function compileLet() {

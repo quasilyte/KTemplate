@@ -14,7 +14,7 @@ class CompilationErrorTest extends TestCase {
         self::$compiler = new Compiler();
     }
 
-    public function testCompile() {
+    public function testSimpleErrors() {
         $tests = [
             '}}' => 'unexpected top-level token: }}',
             '%}' => 'unexpected top-level token: %}',
@@ -31,10 +31,13 @@ class CompilationErrorTest extends TestCase {
 
             '{{ a.b.c.d }}' => 'dot access expression is too complex',
 
+            '{% set x = 1 }}' => 'set names should be identifiers with leading $, found ident',
             '{% let x = 1 }}' => 'let names should be identifiers with leading $, found ident',
             '{% let $x = 1 %}{% let $x = 2 %}' => 'variable x is already declared in this scope',
             '{% let $x 10 %}' => 'expected =, found int_lit',
+            '{% let $x = 10 %}{% set $x 10 %}' => 'expected =, found int_lit',
             '{% let $x = 10 }}' => 'expected %}, found }}',
+            '{% let $x = 10 %}{% set $x = 10 }}' => 'expected %}, found }}',
 
             '{% what %}' => 'unexpected control token: what',
             '{% + %}' => 'unexpected control token: +',
