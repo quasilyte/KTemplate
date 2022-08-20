@@ -304,7 +304,7 @@ class Lexer {
             }
             $this->pos++;
         }
-        if (ord($this->src[$this->pos]) !== $quote) {
+        if ($this->pos >= $this->src_len) {
             $this->setError($dst, 'unterminated string literal');
             return;
         }

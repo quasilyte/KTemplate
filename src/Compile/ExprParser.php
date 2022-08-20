@@ -68,9 +68,8 @@ class ExprParser {
     private function setError(Expr $e, string $msg) {
         $pos = $this->lexer->getPos();
         $line = $this->lexer->getLineByPos($pos);
-        $filename = $this->lexer->getFilename();
         $e->kind = Expr::BAD;
-        $e->value = "$filename:$line: $msg";
+        $e->value = ['line' => $line, 'msg' => $msg];
     }
 
     private function parseExpr(Expr $dst, int $precedence) {
@@ -123,6 +122,9 @@ class ExprParser {
             break;
         case Token::MINUS:
             $this->parseUnaryExpr($left, Expr::NEG, $this->unaryPrecedence(Token::MINUS));
+            break;
+        case Token::ERROR:
+            $this->setError($left, $this->lexer->getError());
             break;
         default:
             $this->setError($left, 'unexpected token ' . Token::prettyKindString($tok->kind));

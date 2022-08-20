@@ -92,9 +92,12 @@ class Compiler {
         case Token::CONTROL_START:
             $this->compileControl();
             return;
+        case Token::ERROR:
+            $this->failToken($tok, $this->lexer->getError());
+            return;
         }
 
-        $this->failToken($tok, 'unexpected top-level token: ' . Token::kindString($tok->kind));
+        $this->failToken($tok, 'unexpected top-level token: ' . Token::prettyKindString($tok->kind));
     }
 
     private function compileControl() {
@@ -108,13 +111,16 @@ class Compiler {
             return;
         }
 
-        $this->failToken($tok, 'unexpected control token: ' . Token::kindString($tok->kind));
+        if ($tok->kind === Token::IDENT) {
+            $this->failToken($tok, 'unexpected control token: ' . $this->lexer->tokenText($tok));
+        }
+        $this->failToken($tok, 'unexpected control token: ' . Token::prettyKindString($tok->kind));
     }
 
     private function compileLet() {
         $tok = $this->lexer->scan();
         if ($tok->kind !== Token::DOLLAR_IDENT) {
-            $this->failToken($tok, 'let names should be identifiers with leading $, found ' . Token::kindString($tok->kind));
+            $this->failToken($tok, 'let names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
         }
         $var_name = $this->lexer->dollarVarName($tok);
         if ($this->frame->lookupLocalInCurrentScope($var_name) !== -1) {
@@ -375,6 +381,10 @@ class Compiler {
         }
 
         switch ($e->kind) {
+        case Expr::BAD:
+            $this->fail((int)$e->value['line'], (string)$e->value['msg']);
+            return Types::UNKNOWN;
+
         case Expr::DOLLAR_IDENT:
             $this->compileTypedMove($dst, $e, $type);
             return $type;
