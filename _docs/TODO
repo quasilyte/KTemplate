@@ -1,4 +1,5 @@
-* add missing operators
+* add missing basic operators
+* add array indexing `[]` operator support
 * `set` for variables
 * add `for` loops
 * docs: add examples
