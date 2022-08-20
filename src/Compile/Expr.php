@@ -29,6 +29,7 @@ class Expr {
     public const FILTER = 23;
     public const CALL = 24;
     public const NEG = 25;
+    public const INDEX = 26;
 
     /** @var int */
     public $kind = 0;

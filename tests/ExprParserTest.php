@@ -68,6 +68,9 @@ class ExprParserTest extends TestCase {
             ['1-1', '(- 1 1)', 3],
             ['-$x', '(neg $x)', 2],
             ['-1', '-1', 1],
+
+            ['$x["a"]', '([] $x `a`)', 3],
+            ['$x["a"][0]', '([] ([] $x `a`) 0)', 5],
         ];
         $lexer = new Lexer();
         $p = new ExprParser();

@@ -69,6 +69,9 @@ class ExprPrinter {
         case Expr::NEG:
             return self::formatUnaryExpr($p, $e, 'neg');
 
+        case Expr::INDEX:
+            return self::formatBinaryExpr($p, $e, '[]');
+
         default:
             return (string)$e->kind;
         }

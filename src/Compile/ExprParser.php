@@ -143,6 +143,9 @@ class ExprParser {
             }
             $tok = $lexer->scan();
             switch ($tok->kind) {
+            case Token::LBRACKET:
+                $this->parseIndexExpr($left);
+                break;
             case Token::PIPE:
                 $this->parseBinaryExpr($left, Expr::FILTER, $right_prec);
                 break;
@@ -251,6 +254,21 @@ class ExprParser {
     }
 
     /**
+     * @param Expr $left
+     */
+    private function parseIndexExpr($left) {
+        $this->tmp->assign($left);
+        $left->kind = Expr::INDEX;
+        $this->allocateExprMembers($left, 2);
+        $this->getExprMember($left, 0)->assign($this->tmp);
+        $this->parseExpr($this->getExprMember($left, 1), 0);
+        if (!$this->lexer->consume(Token::RBRACKET)) {
+            $tok = $this->lexer->peek();
+            $this->setError($left, 'expected ] to close indexing expr, found ' . Token::prettyKindString($tok->kind));
+        }
+    }
+
+    /**
      * @param Expr $e
      * @param string $raw_string
      * @param int $quote
@@ -351,6 +369,8 @@ class ExprParser {
         case Token::STAR:
         case Token::SLASH:
             return 7;
+        case Token::LBRACKET:
+            return 9;
         case Token::PIPE:
             return 13;
         case Token::DOT:

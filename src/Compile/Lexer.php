@@ -164,6 +164,12 @@ class Lexer {
             case ord('"'):
                 $this->scanStringInto($dst, ord('"'));
                 return;
+            case ord('['):
+                $this->acceptSimpleToken($dst, Token::LBRACKET, 1);
+                return;
+            case ord(']'):
+                $this->acceptSimpleToken($dst, Token::RBRACKET, 1);
+                return;
             case ord('+'):
                 $this->acceptSimpleToken($dst, Token::PLUS, 1);
                 return;

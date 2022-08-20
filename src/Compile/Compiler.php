@@ -427,6 +427,10 @@ class Compiler {
             $this->emit3dst($op, $dst, $cache_slot, $key_offset);
             return Types::UNKNOWN;
 
+        case Expr::INDEX:
+            $this->compileIndex($dst, $e);
+            return Types::UNKNOWN;
+
         case Expr::OR:
             $this->compileOr($dst, $e);
             return Types::BOOL;
@@ -490,6 +494,28 @@ class Compiler {
     
         $this->failExpr($e, "compile expr: unexpected $e->kind");
         return Types::UNKNOWN;
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
+    private function compileIndex($dst, $e) {
+        $seq_expr = $this->parser->getExprMember($e, 0);
+        $seq_slot = $this->compileTempExpr($seq_expr);
+        $key_expr = $this->parser->getExprMember($e, 1);
+        if ($key_expr->kind === Expr::STRING_LIT) {
+            $key_id = $this->internString((string)$key_expr->value);
+            $this->emit3dst(Op::INDEX_STRING_KEY, $dst, $seq_slot, $key_id);
+            return;
+        }
+        if ($key_expr->kind === Expr::INT_LIT) {
+            $key_id = $this->internInt((int)$key_expr->value);
+            $this->emit3dst(Op::INDEX_INT_KEY, $dst, $seq_slot, $key_id);
+            return;
+        }
+        $key_slot = $this->compileTempExpr($key_expr);
+        $this->emit3dst(Op::INDEX, $dst, $seq_slot, $key_slot);
     }
 
     /**

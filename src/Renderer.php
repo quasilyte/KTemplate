@@ -244,6 +244,25 @@ class Renderer {
                 $slot0 = $v;
                 break;
             
+            case Op::INDEX_STRING_KEY:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff][$t->string_values[($opdata >> 24) & 0xff]];
+                break;
+            case Op::INDEX_SLOT0_STRING_KEY:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff][$t->string_values[($opdata >> 16) & 0xff]];
+                break;
+            case Op::INDEX_INT_KEY:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff][$t->int_values[($opdata >> 24) & 0xff]];
+                break;
+            case Op::INDEX_SLOT0_INT_KEY:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff][$t->int_values[($opdata >> 16) & 0xff]];
+                break;
+            case Op::INDEX:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff][$state->slots[($opdata >> 24) & 0xff]];
+                break;
+            case Op::INDEX_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff][$state->slots[($opdata >> 16) & 0xff]];
+                break;
+            
             case Op::JUMP:
                 $pc += ($opdata >> 8) & 0xffff;
                 break;
@@ -424,6 +443,7 @@ class Renderer {
                 break;
 
             default:
+                fprintf(STDERR, "%s\n", Op::opcodeString($op));
                 return;
             }
         }

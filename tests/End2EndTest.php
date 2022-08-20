@@ -71,7 +71,10 @@ class SimpleTestDataProvider implements DataProviderInterface {
             'x' => [
                 'y' => [
                     'z' => 111,
+                    1 => 'one',
                 ],
+                0 => 'zero',
+                'key' => 'z',
             ],
         ];
         $this->time = [
@@ -93,6 +96,8 @@ class SimpleTestDataProvider implements DataProviderInterface {
                 return $this->time[$key->part2];
             }
             return null;
+        case 'arr':
+            return $key->num_parts === 1 ? $this->arr : null;
         default:
             switch ($key->num_parts) {
             case 1:

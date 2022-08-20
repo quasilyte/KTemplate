@@ -52,6 +52,13 @@ var rawOpcodes = []opcodeTemplate{
 	{"LOAD_NULL", "op dst:wslot"},
 	{"LOAD_SLOT0_NULL", "op"},
 
+	{"INDEX", "op dst:wslot src:rslot key:rslot"},
+	{"INDEX_SLOT0", "op *slot0 src:rslot key:rslot"},
+	{"INDEX_INT_KEY", "op dst:wslot src:rslot key:intindex"},
+	{"INDEX_SLOT0_INT_KEY", "op *slot0 src:rslot key:intindex"},
+	{"INDEX_STRING_KEY", "op dst:wslot src:rslot key:strindex"},
+	{"INDEX_SLOT0_STRING_KEY", "op *slot0 src:rslot key:strindex"},
+
 	{"MOVE_BOOL", "op dst:wslot src:rslot"},
 	{"MOVE_SLOT0_BOOL", "op *slot0 src:rslot"},
 

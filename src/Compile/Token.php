@@ -50,6 +50,8 @@ class Token {
     public const STRING_LIT_Q2 = 44;
     public const PIPE = 45; // |
     public const COMMA = 46; // ,
+    public const LBRACKET = 47; // [
+    public const RBRACKET = 48; // ]
 
     public $kind = 0;
     public $pos_from = 0;
@@ -128,6 +130,10 @@ class Token {
             return '|';
         case self::COMMA:
             return ',';
+        case self::LBRACKET:
+            return '[';
+        case self::RBRACKET:
+            return ']';
         default:
             return strtolower(self::kindString($kind));
         }
@@ -229,6 +235,10 @@ class Token {
             return 'PIPE';
         case self::COMMA:
             return 'COMMA';
+        case self::LBRACKET:
+            return 'LBRACKET';
+        case self::RBRACKET:
+            return 'RBRACKET';
         default:
             return '<?>';
         }

@@ -130,6 +130,41 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
 
+            // Array indexing.
+            '{{ x[10] }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  INDEX_SLOT0_INT_KEY *slot0 slot2 10',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x["aaa"] }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  INDEX_SLOT0_STRING_KEY *slot0 slot2 `aaa`',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x[y] }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  INDEX_SLOT0 *slot0 slot3 slot4',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x[1][2] }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  INDEX_INT_KEY slot2 slot3 1',
+                '  INDEX_SLOT0_INT_KEY *slot0 slot2 2',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x["y"]["z"] }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  INDEX_STRING_KEY slot2 slot3 `y`',
+                '  INDEX_SLOT0_STRING_KEY *slot0 slot2 `z`',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
             // And/or.
             '{% let $x = 1 %}{% let $y = 2 %}{{ $x and $y }}' => [
                 '  LOAD_INT_CONST slot1 1',

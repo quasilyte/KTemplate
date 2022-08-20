@@ -1,5 +1,4 @@
 * add missing basic operators
-* add array indexing `[]` operator support
 * add `for` loops
 * docs: add examples
 * more end2end tests
