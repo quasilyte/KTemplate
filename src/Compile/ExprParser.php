@@ -312,10 +312,10 @@ class ExprParser {
     private function unaryPrecedence(int $kind): int {
         switch ($kind) {
         case Token::KEYWORD_NOT:
-            return 5;
+            return 6;
         case Token::PLUS:
         case Token::MINUS:
-            return 10;
+            return 11;
         default:
             return -1;
         }
@@ -328,25 +328,25 @@ class ExprParser {
         case Token::KEYWORD_OR:
             return 1;
         case Token::KEYWORD_AND:
-            return 2;
+            return 3;
         case Token::EQ:
         case Token::NOT_EQ:
         case Token::LT:
         case Token::LT_EQ:
         case Token::GT:
         case Token::GT_EQ:
-            return 3;
+            return 4;
         case Token::PLUS:
         case Token::MINUS:
         case Token::TILDE:
-            return 4;
+            return 5;
         case Token::STAR:
         case Token::SLASH:
-            return 6;
+            return 7;
         case Token::PIPE:
-            return 12;
-        case Token::DOT:
             return 13;
+        case Token::DOT:
+            return 14;
         default:
             return -1;
         }
