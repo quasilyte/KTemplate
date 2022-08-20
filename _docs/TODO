@@ -12,3 +12,6 @@
 * output escaping settings
 * macros system
 * compile errors for long jumps/too many consts and vars, etc
+* `$x - 1` should be parsed OK (currently lexing -1 as negative int)
+* refactor compiler code
+* don't discard type information in things like compileTempExpr

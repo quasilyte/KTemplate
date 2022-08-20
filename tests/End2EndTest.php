@@ -35,6 +35,13 @@ class End2EndTest extends TestCase {
         $env->registerFunction2('fmt', function ($format, $x) { return sprintf($format, $x); });
         $env->registerFunction3('concat3', function ($s1, $s2, $s3) { return "$s1$s2$s3"; });
 
+        $env->registerFunction1('assert_true', function ($x) {
+            return $x === true ? 'yes' : 'no';
+        });
+        $env->registerFunction1('assert_false', function ($x) {
+            return $x === false ? 'yes' : 'no';
+        });
+
         $compiler = new Compiler();
         $renderer = new Renderer();
         $data_provider = new SimpleTestDataProvider();

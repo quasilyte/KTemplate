@@ -38,6 +38,8 @@ class ExprParserTest extends TestCase {
             ['x == y and z1 != z2', '(and (== x y) (!= z1 z2))', 7],
             ['x < y or z1 > z2', '(or (< x y) (> z1 z2))', 7],
             ['x >= y or z1 <= z2', '(or (>= x y) (<= z1 z2))', 7],
+            ['$x or $y or $x or 1', '(or $x (or $y (or $x 1)))', 7],
+            ['$x and $y and $x and 1', '(and $x (and $y (and $x 1)))', 7],
 
             ['not x', '(not x)', 2],
             ['not true', '(not true)', 2],

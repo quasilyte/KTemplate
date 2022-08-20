@@ -63,3 +63,19 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ $i1 + 10 + 20 }}
 {{ $i1 * 10 * 20 }}
 {{ ($i1+1) * 10 * 20 }}
+{{ assert_true($i1 or $i2) }}
+{{ assert_true($null or $null) }}
+{{ assert_true($null or $bool_false) }}
+{{ assert_false($i1 or $i2) }}
+{{ assert_false($null or $null) }}
+{{ assert_false($null or $bool_false) }}
+{{ assert_true(0 or $bool_false or $i1) }}
+{{ assert_true($bool_false or 0 or $i1) }}
+{{ assert_false($bool_false and 1) }}
+{{ assert_false(1 and $bool_false) }}
+{{ assert_true(1 and 2) }}
+{{ assert_true($bool_false and 1) }}
+{{ assert_true(1 and $bool_false) }}
+{{ assert_false(1 and 2) }}
+{{ assert_true($i1 and $i1) }}
+{{ assert_true($i1 and $bool_false) }}

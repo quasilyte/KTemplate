@@ -94,8 +94,10 @@ class OpInfo {
     public static function isJump($op) {
         switch ($op) {
         case Op::JUMP:
-        case Op::JUMP_ZERO:
-        case Op::JUMP_NOT_ZERO:
+        case Op::JUMP_FALSY:
+        case Op::JUMP_SLOT0_FALSY:
+        case Op::JUMP_TRUTHY:
+        case Op::JUMP_SLOT0_TRUTHY:
             return true;
         default:
             return false;

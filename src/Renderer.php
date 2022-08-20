@@ -44,11 +44,11 @@ class Renderer {
             case Op::RETURN:
                 return;
 
-            case Op::OUTPUT_SLOT0:
-                $state->buf .= $slot0;
-                break;
             case Op::OUTPUT:
                 $state->buf .= $state->slots[($opdata >> 8) & 0xff];
+                break;
+            case Op::OUTPUT_SLOT0:
+                $state->buf .= $slot0;
                 break;
             case Op::OUTPUT_STRING_CONST:
                 $state->buf .= $t->string_values[($opdata >> 8) & 0xff];
@@ -103,6 +103,21 @@ class Renderer {
                 $state->cache_bitset |= $cache_mask;
                 $state->slots[$cache_slot] = $v;
                 $state->buf .= $v;
+                break;
+            
+            case Op::MOVE_BOOL:
+                $state->slots[($opdata >> 8) & 0xff] = (bool)$state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::MOVE_SLOT0_BOOL:
+               $slot0 = (bool)$state->slots[($opdata >> 16) & 0xff];
+                break;
+
+            case Op::CONV_BOOL:
+                $slot = ($opdata >> 8) & 0xff;
+                $state->slots[$slot] = (bool)$state->slots[$slot];
+                break;
+            case Op::CONV_SLOT0_BOOL:
+                $slot0 = (bool)$slot0;
                 break;
 
             case Op::LOAD_BOOL:
@@ -232,13 +247,23 @@ class Renderer {
             case Op::JUMP:
                 $pc += ($opdata >> 8) & 0xff;
                 break;
-            case Op::JUMP_ZERO:
-                if ((int)$slot0 === 0) {
+            case Op::JUMP_FALSY:
+                if (!$state->slots[($opdata >> 16) & 0xff]) {
                     $pc += ($opdata >> 8) & 0xff;
                 }
                 break;
-            case Op::JUMP_NOT_ZERO:
-                if ((int)$slot0 !== 0) {
+            case Op::JUMP_SLOT0_FALSY:
+                if (!$slot0) {
+                    $pc += ($opdata >> 8) & 0xff;
+                }
+                break;
+            case Op::JUMP_TRUTHY:
+                if ($state->slots[($opdata >> 16) & 0xff]) {
+                    $pc += ($opdata >> 8) & 0xff;
+                }
+                break;
+            case Op::JUMP_SLOT0_TRUTHY:
+                if ($slot0) {
                     $pc += ($opdata >> 8) & 0xff;
                 }
                 break;
@@ -250,6 +275,18 @@ class Renderer {
                 $slot0 = !$state->slots[($opdata >> 8) & 0xff];
                 break;
 
+            case Op::OR:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] || $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::OR_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] || $state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::AND:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] && $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::AND_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] && $state->slots[($opdata >> 16) & 0xff];
+                break;
             case Op::CONCAT:
                 $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] . $state->slots[($opdata >> 24) & 0xff];
                 break;

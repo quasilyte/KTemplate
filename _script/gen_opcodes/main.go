@@ -29,8 +29,8 @@ type argumentInfo struct {
 var rawOpcodes = []opcodeTemplate{
 	{"RETURN", "op"},
 
-	{"OUTPUT_SLOT0", "op *slot0"},
 	{"OUTPUT", "op arg:rslot"},
+	{"OUTPUT_SLOT0", "op *slot0"},
 	{"OUTPUT_INT_CONST", "op val:intindex"},
 	{"OUTPUT_STRING_CONST", "op val:strindex"},
 	{"OUTPUT_EXTDATA_1", "op cache:cacheslot k:keyoffset"},
@@ -52,9 +52,17 @@ var rawOpcodes = []opcodeTemplate{
 	{"LOAD_NULL", "op dst:wslot"},
 	{"LOAD_SLOT0_NULL", "op"},
 
+	{"MOVE_BOOL", "op dst:wslot src:rslot"},
+	{"MOVE_SLOT0_BOOL", "op *slot0 src:rslot"},
+
+	{"CONV_BOOL", "op arg:wslot"},
+	{"CONV_SLOT0_BOOL", "op *slot0"},
+
 	{"JUMP", "op pcdelta:rel8"},
-	{"JUMP_ZERO", "op *slot0 pcdelta:rel8"},
-	{"JUMP_NOT_ZERO", "op *slot0 pcdelta:rel8"},
+	{"JUMP_FALSY", "op pcdelta:rel8 cond:rslot"},
+	{"JUMP_SLOT0_FALSY", "op *slot0 pcdelta:rel8"},
+	{"JUMP_TRUTHY", "op pcdelta:rel8 cond:rslot"},
+	{"JUMP_SLOT0_TRUTHY", "op *slot0 pcdelta:rel8"},
 
 	{"CALL_FILTER1", "op dst:wslot arg1:rslot fn:filterid"},
 	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid"},
@@ -76,6 +84,10 @@ var rawOpcodes = []opcodeTemplate{
 	{"NEG", "op dst:wslot arg:rslot"},
 	{"NEG_SLOT0", "op *slot0 arg:rslot"},
 
+	{"OR", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"OR_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
+	{"AND", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"AND_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 	{"CONCAT", "op dst:wslot arg1:rslot arg2:rslot"},
 	{"CONCAT_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 	{"EQ", "op dst:wslot arg1:rslot arg2:rslot"},

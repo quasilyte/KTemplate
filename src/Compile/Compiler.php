@@ -140,7 +140,7 @@ class Compiler {
     private function compileIfBody() {
         $label_next = $this->newLabel();
         $label_end = $this->newLabel();
-        $this->emitJump(Op::JUMP_ZERO, $label_next);
+        $this->emitCondJump(Op::JUMP_FALSY, 0, $label_next);
         while (true) {
             $tok = $this->lexer->scan();
             if ($tok->kind === Token::CONTROL_START) {
@@ -151,13 +151,13 @@ class Compiler {
                     break;
                 }
                 if ($this->lexer->consume(Token::KEYWORD_ELSE)) {
-                    $this->emitJump(Op::JUMP, $label_end);
+                    $this->emitJump($label_end);
                     $this->expectToken(Token::CONTROL_END);
                     $this->bindLabel($label_next);
                     continue;
                 }
                 if ($this->lexer->consume(Token::KEYWORD_ELSEIF)) {
-                    $this->emitJump(Op::JUMP, $label_end);
+                    $this->emitJump($label_end);
                     $this->bindLabel($label_next);
                     $this->compileIf();
                     $this->bindLabel($label_end);
@@ -334,17 +334,19 @@ class Compiler {
     /**
      * @param int $dst
      * @param Expr $e
+     * @param int $type
+     * @return int
      */
-    private function compileExpr($dst, $e) {
+    private function compileExpr($dst, $e, $type = Types::UNKNOWN) {
         // First try to constant-fold the expression.
         $const_value = $this->const_folder->fold($e);
         if (is_int($const_value)) {
             $this->compileIntConst($dst, (int)$const_value);
-            return;
+            return Types::INT;
         }
         if (is_string($const_value)) {
             $this->compileStringConst($dst, (string)$const_value);
-            return;
+            return Types::STRING;
         }
         // Binary expressions are parsed like this:
         // `x + 1 + 2` => `(+ (+ x 1) 2)`
@@ -375,12 +377,16 @@ class Compiler {
                         Assert::unreachable('unexpected const-folded value type');
                     }
                     $this->compileBinaryExpr($dst, $op, $lhs_lhs_slot, $rhs_slot);
-                    return;
+                    return Types::UNKNOWN;
                 }
             }
         }
 
         switch ($e->kind) {
+        case Expr::DOLLAR_IDENT:
+            $this->compileTypedMove($dst, $e, $type);
+            return $type;
+
         case Expr::IDENT:
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
@@ -390,7 +396,7 @@ class Compiler {
             } else {
                 $this->emit3(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
             }
-            return;
+            return Types::UNKNOWN;
 
         case Expr::DOT_ACCESS:
             [$p1, $p2, $p3] = $this->decodeDotAccess($e);
@@ -406,25 +412,36 @@ class Compiler {
             } else {
                 $this->emit3($op, $dst, $cache_slot, $key_offset);
             }
-            return;
+            return Types::UNKNOWN;
+
+        case Expr::OR:
+            $this->compileOr($dst, $e);
+            return Types::BOOL;
+        case Expr::AND:
+            $this->compileAnd($dst, $e);
+            return Types::BOOL;
 
         case Expr::NOT:
             $this->compileUnaryExpr($dst, Op::NOT, $e);
-            return;
+            return Types::BOOL;
         case Expr::NEG:
             $this->compileUnaryExpr($dst, Op::NEG, $e);
-            return;
+            return Types::UNKNOWN;
 
         case Expr::CONCAT:
+            $this->compileBinaryExprNode($dst, $e);
+            return Types::STRING;
         case Expr::EQ:
         case Expr::GT:
         case Expr::LT:
         case Expr::NOT_EQ:
+            $this->compileBinaryExprNode($dst, $e);
+            return Types::BOOL;
         case Expr::ADD:
         case Expr::SUB:
         case Expr::MUL:
             $this->compileBinaryExprNode($dst, $e);
-            return;
+            return Types::UNKNOWN;
 
         case Expr::NULL_LIT:
             if ($dst === 0) {
@@ -432,11 +449,11 @@ class Compiler {
             } else {
                 $this->emit1(Op::LOAD_NULL, $dst);
             }
-            return;
+            return Types::NULL;
 
         case Expr::STRING_LIT:
             $this->compileStringConst($dst, (string)$e->value);
-            return;
+            return Types::STRING;
 
         case Expr::BOOL_LIT:
             if ($dst === 0) {
@@ -444,29 +461,88 @@ class Compiler {
             } else {
                 $this->emit2(Op::LOAD_BOOL, $dst, (int)$e->value);
             }
-            return;
+            return Types::BOOL;
 
         case Expr::INT_LIT:
             $this->compileIntConst($dst, (int)$e->value);
-            return;
+            return Types::INT;
 
         case Expr::CALL:
             $this->compileCall($dst, $e);
-            return;
+            return Types::UNKNOWN;
 
         case Expr::FILTER:
             if ($this->parser->getExprMember($e, 1)->kind === Expr::IDENT) {
                 $this->compileFilter1($dst, $e);
-                return;
+                return Types::UNKNOWN;
             }
             if ($this->parser->getExprMember($e, 1)->kind === Expr::CALL) {
                 $this->compileFilter2($dst, $e);
-                return;
+                return Types::UNKNOWN;
             }
             $this->failExpr($e, 'compile expr: invalid filter, expected a call or ident');
         }
     
         $this->failExpr($e, "compile expr: unexpected $e->kind");
+        return Types::UNKNOWN;
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     * @param int $type
+     */
+    private function compileTypedMove($dst, $e, $type) {
+        $op = 0;
+        switch ($type) {
+        case Types::BOOL:
+            $op = Op::MOVE_BOOL;
+            break;
+        default:
+            $this->failExpr($e, 'unsupported typed move for type ' . Types::typeString($type));
+        }
+        $src_slot = $this->compileTempExpr($e);
+        $this->emit2dst($op, $dst, $src_slot);
+    }
+
+    private function compileAndOr($jump_op, $dst, $e) {
+        $lhs = $this->parser->getExprMember($e, 0);
+        $rhs = $this->parser->getExprMember($e, 1);
+
+        if ($lhs->kind === Expr::DOLLAR_IDENT && $rhs->kind === Expr::DOLLAR_IDENT) {
+            $this->compileBinaryExprNode($dst, $e);
+            return;
+        }
+
+        $label_end = $this->newLabel();
+        $lhs_type = $this->compileExpr($dst, $lhs, Types::BOOL);
+        $this->emitCondJump($jump_op, $dst, $label_end);
+        $rhs_type = $this->compileExpr($dst, $rhs, Types::BOOL);
+        if ($lhs_type !== Types::BOOL) {
+            $this->bindLabel($label_end);
+        }
+        if ($lhs_type !== Types::BOOL || $rhs_type !== Types::BOOL) {
+            $this->emit1dst(Op::CONV_BOOL, $dst);
+        }
+        if ($lhs_type === Types::BOOL) {
+            $this->bindLabel($label_end);
+        }
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
+    private function compileOr($dst, $e) {
+        $this->compileAndOr(Op::JUMP_TRUTHY, $dst, $e);
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     */
+    private function compileAnd($dst, $e) {
+        $this->compileAndOr(Op::JUMP_FALSY, $dst, $e);
     }
 
     /**
@@ -591,6 +667,10 @@ class Compiler {
      */
     private function opByBinaryExprKind($kind) {
         switch ($kind) {
+        case Expr::OR:
+            return Op::OR;
+        case Expr::AND:
+            return Op::AND;
         case Expr::CONCAT:
             return Op::CONCAT;
         case Expr::EQ:
@@ -667,11 +747,48 @@ class Compiler {
     }
 
     /**
-     * @param int $op
      * @param int $label_id
      */
-    private function emitJump($op, $label_id) {
-        $this->emit1($op, $label_id);
+    private function emitJump($label_id) {
+        $this->emit1(Op::JUMP, $label_id);
+    }
+
+    /**
+     * @param int $op
+     * @param int $cond_slot
+     * @param int $label_id
+     */
+    private function emitCondJump($op, $cond_slot, $label_id) {
+        if ($cond_slot === 0) {
+            $this->emit1($op+1, $label_id);
+            return;
+        }
+        $this->emit2($op, $label_id, $cond_slot);
+    }
+
+    /**
+     * @param int $op
+     * @param int $dst
+     */
+    private function emit1dst($op, $dst) {
+        if ($dst === 0) {
+            $this->emit($op+1);
+            return;
+        }
+        $this->emit1($op, $dst);
+    }
+
+    /**
+     * @param int $op
+     * @param int $dst
+     * @param int $arg1
+     */
+    private function emit2dst($op, $dst, $arg1) {
+        if ($dst === 0) {
+            $this->emit1($op+1, $arg1);
+            return;
+        }
+        $this->emit2($op, $dst, $arg1);
     }
 
     /**

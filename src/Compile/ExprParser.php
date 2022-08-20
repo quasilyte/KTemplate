@@ -157,10 +157,12 @@ class ExprParser {
                 $this->parseBinaryExpr($left, Expr::CONCAT, $right_prec);
                 break;
             case Token::KEYWORD_AND:
-                $this->parseBinaryExpr($left, Expr::AND, $right_prec);
+                // Parse AND as right-associative to simplify the compilation.
+                $this->parseBinaryExpr($left, Expr::AND, $right_prec - 1);
                 break;
             case Token::KEYWORD_OR:
-                $this->parseBinaryExpr($left, Expr::OR, $right_prec);
+                // Parse OR as right-associative to simplify the compilation.
+                $this->parseBinaryExpr($left, Expr::OR, $right_prec - 1);
                 break;
             case Token::EQ:
                 $this->parseBinaryExpr($left, Expr::EQ, $right_prec);
