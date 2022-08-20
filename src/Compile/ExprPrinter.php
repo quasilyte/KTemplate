@@ -7,6 +7,9 @@ class ExprPrinter {
         switch ($e->kind) {
         case Expr::IDENT:
             return (string)$e->value;
+        case Expr::DOLLAR_IDENT:
+            return '$' . (string)$e->value;
+
         case Expr::BOOL_LIT:
             return $e->value ? 'true' : 'false';
 
