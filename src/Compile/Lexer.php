@@ -168,10 +168,6 @@ class Lexer {
                 $this->acceptSimpleToken($dst, Token::PLUS, 1);
                 return;
             case ord('-'):
-                if (self::isDigitChar($this->peekChar(1))) {
-                    $this->scanNumberInto($dst, true);
-                    return;
-                }
                 $this->acceptSimpleToken($dst, Token::MINUS, 1);
                 return;
             case ord('*'):

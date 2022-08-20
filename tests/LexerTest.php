@@ -72,7 +72,7 @@ class LexerTest extends TestCase {
             // Numeric literals.
             [
                 '{{ -1 }}',
-                ['ECHO_START', 'INT_LIT(-1)', 'ECHO_END'],
+                ['ECHO_START', 'MINUS', 'INT_LIT(1)', 'ECHO_END'],
             ],
 
             // String literals.

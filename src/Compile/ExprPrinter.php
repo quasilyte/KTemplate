@@ -19,7 +19,7 @@ class ExprPrinter {
             return (string)$e->value;
 
         case Expr::BAD:
-            return '(bad `' . $e->value . '`)';
+            return '(bad `' . $e->value['msg'] . '`)';
 
         case Expr::CALL:
             $num_args = (int)$e->value;
@@ -66,9 +66,11 @@ class ExprPrinter {
 
         case Expr::NOT:
             return self::formatUnaryExpr($p, $e, 'not');
+        case Expr::NEG:
+            return self::formatUnaryExpr($p, $e, 'neg');
 
         default:
-            return '?';
+            return (string)$e->kind;
         }
     }
 

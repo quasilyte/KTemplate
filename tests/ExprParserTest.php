@@ -63,6 +63,11 @@ class ExprParserTest extends TestCase {
             ['x+1|add1', '(+ x (| 1 add1))', 5],
             ['(x+1)|add1', '(| (+ x 1) add1)', 5],
             ['x|default(1)', '(| x (call default 1))', 7],
+
+            ['$x-1', '(- $x 1)', 3],
+            ['1-1', '(- 1 1)', 3],
+            ['-$x', '(neg $x)', 2],
+            ['-1', '-1', 1],
         ];
         $lexer = new Lexer();
         $p = new ExprParser();

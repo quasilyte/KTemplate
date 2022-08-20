@@ -121,6 +121,12 @@ class ExprParser {
             $this->parseUnaryExpr($left, Expr::NOT, $this->unaryPrecedence(Token::KEYWORD_NOT));
             break;
         case Token::MINUS:
+            if ($lexer->peek()->kind === Token::INT_LIT) {
+                $tok = $lexer->scan();
+                $left->kind = Expr::INT_LIT;
+                $left->value = -(int)$lexer->tokenText($tok);
+                break;
+            }
             $this->parseUnaryExpr($left, Expr::NEG, $this->unaryPrecedence(Token::MINUS));
             break;
         case Token::ERROR:
