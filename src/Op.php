@@ -8,13 +8,13 @@ class Op {
     // Encoding: 0x01
     public const RETURN = 1;
     
-    // Encoding: 0x02
-    // Flags: FLAG_IMPLICIT_SLOT0
-    public const OUTPUT_SLOT0 = 2;
-    
-    // Encoding: 0x03 arg:rslot
+    // Encoding: 0x02 arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    public const OUTPUT = 3;
+    public const OUTPUT = 2;
+    
+    // Encoding: 0x03
+    // Flags: FLAG_IMPLICIT_SLOT0
+    public const OUTPUT_SLOT0 = 3;
     
     // Encoding: 0x04 val:intindex
     public const OUTPUT_INT_CONST = 4;
@@ -102,22 +102,22 @@ class Op {
     // Flags: FLAG_IMPLICIT_SLOT0
     public const CONV_SLOT0_BOOL = 26;
     
-    // Encoding: 0x1b pcdelta:rel8
+    // Encoding: 0x1b pcdelta:rel16
     public const JUMP = 27;
     
-    // Encoding: 0x1c pcdelta:rel8 cond:rslot
+    // Encoding: 0x1c pcdelta:rel16 cond:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     public const JUMP_FALSY = 28;
     
-    // Encoding: 0x1d pcdelta:rel8
+    // Encoding: 0x1d pcdelta:rel16
     // Flags: FLAG_IMPLICIT_SLOT0
     public const JUMP_SLOT0_FALSY = 29;
     
-    // Encoding: 0x1e pcdelta:rel8 cond:rslot
+    // Encoding: 0x1e pcdelta:rel16 cond:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     public const JUMP_TRUTHY = 30;
     
-    // Encoding: 0x1f pcdelta:rel8
+    // Encoding: 0x1f pcdelta:rel16
     // Flags: FLAG_IMPLICIT_SLOT0
     public const JUMP_SLOT0_TRUTHY = 31;
     
@@ -278,9 +278,9 @@ class Op {
         case 1:
             return 'RETURN';
         case 2:
-            return 'OUTPUT_SLOT0';
-        case 3:
             return 'OUTPUT';
+        case 3:
+            return 'OUTPUT_SLOT0';
         case 4:
             return 'OUTPUT_INT_CONST';
         case 5:
@@ -422,10 +422,10 @@ class Op {
         switch ($op) {
         case 1: // RETURN
             return 0;
-        case 2: // OUTPUT_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 3: // OUTPUT
+        case 2: // OUTPUT
             return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 3: // OUTPUT_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
         case 4: // OUTPUT_INT_CONST
             return 0;
         case 5: // OUTPUT_STRING_CONST
@@ -565,8 +565,8 @@ class Op {
 
     public static $args = [
         self::RETURN => [],
-        self::OUTPUT_SLOT0 => [],
         self::OUTPUT => [OpInfo::ARG_SLOT],
+        self::OUTPUT_SLOT0 => [],
         self::OUTPUT_INT_CONST => [OpInfo::ARG_INT_CONST],
         self::OUTPUT_STRING_CONST => [OpInfo::ARG_STRING_CONST],
         self::OUTPUT_EXTDATA_1 => [OpInfo::ARG_CACHE_SLOT, OpInfo::ARG_KEY_OFFSET],
@@ -590,11 +590,11 @@ class Op {
         self::MOVE_SLOT0_BOOL => [OpInfo::ARG_SLOT],
         self::CONV_BOOL => [OpInfo::ARG_SLOT],
         self::CONV_SLOT0_BOOL => [],
-        self::JUMP => [OpInfo::ARG_REL8],
-        self::JUMP_FALSY => [OpInfo::ARG_REL8, OpInfo::ARG_SLOT],
-        self::JUMP_SLOT0_FALSY => [OpInfo::ARG_REL8],
-        self::JUMP_TRUTHY => [OpInfo::ARG_REL8, OpInfo::ARG_SLOT],
-        self::JUMP_SLOT0_TRUTHY => [OpInfo::ARG_REL8],
+        self::JUMP => [OpInfo::ARG_REL16],
+        self::JUMP_FALSY => [OpInfo::ARG_REL16, OpInfo::ARG_SLOT],
+        self::JUMP_SLOT0_FALSY => [OpInfo::ARG_REL16],
+        self::JUMP_TRUTHY => [OpInfo::ARG_REL16, OpInfo::ARG_SLOT],
+        self::JUMP_SLOT0_TRUTHY => [OpInfo::ARG_REL16],
         self::CALL_FILTER1 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_FILTER_ID],
         self::CALL_SLOT0_FILTER1 => [OpInfo::ARG_SLOT, OpInfo::ARG_FILTER_ID],
         self::CALL_FILTER2 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_FILTER_ID],

@@ -58,11 +58,11 @@ var rawOpcodes = []opcodeTemplate{
 	{"CONV_BOOL", "op arg:wslot"},
 	{"CONV_SLOT0_BOOL", "op *slot0"},
 
-	{"JUMP", "op pcdelta:rel8"},
-	{"JUMP_FALSY", "op pcdelta:rel8 cond:rslot"},
-	{"JUMP_SLOT0_FALSY", "op *slot0 pcdelta:rel8"},
-	{"JUMP_TRUTHY", "op pcdelta:rel8 cond:rslot"},
-	{"JUMP_SLOT0_TRUTHY", "op *slot0 pcdelta:rel8"},
+	{"JUMP", "op pcdelta:rel16"},
+	{"JUMP_FALSY", "op pcdelta:rel16 cond:rslot"},
+	{"JUMP_SLOT0_FALSY", "op *slot0 pcdelta:rel16"},
+	{"JUMP_TRUTHY", "op pcdelta:rel16 cond:rslot"},
+	{"JUMP_SLOT0_TRUTHY", "op *slot0 pcdelta:rel16"},
 
 	{"CALL_FILTER1", "op dst:wslot arg1:rslot fn:filterid"},
 	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid"},
@@ -143,8 +143,8 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 			arg.Kind = "OpInfo::ARG_STRING_CONST"
 		case "intindex":
 			arg.Kind = "OpInfo::ARG_INT_CONST"
-		case "rel8":
-			arg.Kind = "OpInfo::ARG_REL8"
+		case "rel16":
+			arg.Kind = "OpInfo::ARG_REL16"
 		case "imm8":
 			arg.Kind = "OpInfo::ARG_IMM8"
 		case "filterid":

@@ -16,4 +16,3 @@
 * `$x - 1` should be parsed OK (currently lexing -1 as negative int)
 * refactor compiler code
 * don't discard type information in things like compileTempExpr
-* increase the number of labels supported in compiler

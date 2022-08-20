@@ -725,23 +725,23 @@ class Compiler {
     }
 
     /**
-     * @param int $label_id
+     * @param int $label_id - 16bit
      */
     private function emitJump($label_id) {
-        $this->emit1(Op::JUMP, $label_id);
+        $this->result->code[] = Op::JUMP| ($label_id << 8);
     }
 
     /**
      * @param int $op
      * @param int $cond_slot
-     * @param int $label_id
+     * @param int $label_id - 16bit
      */
     private function emitCondJump($op, $cond_slot, $label_id) {
         if ($cond_slot === 0) {
-            $this->emit1($op+1, $label_id);
+            $this->result->code[] = ($op+1) | ($label_id << 8);
             return;
         }
-        $this->emit2($op, $label_id, $cond_slot);
+        $this->result->code[] = ($op) | ($label_id << 8) | ($cond_slot << 24);
     }
 
     /**
@@ -961,20 +961,20 @@ class Compiler {
                     $arg_mask = 0xff << $arg_shift;
                     $new_opdata = ($new_opdata & (~$arg_mask)) | ($new_slot << $arg_shift);
                 }
-                $arg_shift += 8;
+                $arg_shift += OpInfo::argSize($a) * 8;
             }
             $this->result->code[$pc] = $new_opdata;
         }
     }
 
     private function linkJumps() {
-        $mask = 0xff << 8;
+        $mask = 0xffff << 8;
         foreach ($this->result->code as $pc => $opdata) {
             $op = $opdata & 0xff;
             if (!OpInfo::isJump($op)) {
                 continue;
             }
-            $label_id = ($opdata >> 8) & 0xff;
+            $label_id = ($opdata >> 8) & 0xffff;
             $jump_target = $this->addr_by_label_id[$label_id];
             $jump_offset = ($jump_target - $pc) - 1;
             $this->result->code[$pc] = ($opdata & (~$mask)) | ($jump_offset << 8);

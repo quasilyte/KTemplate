@@ -6,7 +6,7 @@ class OpInfo {
     public const ARG_SLOT = 0;
     public const ARG_STRING_CONST = 1;
     public const ARG_INT_CONST = 2;
-    public const ARG_REL8 = 3;
+    public const ARG_REL16 = 3;
     public const ARG_IMM8 = 4;
     public const ARG_KEY_OFFSET = 5;
     public const ARG_CACHE_SLOT = 6;
@@ -24,6 +24,7 @@ class OpInfo {
         switch ($arg) {
         case self::ARG_FILTER_ID:
         case self::ARG_FUNC_ID:
+        case self::ARG_REL16:
             return 2;
         default:
             return 1;

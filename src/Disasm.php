@@ -17,7 +17,7 @@ class Disasm {
             if (!OpInfo::isJump($op)) {
                 continue;
             }
-            $offset = ($opdata >> 8) & 0xff;
+            $offset = ($opdata >> 8) & 0xffff;
             $target_pc = ($pc + $offset) + 1;
             if (!array_key_exists($target_pc, $label_by_addr)) {
                 $label_by_addr[$target_pc] = 'L' . count($label_by_addr);
@@ -62,7 +62,7 @@ class Disasm {
                 case OpInfo::ARG_INT_CONST:
                     $parts[] = $t->int_values[$v];
                     break;
-                case OpInfo::ARG_REL8:
+                case OpInfo::ARG_REL16:
                     $parts[] = $label_by_addr[$pc + $v + 1];
                     break;
                 case OpInfo::ARG_IMM8:

@@ -245,26 +245,26 @@ class Renderer {
                 break;
             
             case Op::JUMP:
-                $pc += ($opdata >> 8) & 0xff;
+                $pc += ($opdata >> 8) & 0xffff;
                 break;
             case Op::JUMP_FALSY:
-                if (!$state->slots[($opdata >> 16) & 0xff]) {
-                    $pc += ($opdata >> 8) & 0xff;
+                if (!$state->slots[($opdata >> 24) & 0xff]) {
+                    $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
             case Op::JUMP_SLOT0_FALSY:
                 if (!$slot0) {
-                    $pc += ($opdata >> 8) & 0xff;
+                    $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
             case Op::JUMP_TRUTHY:
-                if ($state->slots[($opdata >> 16) & 0xff]) {
-                    $pc += ($opdata >> 8) & 0xff;
+                if ($state->slots[($opdata >> 24) & 0xff]) {
+                    $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
             case Op::JUMP_SLOT0_TRUTHY:
                 if ($slot0) {
-                    $pc += ($opdata >> 8) & 0xff;
+                    $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
 
