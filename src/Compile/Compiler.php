@@ -297,11 +297,7 @@ class Compiler {
      * @param string $value
      */
     private function compileStringConst($dst, $value) {
-        if ($dst === 0) {
-            $this->emit1(Op::LOAD_SLOT0_STRING_CONST, $this->internString($value));
-        } else {
-            $this->emit2(Op::LOAD_STRING_CONST, $dst, $this->internString($value));
-        }
+        $this->emit2dst(Op::LOAD_STRING_CONST, $dst, $this->internString($value));
     }
 
     /**
@@ -309,11 +305,7 @@ class Compiler {
      * @param int $value
      */
     private function compileIntConst($dst, $value) {
-        if ($dst === 0) {
-            $this->emit1(Op::LOAD_SLOT0_INT_CONST, $this->internInt($value));
-        } else {
-            $this->emit2(Op::LOAD_INT_CONST, $dst, $this->internInt($value));
-        }
+        $this->emit2dst(Op::LOAD_INT_CONST, $dst, $this->internInt($value));
     }
 
     /**
@@ -391,11 +383,7 @@ class Compiler {
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
-            if ($dst === 0) {
-                $this->emit2(Op::LOAD_SLOT0_EXTDATA_1, $cache_slot, $key_offset);
-            } else {
-                $this->emit3(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
-            }
+            $this->emit3dst(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
             return Types::UNKNOWN;
 
         case Expr::DOT_ACCESS:
@@ -407,11 +395,7 @@ class Compiler {
             $cache_slot = $slot_info & 0xff;
             $key_offset = ($slot_info >> 8) & 0xff;
             $op = $p3 === '' ? Op::LOAD_EXTDATA_2 : Op::LOAD_EXTDATA_3;
-            if ($dst === 0) {
-                $this->emit2($op + 1, $cache_slot, $key_offset);
-            } else {
-                $this->emit3($op, $dst, $cache_slot, $key_offset);
-            }
+            $this->emit3dst($op, $dst, $cache_slot, $key_offset);
             return Types::UNKNOWN;
 
         case Expr::OR:
@@ -444,11 +428,7 @@ class Compiler {
             return Types::UNKNOWN;
 
         case Expr::NULL_LIT:
-            if ($dst === 0) {
-                $this->emit(Op::LOAD_SLOT0_NULL);
-            } else {
-                $this->emit1(Op::LOAD_NULL, $dst);
-            }
+            $this->emit1dst(Op::LOAD_NULL, $dst);
             return Types::NULL;
 
         case Expr::STRING_LIT:
@@ -456,11 +436,7 @@ class Compiler {
             return Types::STRING;
 
         case Expr::BOOL_LIT:
-            if ($dst === 0) {
-                $this->emit1(Op::LOAD_SLOT0_BOOL, (int)$e->value);
-            } else {
-                $this->emit2(Op::LOAD_BOOL, $dst, (int)$e->value);
-            }
+            $this->emit2dst(Op::LOAD_BOOL, $dst, (int)$e->value);
             return Types::BOOL;
 
         case Expr::INT_LIT:
@@ -631,11 +607,7 @@ class Compiler {
         $filter_id = $this->env->getFilterID((string)$rhs->value, 1);
         if ($filter_id === -1) {
             if ($rhs->value === 'length') {
-                if ($dst === 0) {
-                    $this->emit1(Op::LENGTH_SLOT0_FILTER, $arg1_slot);
-                } else {
-                    $this->emit2(Op::LENGTH_FILTER, $dst, $arg1_slot);
-                }
+                $this->emit2dst(Op::LENGTH_FILTER, $dst, $arg1_slot);
                 return;
             }
             $this->failExpr($rhs, "$rhs->value filter is not defined");
@@ -712,11 +684,7 @@ class Compiler {
      */
     private function compileUnaryExpr($dst, $op, $e) {
         $arg = $this->compileTempExpr($this->parser->getExprMember($e, 0));
-        if ($dst === 0) {
-            $this->emit1($op + 1, $arg);
-            return;
-        }
-        $this->emit2($op, $dst, $arg);
+        $this->emit2dst($op, $dst, $arg);
     }
 
     /**
@@ -789,6 +757,20 @@ class Compiler {
             return;
         }
         $this->emit2($op, $dst, $arg1);
+    }
+
+    /**
+     * @param int $op
+     * @param int $dst
+     * @param int $arg1
+     * @param int $arg2
+     */
+    private function emit3dst($op, $dst, $arg1, $arg2) {
+        if ($dst === 0) {
+            $this->emit2($op+1, $arg1, $arg2);
+            return;
+        }
+        $this->emit3($op, $dst, $arg1, $arg2);
     }
 
     /**
