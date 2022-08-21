@@ -161,7 +161,10 @@ class ExprParser {
                 $this->parseBinaryExpr($left, Expr::MUL, $right_prec);
                 break;
             case Token::SLASH:
-                $this->parseBinaryExpr($left, Expr::DIV, $right_prec);
+                $this->parseBinaryExpr($left, Expr::QUO, $right_prec);
+                break;
+            case Token::PERCENT:
+                $this->parseBinaryExpr($left, Expr::MOD, $right_prec);
                 break;
             case Token::TILDE:
                 $this->parseBinaryExpr($left, Expr::CONCAT, $right_prec);
@@ -313,6 +316,7 @@ class ExprParser {
             return 5;
         case Token::STAR:
         case Token::SLASH:
+        case Token::PERCENT:
             return 7;
         case Token::LBRACKET:
             return 9;

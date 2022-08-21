@@ -52,6 +52,7 @@ class Token {
     public const COMMA = 46; // ,
     public const LBRACKET = 47; // [
     public const RBRACKET = 48; // ]
+    public const PERCENT = 49; // %
 
     public $kind = 0;
     public $pos_from = 0;
@@ -78,7 +79,7 @@ class Token {
         case self::INT_LIT:
         case self::STRING_LIT_Q1:
         case self::STRING_LIT_Q2:
-                    return true;
+            return true;
         default:
             return false;
         }
@@ -104,6 +105,8 @@ class Token {
             return '-';
         case self::STAR:
             return '*';
+        case self::PERCENT:
+            return '%';
         case self::SLASH:
             return '/';
         case self::LPAREN:
@@ -175,6 +178,8 @@ class Token {
             return 'MINUS';
         case self::STAR:
             return 'STAR';
+        case self::PERCENT:
+            return 'PERCENT';
         case self::SLASH:
             return 'SLASH';
         case self::LPAREN:

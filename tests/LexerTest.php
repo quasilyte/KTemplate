@@ -139,8 +139,8 @@ class LexerTest extends TestCase {
                 ['ECHO_START', 'IDENT(x)', 'STAR', 'IDENT(y)', 'ECHO_END'],
             ],
             [
-                '{{ x / y }}',
-                ['ECHO_START', 'IDENT(x)', 'SLASH', 'IDENT(y)', 'ECHO_END'],
+                '{{ x / y % z }}',
+                ['ECHO_START', 'IDENT(x)', 'SLASH', 'IDENT(y)', 'PERCENT', 'IDENT(z)', 'ECHO_END'],
             ],
             [
                 '{{ x + 1 }}',

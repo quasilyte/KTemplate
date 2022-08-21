@@ -457,6 +457,8 @@ class Compiler {
         case Expr::ADD:
         case Expr::SUB:
         case Expr::MUL:
+        case Expr::QUO:
+        case Expr::MOD:
             $this->compileBinaryExprNode($dst, $e);
             return Types::UNKNOWN;
 
@@ -718,6 +720,10 @@ class Compiler {
             return Op::SUB;
         case Expr::MUL:
             return Op::MUL;
+        case Expr::QUO:
+            return Op::QUO;
+        case Expr::MOD:
+            return Op::MOD;
 
         default:
             Assert::unreachable("can't map expr kind to bytecode op");

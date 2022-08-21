@@ -129,6 +129,24 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
+            '{{ x / y / z }}' => [
+                '  LOAD_EXTDATA_1 slot5 slot1 x',
+                '  LOAD_EXTDATA_1 slot6 slot2 y',
+                '  QUO slot4 slot5 slot6',
+                '  LOAD_EXTDATA_1 slot7 slot3 z',
+                '  QUO_SLOT0 *slot0 slot4 slot7',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x % y % z }}' => [
+                '  LOAD_EXTDATA_1 slot5 slot1 x',
+                '  LOAD_EXTDATA_1 slot6 slot2 y',
+                '  MOD slot4 slot5 slot6',
+                '  LOAD_EXTDATA_1 slot7 slot3 z',
+                '  MOD_SLOT0 *slot0 slot4 slot7',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
 
             // Array indexing.
             '{{ x[10] }}' => [

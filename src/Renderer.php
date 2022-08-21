@@ -354,6 +354,18 @@ class Renderer {
             case Op::MUL_SLOT0:
                 $slot0 = $state->slots[($opdata >> 8) & 0xff] * $state->slots[($opdata >> 16) & 0xff];
                 break;
+            case Op::QUO:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] / $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::QUO_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] / $state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::MOD:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff] % $state->slots[($opdata >> 24) & 0xff];
+                break;
+            case Op::MOD_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff] % $state->slots[($opdata >> 16) & 0xff];
+                break;
 
             case Op::CALL_FILTER1:
                 $arg1 = $state->slots[($opdata >> 16) & 0xff];

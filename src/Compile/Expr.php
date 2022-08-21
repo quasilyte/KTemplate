@@ -8,7 +8,7 @@ class Expr {
     public const ADD = 2;
     public const SUB = 3;
     public const MUL = 4;
-    public const DIV = 5;
+    public const QUO = 5;
     public const CONCAT = 6;
     public const AND = 7;
     public const OR = 8;
@@ -30,6 +30,7 @@ class Expr {
     public const CALL = 24;
     public const NEG = 25;
     public const INDEX = 26;
+    public const MOD = 27;
 
     /** @var int */
     public $kind = 0;

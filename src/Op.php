@@ -305,6 +305,22 @@ class Op {
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     public const MUL_SLOT0 = 77;
     
+    // Encoding: 0x4e dst:wslot arg1:rslot arg2:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    public const QUO = 78;
+    
+    // Encoding: 0x4f arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    public const QUO_SLOT0 = 79;
+    
+    // Encoding: 0x50 dst:wslot arg1:rslot arg2:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    public const MOD = 80;
+    
+    // Encoding: 0x51 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    public const MOD_SLOT0 = 81;
+    
     public static function opcodeString(int $op): string {
         switch ($op) {
         case 1:
@@ -461,6 +477,14 @@ class Op {
             return 'MUL';
         case 77:
             return 'MUL_SLOT0';
+        case 78:
+            return 'QUO';
+        case 79:
+            return 'QUO_SLOT0';
+        case 80:
+            return 'MOD';
+        case 81:
+            return 'MOD_SLOT0';
         default:
             return '?';
         }
@@ -622,6 +646,14 @@ class Op {
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case 77: // MUL_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 78: // QUO
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 79: // QUO_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 80: // MOD
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 81: // MOD_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
         default:
             return 0;
         }
@@ -705,5 +737,9 @@ class Op {
         self::SUB_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::MUL => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::MUL_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::QUO => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::QUO_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::MOD => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::MOD_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
     ];
 }

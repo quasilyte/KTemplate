@@ -113,6 +113,10 @@ var rawOpcodes = []opcodeTemplate{
 	{"SUB_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 	{"MUL", "op dst:wslot arg1:rslot arg2:rslot"},
 	{"MUL_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
+	{"QUO", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"QUO_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
+	{"MOD", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"MOD_SLOT0", "op *slot0 arg1:rslot arg2:rslot"},
 }
 
 func getOpcodeInfo(data opcodeTemplate) opcodeInfo {

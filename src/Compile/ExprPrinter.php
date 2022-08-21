@@ -43,8 +43,10 @@ class ExprPrinter {
             return self::formatBinaryExpr($p, $e, '-');
         case Expr::MUL:
             return self::formatBinaryExpr($p, $e, '*');
-        case Expr::DIV:
+        case Expr::QUO:
             return self::formatBinaryExpr($p, $e, '/');
+        case Expr::MOD:
+            return self::formatBinaryExpr($p, $e, '%');
         case Expr::CONCAT:
             return self::formatBinaryExpr($p, $e, '~');
         case Expr::AND:

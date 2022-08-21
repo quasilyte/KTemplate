@@ -200,6 +200,12 @@ class Lexer {
             case ord(','):
                 $this->acceptSimpleToken($dst, Token::COMMA, 1);
                 return;
+            case ord('%'):
+                if ($this->peekChar(1) !== ord('}')) {
+                    $this->acceptSimpleToken($dst, Token::PERCENT, 1);
+                    return;
+                }
+                break; // Scan as top-level token
             case ord('<'):
                 switch ($this->peekChar(1)) {
                 case ord('='):

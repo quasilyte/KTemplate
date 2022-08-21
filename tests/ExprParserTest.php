@@ -24,6 +24,9 @@ class ExprParserTest extends TestCase {
             ['x * (y + z)', '(* x (+ y z))', 5],
             ['x1 * x2 * x3 * x4', '(* (* (* x1 x2) x3) x4)', 7],
 
+            ['x / y', '(/ x y)', 3],
+            ['x % y', '(% x y)', 3],
+
             ['x ~ y ~ z', '(~ (~ x y) z)', 5],
 
             ['x.y', '(. x y)', 3],

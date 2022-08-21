@@ -40,7 +40,7 @@ class ConstFolder {
                 return null;
             }
             return $lhs * $rhs;
-        case Expr::DIV:
+        case Expr::QUO:
             $lhs = self::fold($x);
             if (!is_numeric($lhs)) {
                 return null;
@@ -98,7 +98,7 @@ class ConstFolder {
         case Expr::ADD:
         case Expr::SUB:
         case Expr::MUL:
-        case Expr::DIV:
+        case Expr::QUO:
             return $this->foldBinaryExprNode($e);
 
         default:
