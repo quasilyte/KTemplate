@@ -307,24 +307,31 @@ class CompilerTest extends TestCase {
             '{{ x|default(0) }}' => [
                 '  LOAD_EXTDATA_1 slot2 slot1 x',
                 '  LOAD_INT_CONST slot3 0',
-                '  CALL_SLOT0_FILTER2 *slot0 slot2 slot3 default',
+                '  DEFAULT_SLOT0_FILTER slot2 slot3 slot1',
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
-            '{{ x|default(0)|add1|default(10) }}' => [
+            '{{ x|mydefault(0) }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_INT_CONST slot3 0',
+                '  CALL_SLOT0_FILTER2 *slot0 slot2 slot3 mydefault',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x|mydefault(0)|add1|mydefault(10) }}' => [
                 '  LOAD_EXTDATA_1 slot4 slot1 x',
                 '  LOAD_INT_CONST slot5 0',
-                '  CALL_FILTER2 slot3 slot4 slot5 default',
+                '  CALL_FILTER2 slot3 slot4 slot5 mydefault',
                 '  CALL_FILTER1 slot2 slot3 add1',
                 '  LOAD_INT_CONST slot6 10',
-                '  CALL_SLOT0_FILTER2 *slot0 slot2 slot6 default',
+                '  CALL_SLOT0_FILTER2 *slot0 slot2 slot6 mydefault',
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
-            '{{ x|default(y) }}' => [
+            '{{ x|mydefault(y) }}' => [
                 '  LOAD_EXTDATA_1 slot3 slot1 x',
                 '  LOAD_EXTDATA_1 slot4 slot2 y',
-                '  CALL_SLOT0_FILTER2 *slot0 slot3 slot4 default',
+                '  CALL_SLOT0_FILTER2 *slot0 slot3 slot4 mydefault',
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
@@ -447,7 +454,7 @@ class CompilerTest extends TestCase {
         $env->registerFilter1('strlen', function ($s) { return strlen($s); });
         $env->registerFilter1('add1', function ($x) { return $x + 1; });
         $env->registerFilter1('sub1', function ($x) { return $x - 1; });
-        $env->registerFilter2('default', function ($x, $or_else) { return $x ?? $or_else; });
+        $env->registerFilter2('mydefault', function ($x, $or_else) { return $x ?? $or_else; });
         $env->registerFunction0('testfunc0', function () { return 10; });
         $env->registerFunction1('testfunc1', function ($x) { return $x; });
         $env->registerFunction2('testfunc2', function ($x, $y) { return $x + $y; });

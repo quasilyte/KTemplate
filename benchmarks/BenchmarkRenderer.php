@@ -13,7 +13,8 @@ class BenchmarkRenderer {
     private $var_access1_x2_template;
     private $var_access1_x10_template;
     private $var_access1_x100_template;
-    private $length_template;
+    private $length_filter_template;
+    private $default_filter_template;
     private $slot0_template;
 
     /** @var Env */
@@ -27,7 +28,6 @@ class BenchmarkRenderer {
     public function __construct() {
         $env = new Env();
         $this->env = $env;
-        $this->env->registerFilter1('length', function ($x) { return strlen($x); });
 
         $this->renderer = new Renderer();
         $this->array_data_provider = new ArrayDataProvider();
@@ -48,7 +48,8 @@ class BenchmarkRenderer {
         }
         $this->var_access1_x100_template = $c->compile($env, 'test', $var_access1_src);
 
-        $this->length_template = $c->compile($env, 'test', '{% let $s = "" %}{{ $s|length }}{{ $s|length }}{{ $s|length }}{{ $s|length }}');
+        $this->length_filter_template = $c->compile($env, 'test', '{% let $s = "" %}{{ $s|length }}{{ $s|length }}{{ $s|length }}{{ $s|length }}');
+        $this->default_filter_template = $c->compile($env, 'test', '{% let $x = null %}{{ $x|default(0) }}{{ $x|default("a") }}{{ $x|default(1) }}{{ $x|default(null)|default(1) }}');
         $this->slot0_template = $c->compile($env, 'test', '{{null}}{{null}}{{null}}{{null}}');
     }
 
@@ -56,8 +57,12 @@ class BenchmarkRenderer {
         return $this->renderer->render($this->env, $this->slot0_template, $this->array_data_provider);
     }
 
-    public function benchmarkLength() {
-        return $this->renderer->render($this->env, $this->length_template, $this->array_data_provider);
+    public function benchmarkLengthFilter() {
+        return $this->renderer->render($this->env, $this->length_filter_template, $this->array_data_provider);
+    }
+
+    public function benchmarkDefaultFilter() {
+        return $this->renderer->render($this->env, $this->default_filter_template, $this->array_data_provider);
     }
 
     public function benchmarkVarAccess1() {

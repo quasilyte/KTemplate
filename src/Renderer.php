@@ -441,12 +441,42 @@ class Renderer {
                 $arg = $state->slots[($opdata >> 8) & 0xff];
                 $slot0 = self::lengthFilter($env, $arg);
                 break;
+            case Op::DEFAULT_FILTER:
+                $arg1 = $state->slots[($opdata >> 16) & 0xff];
+                $arg2 = $state->slots[($opdata >> 24) & 0xff];
+                $state->slots[($opdata >> 8) & 0xff] = self::defaultFilter($arg1, $arg2);
+                break;
+            case Op::DEFAULT_SLOT0_FILTER:
+                $arg1 = $state->slots[($opdata >> 8) & 0xff];
+                $arg2 = $state->slots[($opdata >> 16) & 0xff];
+                $slot0 = self::defaultFilter($arg1, $arg2);
+                break;
 
             default:
                 fprintf(STDERR, "%s\n", Op::opcodeString($op));
                 return;
             }
         }
+    }
+
+    /**
+     * @param mixed $x
+     * @return bool
+     */
+    private static function isEmptyPredicate($x) {
+        return $x === '' || $x === false || $x === null || $x === [];
+    }
+
+    /**
+     * @param mixed $x
+     * @param mixed $default
+     * @return mixed
+     */
+    private static function defaultFilter($x, $default) {
+        if (self::isEmptyPredicate($x)) {
+            return $default;
+        }
+        return $x;
     }
 
     /**

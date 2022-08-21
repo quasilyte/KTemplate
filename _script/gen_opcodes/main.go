@@ -85,6 +85,8 @@ var rawOpcodes = []opcodeTemplate{
 	{"CALL_SLOT0_FUNC3", "op *slot0 arg1:rslot arg2:rslot arg3:rslot fn:funcid"},
 	{"LENGTH_FILTER", "op dst:wslot arg1:rslot"},
 	{"LENGTH_SLOT0_FILTER", "op dst:wslot arg1:rslot"},
+	{"DEFAULT_FILTER", "op dst:wslot arg1:rslot arg2:rslot"},
+	{"DEFAULT_SLOT0_FILTER", "op dst:wslot arg1:rslot arg2:rslot"},
 
 	{"NOT", "op dst:wslot arg:rslot"},
 	{"NOT_SLOT0", "op *slot0 arg:rslot"},

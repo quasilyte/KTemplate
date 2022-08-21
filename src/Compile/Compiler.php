@@ -643,6 +643,10 @@ class Compiler {
         $filter_name = (string)$this->parser->getExprMember($rhs, 0)->value;
         $filter_id = $this->env->getFilterID($filter_name, 2);
         if ($filter_id === -1) {
+            if ($filter_name === 'default') {
+                $this->emit3dst(Op::DEFAULT_FILTER, $dst, $arg1_slot, $arg2_slot);
+                return;
+            }
             $this->failExpr($this->parser->getExprMember($rhs, 0), "$filter_name filter is not defined");
         }
         if ($dst === 0) {
