@@ -448,9 +448,17 @@ class Compiler {
         case Expr::CONCAT:
             $this->compileBinaryExprNode($dst, $e);
             return Types::STRING;
-        case Expr::EQ:
+
         case Expr::GT:
+            $this->compileReversedBinaryExprNode($dst, Op::LT, $e);
+            return Types::BOOL;
+        case Expr::GT_EQ:
+            $this->compileReversedBinaryExprNode($dst, Op::LT_EQ, $e);
+            return Types::BOOL;
+
+        case Expr::EQ:
         case Expr::LT:
+        case Expr::LT_EQ:
         case Expr::NOT_EQ:
             $this->compileBinaryExprNode($dst, $e);
             return Types::BOOL;
@@ -708,10 +716,10 @@ class Compiler {
             return Op::CONCAT;
         case Expr::EQ:
             return Op::EQ;
-        case Expr::GT:
-            return Op::GT;
         case Expr::LT:
             return Op::LT;
+        case Expr::LT_EQ:
+            return Op::LT_EQ;
         case Expr::NOT_EQ:
             return Op::NOT_EQ;
         case Expr::ADD:
@@ -740,6 +748,19 @@ class Compiler {
         $rhs_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
         $op = $this->opByBinaryExprKind($e->kind);
         $this->compileBinaryExpr($dst, $op, $lhs_slot, $rhs_slot);
+    }
+
+    /**
+     * @param int $dst
+     * @param int $op
+     * @param Expr $e
+     */
+    private function compileReversedBinaryExprNode($dst, $op, $e) {
+        // Evaluate the arguments normally, but emit opcode slot
+        // args in the reversed order.
+        $lhs_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
+        $rhs_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
+        $this->compileBinaryExpr($dst, $op, $rhs_slot, $lhs_slot);
     }
 
     /**

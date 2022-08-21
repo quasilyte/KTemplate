@@ -104,3 +104,11 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ $myvar / $i1 }}
 {{ $myvar % 3 }}
 {{ $myvar % 11 % ($i1 * 5) }}
+{{ assert_true($i1 > ($i2 - 1)) }}
+{{ assert_true($i1 < ($i2 - 1)) }}
+{{ assert_true($i1 >= ($i2 - 1)) }}
+{{ assert_true($i1 <= ($i2 - 1)) }}
+{{ assert_false(($i2 - 1) > $i1) }}
+{{ assert_false(($i2 - 1) < $i1) }}
+{{ assert_false(($i2 - 1) >= $i1) }}
+{{ assert_false(($i2 - 1) <= $i1) }}

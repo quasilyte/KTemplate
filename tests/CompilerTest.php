@@ -148,6 +148,36 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
 
+            // Comparisons.
+            '{{ x < y }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LT_SLOT0 *slot0 slot3 slot4',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x > y }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LT_SLOT0 *slot0 slot4 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x <= y }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LT_EQ_SLOT0 *slot0 slot3 slot4',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x >= y }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LT_EQ_SLOT0 *slot0 slot4 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
             // Array indexing.
             '{{ x[10] }}' => [
                 '  LOAD_EXTDATA_1 slot2 slot1 x',
