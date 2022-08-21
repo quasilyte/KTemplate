@@ -39,7 +39,7 @@ It's possible to use parentheses to group the expressions and force some specifi
 
 ### Literals
 
-Single-quoted and double-quoted string literals are functionally identical. They can have escape sequences supported by [addcslashes](https://www.php.net/manual/en/function.addcslashes.php).
+Single-quoted and double-quoted string literals are functionally identical. They can have escape sequences recognized by [stripcslashes](https://www.php.net/manual/en/function.stripcslashes.php).
 
 ### Variables and data providers
 
