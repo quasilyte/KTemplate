@@ -17,6 +17,9 @@ class Template {
     /** @var int[] */
     public $code = [];
 
+    /** @var int */
+    public $frame_size = 1;
+
     /**
      * @return string
      */

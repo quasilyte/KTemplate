@@ -1044,6 +1044,7 @@ class Compiler {
     private function finalizeTemplate() {
         $this->linkJumps();
         $this->reallocateSlots();
+        $this->result->frame_size = 1 + count($this->frame->cache_slots) + $this->frame->num_locals;
     }
 
     private function reallocateSlots() {
