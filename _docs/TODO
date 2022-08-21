@@ -4,7 +4,6 @@
 * more end2end tests
 * adjusting frame size for the template
 * nested/partial templates
-* full double quote strings support
 * filesystem bytecode cache
 * float literals, values and constants
 * builtin functions

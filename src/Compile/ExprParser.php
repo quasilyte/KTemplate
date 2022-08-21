@@ -101,12 +101,11 @@ class ExprParser {
             $left->value = (int)$lexer->tokenText($tok);
             break;
         case Token::STRING_LIT_Q1:
-            $left->kind = Expr::STRING_LIT;
-            $left->value = $this->interpretString($left, $lexer->stringText($tok), ord('\''));
-            break;
         case Token::STRING_LIT_Q2:
+            // We may enable string interpolation inside DQ strings later.
+            // For now, they're behaving identically.
             $left->kind = Expr::STRING_LIT;
-            $left->value = $this->interpretString($left, $lexer->stringText($tok), ord('\"'));
+            $left->value = $this->interpretString($left, $lexer->stringText($tok));
             break;
         case Token::KEYWORD_NULL:
             $left->kind = Expr::NULL_LIT;
@@ -271,68 +270,14 @@ class ExprParser {
     /**
      * @param Expr $e
      * @param string $raw_string
-     * @param int $quote
      * @return string
      */
-    private function interpretString($e, $raw_string, $quote) {
+    private function interpretString($e, $raw_string) {
         if (!Strings::contains($raw_string, '\\')) {
             // Fast path: nothing to replace.
             return $raw_string;
         }
-
-        // To understand what's going on, consult the manual:
-        // https://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.double
-
-        if ($quote === ord('"')) {
-            return $this->interpretStringQ2($e, $raw_string);
-        }
-        return $this->interpretStringQ1($e, $raw_string);
-    }
-
-    /**
-     * @param Expr $e
-     * @param string $raw_string
-     * @return string
-     */
-    private function interpretStringQ1($e, $raw_string) {
-        $out = '';
-        $i = 0;
-        while ($i < strlen($raw_string)) {
-            $ch = ord($raw_string[$i]);
-            if ($ch === ord('\\')) {
-                if (($i + 1) >= strlen($raw_string)) {
-                    $this->setError($e, 'illegal trailing \\');
-                    return $out;
-                }
-                switch (ord($raw_string[$i+1])) {
-                case ord('\''):
-                    $out .= '\'';
-                    break;
-                case ord('\\'):
-                    $out .= '\\';
-                    break;
-                default:
-                    $out .= '\\';
-                    $out .= $raw_string[$i+1];
-                    break;
-                }
-                $i += 2;
-                continue;
-            }
-            $out .= $raw_string[$i];
-            $i++;
-        }
-        return $out;
-    }
-
-    /**
-     * @param Expr $e
-     * @param string $raw_string
-     * @return string
-     */
-    private function interpretStringQ2($e, $raw_string) {
-        // TODO: add an actual double quote string support.
-        return $this->interpretStringQ1($e, $raw_string);
+        return stripcslashes($raw_string);
     }
 
     private function unaryPrecedence(int $kind): int {

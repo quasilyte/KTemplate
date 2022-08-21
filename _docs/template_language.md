@@ -32,10 +32,14 @@ Supported kinds of expressions:
 | Bool literals | `true`, `false` |
 | Local variables | `$x`, `$foo` |
 | External variables | `x`, `x.y.z` |
-| Array indexing | `$arr[0]`, `$arr['key']`, `$arr.key` |
+| Array indexing | `$arr[0]`, `$arr['key']` |
 | Operators | `x ~ y`, `x and y`, `not x` |
 
 It's possible to use parentheses to group the expressions and force some specific evaluation order in case the default precedence would not work for you.
+
+### Literals
+
+Single-quoted and double-quoted string literals are functionally identical. They can have escape sequences supported by [addcslashes](https://www.php.net/manual/en/function.addcslashes.php).
 
 ### Variables and data providers
 

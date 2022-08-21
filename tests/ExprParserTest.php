@@ -71,6 +71,10 @@ class ExprParserTest extends TestCase {
 
             ['$x["a"]', '([] $x `a`)', 3],
             ['$x["a"][0]', '([] ([] $x `a`) 0)', 5],
+
+            ['"\x41\x23"', '`A#`', 1],
+            ['"\""', '`"`', 1],
+            ["'\\''", "`'`", 1],
         ];
         $lexer = new Lexer();
         $p = new ExprParser();
