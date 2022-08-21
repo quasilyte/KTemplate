@@ -2,7 +2,7 @@
 
 ## Overview
 
-KTemplate is a simple text template engine like [Twig](https://twig.symfony.com/) for PHP and [KPHP](https://github.com/VKCOM/kphp).
+KTemplate is a simple text template engine with [Twig](https://twig.symfony.com/)-like syntax for PHP and [KPHP](https://github.com/VKCOM/kphp) .
 
 Features:
 
