@@ -1,4 +1,3 @@
-* add missing basic operators
 * add `for` loops
 * docs: add examples
 * more end2end tests
@@ -10,5 +9,4 @@
 * output escaping settings
 * macros system
 * compile errors for long jumps/too many consts and vars, etc
-* refactor compiler code
 * don't discard type information in things like compileTempExpr
