@@ -41,6 +41,8 @@ var rawOpcodes = []opcodeTemplate{
 	{"LOAD_SLOT0_BOOL", "op *slot0 val:imm8"},
 	{"LOAD_INT_CONST", "op dst:wslot val:intindex"},
 	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex"},
+	{"LOAD_FLOAT_CONST", "op dst:wslot val:floatindex"},
+	{"LOAD_SLOT0_FLOAT_CONST", "op *slot0 val:floatindex"},
 	{"LOAD_STRING_CONST", "op dst:wslot val:strindex"},
 	{"LOAD_SLOT0_STRING_CONST", "op *slot0 val:strindex"},
 	{"LOAD_EXTDATA_1", "op dst:wslot cache:cacheslot k:keyoffset"},
@@ -156,6 +158,8 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 			arg.Kind = "OpInfo::ARG_STRING_CONST"
 		case "intindex":
 			arg.Kind = "OpInfo::ARG_INT_CONST"
+		case "floatindex":
+			arg.Kind = "OpInfo::ARG_FLOAT_CONST"
 		case "rel16":
 			arg.Kind = "OpInfo::ARG_REL16"
 		case "imm8":

@@ -53,6 +53,7 @@ class Token {
     public const LBRACKET = 47; // [
     public const RBRACKET = 48; // ]
     public const PERCENT = 49; // %
+    public const FLOAT_LIT = 50;
 
     public $kind = 0;
     public $pos_from = 0;
@@ -77,6 +78,7 @@ class Token {
         case self::IDENT:
         case self::DOLLAR_IDENT:
         case self::INT_LIT:
+        case self::FLOAT_LIT:
         case self::STRING_LIT_Q1:
         case self::STRING_LIT_Q2:
             return true;
@@ -168,6 +170,8 @@ class Token {
             return 'DOLLAR_IDENT';
         case self::INT_LIT:
             return 'INT_LIT';
+        case self::FLOAT_LIT:
+            return 'FLOAT_LIT';
         case self::STRING_LIT_Q1:
             return 'STRING_LIT_Q1';
         case self::STRING_LIT_Q2:

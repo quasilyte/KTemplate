@@ -11,6 +11,8 @@ class Template {
     public $keys = [];
     /** @var int[] */
     public $int_values = [];
+    /** @var float[] */
+    public $float_values = [];
 
     /** @var int[] */
     public $code = [];

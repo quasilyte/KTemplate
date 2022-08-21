@@ -36,6 +36,8 @@ class Compiler {
     private $string_values;
     /** @var int[] */
     private $int_values;
+    /** @var int[] */
+    private $float_values;
 
     public function __construct() {
         $this->lexer = new Lexer();
@@ -336,6 +338,14 @@ class Compiler {
     }
 
     /**
+     * @param int $dst
+     * @param float $value
+     */
+    private function compileFloatConst($dst, $value) {
+        $this->emit2dst(Op::LOAD_FLOAT_CONST, $dst, $this->internFloat($value));
+    }
+
+    /**
      * @param Expr $e
      * @return bool
      */
@@ -487,6 +497,10 @@ class Compiler {
         case Expr::INT_LIT:
             $this->compileIntConst($dst, (int)$e->value);
             return Types::INT;
+
+        case Expr::FLOAT_LIT:
+            $this->compileFloatConst($dst, (float)$e->value);
+            return Types::FLOAT;
 
         case Expr::CALL:
             $this->compileCall($dst, $e);
@@ -784,6 +798,7 @@ class Compiler {
         $this->env = null;
         $this->string_values = [];
         $this->int_values = [];
+        $this->float_values = [];
     }
 
     /**
@@ -798,6 +813,7 @@ class Compiler {
         $this->frame->reset($this->result);
         $this->string_values = [];
         $this->int_values = [];
+        $this->float_values = [];
         $this->addr_by_label_id = [];
         $this->label_seq = 0;
     }
@@ -963,13 +979,27 @@ class Compiler {
      * @param int $v
      * @return int
      */
-    private function internInt(int $v) {
+    private function internInt($v) {
         if (array_key_exists($v, $this->int_values)) {
             return $this->int_values[$v];
         }
         $id = count($this->result->int_values);
         $this->result->int_values[] = $v;
         $this->int_values[$v] = $id;
+        return $id;
+    }
+
+    /**
+     * @param float $v
+     * @return int
+     */
+    private function internFloat($v) {
+        if (array_key_exists($v, $this->float_values)) {
+            return $this->float_values[$v];
+        }
+        $id = count($this->result->float_values);
+        $this->result->float_values[] = $v;
+        $this->float_values[$v] = $id;
         return $id;
     }
 

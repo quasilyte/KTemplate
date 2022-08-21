@@ -100,6 +100,10 @@ class ExprParser {
             $left->kind = Expr::INT_LIT;
             $left->value = (int)$lexer->tokenText($tok);
             break;
+        case Token::FLOAT_LIT:
+            $left->kind = Expr::FLOAT_LIT;
+            $left->value = (float)$lexer->tokenText($tok);
+            break;
         case Token::STRING_LIT_Q1:
         case Token::STRING_LIT_Q2:
             // We may enable string interpolation inside DQ strings later.

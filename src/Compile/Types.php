@@ -6,8 +6,9 @@ class Types {
     public const UNKNOWN = 0;
     public const BOOL = 1;
     public const INT = 2;
-    public const STRING = 3;
-    public const NULL = 4;
+    public const FLOAT = 3;
+    public const STRING = 4;
+    public const NULL = 5;
 
     /**
      * @param int $type
@@ -21,6 +22,8 @@ class Types {
             return 'bool';
         case self::INT:
             return 'int';
+        case self::FLOAT:
+            return 'float';
         case self::STRING:
             return 'string';
         case self::NULL:

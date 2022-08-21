@@ -112,3 +112,7 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ assert_false(($i2 - 1) < $i1) }}
 {{ assert_false(($i2 - 1) >= $i1) }}
 {{ assert_false(($i2 - 1) <= $i1) }}
+{{ 5.5 }}
+{% set $myvar = 4.6 %}
+{{ assert_true($myvar == 4.6) }}
+{{ assert_true($myvar == 3.6) }}

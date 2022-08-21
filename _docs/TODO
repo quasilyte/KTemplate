@@ -4,7 +4,6 @@
 * adjusting frame size for the template
 * nested/partial templates
 * filesystem bytecode cache
-* float literals, values and constants
 * builtin functions
 * output escaping settings
 * macros system

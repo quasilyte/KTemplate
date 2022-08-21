@@ -51,9 +51,7 @@ class Disasm {
                     $parts[] = "slot$v";
                     break;
                 case OpInfo::ARG_STRING_CONST:
-                    $s = addslashes($t->string_values[$v]);
-                    $s = str_replace("\n", "\\n", $s);
-                    $s = str_replace("\r", "\\r", $s);
+                    $s = addcslashes($t->string_values[$v], "\0\t\"\\\n\r");
                     if (strlen($s) > 32) {
                         $s = substr($s, 0, 29) . '...';
                     } 
@@ -61,6 +59,9 @@ class Disasm {
                     break;
                 case OpInfo::ARG_INT_CONST:
                     $parts[] = $t->int_values[$v];
+                    break;
+                case OpInfo::ARG_FLOAT_CONST:
+                    $parts[] = $t->float_values[$v];
                     break;
                 case OpInfo::ARG_REL16:
                     $parts[] = $label_by_addr[$pc + $v + 1];

@@ -132,6 +132,12 @@ class Renderer {
             case Op::LOAD_SLOT0_INT_CONST:
                 $slot0 = $t->int_values[($opdata >> 8) & 0xff];
                 break;
+            case Op::LOAD_FLOAT_CONST:
+                $state->slots[($opdata >> 8) & 0xff] = $t->float_values[($opdata >> 16) & 0xff];
+                break;
+            case Op::LOAD_SLOT0_FLOAT_CONST:
+                $slot0 = $t->float_values[($opdata >> 8) & 0xff];
+                break;
             case Op::LOAD_STRING_CONST:
                 $state->slots[($opdata >> 8) & 0xff] = $t->string_values[($opdata >> 16) & 0xff];
                 break;

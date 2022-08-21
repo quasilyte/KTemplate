@@ -334,6 +334,13 @@ class Lexer {
         while ($this->pos < $this->src_len && self::isDigitChar(ord($this->src[$this->pos]))) {
             $this->pos++;
         }
+        if ($this->peekChar(0) === ord('.')) {
+            $this->pos++;
+            $dst->kind = Token::FLOAT_LIT;
+            while ($this->pos < $this->src_len && self::isDigitChar(ord($this->src[$this->pos]))) {
+                $this->pos++;
+            }
+        }
         $dst->pos_to = $this->pos;
     }
 

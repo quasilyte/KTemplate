@@ -6,12 +6,13 @@ class OpInfo {
     public const ARG_SLOT = 0;
     public const ARG_STRING_CONST = 1;
     public const ARG_INT_CONST = 2;
-    public const ARG_REL16 = 3;
-    public const ARG_IMM8 = 4;
-    public const ARG_KEY_OFFSET = 5;
-    public const ARG_CACHE_SLOT = 6;
-    public const ARG_FILTER_ID = 7;
-    public const ARG_FUNC_ID = 8;
+    public const ARG_FLOAT_CONST = 3;
+    public const ARG_REL16 = 4;
+    public const ARG_IMM8 = 5;
+    public const ARG_KEY_OFFSET = 6;
+    public const ARG_CACHE_SLOT = 7;
+    public const ARG_FILTER_ID = 8;
+    public const ARG_FUNC_ID = 9;
 
     public const FLAG_IMPLICIT_SLOT0 = 1 << 0;
     public const FLAG_HAS_SLOT_ARG = 1 << 1;

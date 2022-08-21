@@ -20,6 +20,11 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_INT_CONST -1',
                 '  RETURN',
             ],
+            '{{ 2.4 }}' => [
+                '  LOAD_SLOT0_FLOAT_CONST *slot0 2.4',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
 
             // Local variables.
             '{% let $s = "abc" %}{{ $s }}{% set $s = "a" %}{{ $s }}' => [
