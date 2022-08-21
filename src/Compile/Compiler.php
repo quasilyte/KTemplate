@@ -297,11 +297,13 @@ class Compiler {
     /**
      * @param int $dst
      * @param Expr $e
+     * @return int
      */
     private function compileRootExpr($dst, $e) {
         $this->frame->enterTempBlock();
-        $this->compileExpr($dst, $e);
+        $result_type = $this->compileExpr($dst, $e);
         $this->frame->leaveTempBlock();
+        return $result_type;
     }
 
     /**
