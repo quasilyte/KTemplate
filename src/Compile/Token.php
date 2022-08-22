@@ -54,6 +54,7 @@ class Token {
     public const RBRACKET = 48; // ]
     public const PERCENT = 49; // %
     public const FLOAT_LIT = 50;
+    public const KEYWORD_IN = 51;
 
     public $kind = 0;
     public $pos_from = 0;
@@ -248,6 +249,8 @@ class Token {
             return 'LBRACKET';
         case self::RBRACKET:
             return 'RBRACKET';
+        case self::KEYWORD_IN:
+            return 'IN';
         default:
             return '<?>';
         }

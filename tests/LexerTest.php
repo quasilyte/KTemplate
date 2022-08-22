@@ -163,6 +163,10 @@ class LexerTest extends TestCase {
                 ['ECHO_START', 'OR', 'ECHO_END'],
             ],
             [
+                '{{ in }}',
+                ['ECHO_START', 'IN', 'ECHO_END'],
+            ],
+            [
                 '{{ if do }}',
                 ['ECHO_START', 'IF', 'DO', 'ECHO_END'],
             ],

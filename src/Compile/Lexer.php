@@ -372,6 +372,10 @@ class Lexer {
                 $dst->kind = Token::KEYWORD_DO;
                 return;
             }
+            if (substr_compare($this->src, 'in', $dst->pos_from, strlen('in')) === 0) {
+                $dst->kind = Token::KEYWORD_IN;
+                return;
+            }
         case 3:
             if (substr_compare($this->src, 'not', $dst->pos_from, strlen('not')) === 0) {
                 $dst->kind = Token::KEYWORD_NOT;
