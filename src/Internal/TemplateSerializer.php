@@ -21,7 +21,6 @@ class TemplateSerializer {
         $data->float_values = $t->float_values;
         $data->code = $t->code;
         $data->frame_size = $t->frame_size;
-        $data->num_iterators = $t->num_iterators;
 
         return (string)instance_serialize($data);
     }
@@ -54,6 +53,5 @@ class TemplateSerializer {
         $t->float_values = $data->float_values;
         $t->code = $data->code;
         $t->frame_size = $data->frame_size;
-        $t->num_iterators = $data->num_iterators;
     }
 }

@@ -44,10 +44,4 @@ class TemplateData {
      * @kphp-serialized-field 7
      */
     public $frame_size;
-
-    /**
-     * @var int
-     * @kphp-serialized-field 8
-     */
-    public $num_iterators;
 }
