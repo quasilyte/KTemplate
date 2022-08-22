@@ -123,3 +123,11 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {% endfor %}
 {% set $myvar = time %}
 {% for $k, $v in $myvar %}{{ $k ~ '=>' ~ $v ~ ';' }}{% endfor %}
+{% for $k in empty_arr %}non-empty{% else %}empty{% endfor %}
+{% for $k in arr1 %}non-empty{% else %}empty{% endfor %}
+{% for $k, $v in time %}
+  {% for $x in arr1 %}
+    {{ $k ~ ' ' ~ $v ~ '/' ~ $x }}
+  {% endfor %}
+  OK
+{% endfor %}

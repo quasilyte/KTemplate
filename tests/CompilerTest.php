@@ -531,6 +531,17 @@ class CompilerTest extends TestCase {
                 'L0:',
                 '  RETURN',
             ],
+            '{% for $x in xs %}1{% else %}2{% endfor %}' => [
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
+                '  FOR_VAL *slot0 L0 slot2',
+                '  OUTPUT_STRING_CONST `1`',
+                '  RETURN',
+                'L0:',
+                '  JUMP_SLOT0_TRUTHY *slot0 L1',
+                '  OUTPUT_STRING_CONST `2`',
+                'L1:',
+                '  RETURN',
+            ],
         ];
 
         $env = new Env();

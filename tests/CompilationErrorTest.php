@@ -31,6 +31,12 @@ class CompilationErrorTest extends TestCase {
 
             '{{ a.b.c.d }}' => 'dot access expression is too complex',
 
+            '{% for x in %}' => 'for loop var names should be identifiers with leading $, found ident',
+            '{% for $x $y %}' => 'expected in, found dollar_ident',
+            '{% for $x, 3 in x %}' => 'for loop var names should be identifiers with leading $, found int_lit',
+            '{% for $x in xs }}' => 'expected %}, found }}',
+            '{% for $x in xs %}{% else %}{% else %}' => 'unexpected control token: else',
+
             '{% set x = 1 }}' => 'set names should be identifiers with leading $, found ident',
             '{% let x = 1 }}' => 'let names should be identifiers with leading $, found ident',
             '{% let $x = 1 %}{% let $x = 2 %}' => 'variable x is already declared in this scope',

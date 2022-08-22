@@ -127,3 +127,16 @@ month:August
 
 
 year=>2022;month=>August;
+empty
+non-empty
+
+  
+    year 2022/1
+  
+  OK
+
+  
+    month August/1
+  
+  OK
+

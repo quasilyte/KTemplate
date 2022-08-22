@@ -101,6 +101,10 @@ class SimpleTestDataProvider implements DataProviderInterface {
             return null;
         case 'arr':
             return $key->num_parts === 1 ? $this->arr : null;
+        case 'empty_arr':
+            return [];
+        case 'arr1':
+            return [1];
         default:
             switch ($key->num_parts) {
             case 1:

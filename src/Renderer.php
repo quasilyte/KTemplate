@@ -305,6 +305,7 @@ class Renderer {
                     $state->slots[$val_slot] = $v;
                     $this->eval($env, $t, $pc);
                 }
+                $slot0 = count($slot0) !== 0;
                 $pc += ($opdata >> 8) & 0xffff;
                 break;
             case Op::FOR_KEY_VAL:
@@ -315,6 +316,7 @@ class Renderer {
                     $state->slots[$val_slot] = $v;
                     $this->eval($env, $t, $pc);
                 }
+                $slot0 = count($slot0) !== 0;
                 $pc += ($opdata >> 8) & 0xffff;
                 break;
 

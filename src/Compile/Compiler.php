@@ -162,21 +162,34 @@ class Compiler {
      * @param int $val_slot
      */
     private function compileForBody($key_slot, $val_slot) {
+        $label_else = $this->newLabel();
         $label_end = $this->newLabel();
         if ($key_slot) {
-            $this->emit((Op::FOR_KEY_VAL) | ($label_end << 8) | ($key_slot << 24) | ($val_slot << 32));
+            $this->emit((Op::FOR_KEY_VAL) | ($label_else << 8) | ($key_slot << 24) | ($val_slot << 32));
         } else {
-            $this->emit((Op::FOR_VAL) | ($label_end << 8) | ($val_slot << 24));
+            $this->emit((Op::FOR_VAL) | ($label_else << 8) | ($val_slot << 24));
         }
 
+        $has_else = false;
         while (true) {
             $tok = $this->lexer->scan();
             if ($tok->kind === Token::CONTROL_START) {
                 if ($this->lexer->consume(Token::KEYWORD_ENDFOR)) {
                     $this->expectToken(Token::CONTROL_END);
-                    $this->emit(Op::RETURN);
+                    if (!$has_else) {
+                        $this->emit(Op::RETURN);
+                    }
                     $this->bindLabel($label_end);
+                    $this->tryBindLabel($label_else);
                     break;
+                }
+                if (!$has_else && $this->lexer->consume(Token::KEYWORD_ELSE)) {
+                    $has_else = true;
+                    $this->expectToken(Token::CONTROL_END);
+                    $this->emit(Op::RETURN);
+                    $this->bindLabel($label_else);
+                    $this->emitCondJump(Op::JUMP_TRUTHY, 0, $label_end);
+                    continue;
                 }
             }
             $this->compileToken($tok);
