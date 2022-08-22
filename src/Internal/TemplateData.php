@@ -47,7 +47,7 @@ class TemplateData {
 
     /**
      * @var int
-     * @kphp-serialized field 8
+     * @kphp-serialized-field 8
      */
     public $num_iterators;
 }
