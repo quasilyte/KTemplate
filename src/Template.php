@@ -20,6 +20,9 @@ class Template {
     /** @var int */
     public $frame_size = 1;
 
+    /** @var int */
+    public $num_iterators = 0;
+
     /**
      * @return string
      */

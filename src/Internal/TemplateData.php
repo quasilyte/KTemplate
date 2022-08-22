@@ -27,10 +27,27 @@ class TemplateData {
      * @kphp-serialized-field 4
      **/
     public $int_values = [];
+    /**
+     * @var float[]
+     * @kphp-serialized-field 5
+     **/
+    public $float_values = [];
 
     /**
      * @var int[]
-     * @kphp-serialized-field 5
+     * @kphp-serialized-field 6
      **/
     public $code = [];
+
+    /**
+     * @var int
+     * @kphp-serialized-field 7
+     */
+    public $frame_size;
+
+    /**
+     * @var int
+     * @kphp-serialized field 8
+     */
+    public $num_iterators;
 }

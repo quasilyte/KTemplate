@@ -14,10 +14,15 @@ class TemplateSerializer {
     public static function encode($t) {
         $data = new TemplateData();
         $data->version = self::$format_version;
+
         $data->string_values = $t->string_values;
         $data->keys = $t->keys;
         $data->int_values = $t->int_values;
+        $data->float_values = $t->float_values;
         $data->code = $t->code;
+        $data->frame_size = $t->frame_size;
+        $data->num_iterators = $t->num_iterators;
+
         return (string)instance_serialize($data);
     }
 
@@ -42,9 +47,13 @@ class TemplateSerializer {
         if ($data->version !== self::$format_version) {
             throw new \Exception("invalid template data version: $data->version vs " . self::$format_version);
         }
+
         $t->string_values = $data->string_values;
         $t->keys = $data->keys;
         $t->int_values = $data->int_values;
+        $t->float_values = $data->float_values;
         $t->code = $data->code;
+        $t->frame_size = $data->frame_size;
+        $t->num_iterators = $data->num_iterators;
     }
 }
