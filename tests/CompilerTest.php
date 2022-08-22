@@ -501,6 +501,36 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
             ],
+            
+            // Loops.
+            '{% for $x in xs %}{{ $x }}{% endfor %}' => [
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
+                '  FOR_VAL *slot0 L0 slot2',
+                '  OUTPUT slot2',
+                '  RETURN',
+                'L0:',
+                '  RETURN',
+            ],
+            '{% for $k, $v in xs %}{{ $k ~ "/" ~ $v }}{% endfor %}' => [
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
+                '  FOR_KEY_VAL *slot0 L0 slot2 slot3',
+                '  LOAD_STRING_CONST slot5 `/`',
+                '  CONCAT slot4 slot2 slot5',
+                '  CONCAT_SLOT0 *slot0 slot4 slot3',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+                'L0:',
+                '  RETURN',
+            ],
+            '{% let $arr = arr %}{% for $x in $arr %}{{ $x }}{% endfor %}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 arr',
+                '  MOVE_SLOT0 *slot0 slot2',
+                '  FOR_VAL *slot0 L0 slot3',
+                '  OUTPUT slot3',
+                '  RETURN',
+                'L0:',
+                '  RETURN',
+            ],
         ];
 
         $env = new Env();

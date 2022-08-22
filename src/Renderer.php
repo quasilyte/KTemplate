@@ -18,18 +18,18 @@ class Renderer {
      */
     public function render($env, $t, $data_provider) {
         $this->state->reset($data_provider);
-        $this->doRender($env, $t);
+        $this->eval($env, $t);
         return $this->state->buf;
     }
 
     /**
      * @param Env $env
      * @param Template $t
+     * @param int $pc
      */
-    private function doRender($env, $t) {
+    private function eval($env, $t, $pc = 0) {
         $state = $this->state;
         $key = $this->state->data_key;
-        $pc = 0;
         $code = $t->code;
 
         /** @var mixed $slot0 */
@@ -105,11 +105,17 @@ class Renderer {
                 $state->buf .= $v;
                 break;
             
+            case Op::MOVE:
+                $state->slots[($opdata >> 8) & 0xff] = $state->slots[($opdata >> 16) & 0xff];
+                break;
+            case Op::MOVE_SLOT0:
+                $slot0 = $state->slots[($opdata >> 8) & 0xff];
+                break;
             case Op::MOVE_BOOL:
                 $state->slots[($opdata >> 8) & 0xff] = (bool)$state->slots[($opdata >> 16) & 0xff];
                 break;
             case Op::MOVE_SLOT0_BOOL:
-               $slot0 = (bool)$state->slots[($opdata >> 16) & 0xff];
+                $slot0 = (bool)$state->slots[($opdata >> 8) & 0xff];
                 break;
 
             case Op::CONV_BOOL:
@@ -291,6 +297,25 @@ class Renderer {
                 if ($slot0) {
                     $pc += ($opdata >> 8) & 0xffff;
                 }
+                break;
+
+            case Op::FOR_VAL:
+                $val_slot = ($opdata >> 24) & 0xff;
+                foreach ($slot0 as $v) {
+                    $state->slots[$val_slot] = $v;
+                    $this->eval($env, $t, $pc);
+                }
+                $pc += ($opdata >> 8) & 0xffff;
+                break;
+            case Op::FOR_KEY_VAL:
+                $key_slot = ($opdata >> 24) & 0xff;
+                $val_slot = ($opdata >> 32) & 0xff;
+                foreach ($slot0 as $k => $v) {
+                    $state->slots[$key_slot] = $k;
+                    $state->slots[$val_slot] = $v;
+                    $this->eval($env, $t, $pc);
+                }
+                $pc += ($opdata >> 8) & 0xffff;
                 break;
 
             case Op::NOT:

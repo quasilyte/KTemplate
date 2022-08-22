@@ -92,6 +92,9 @@ class SimpleTestDataProvider implements DataProviderInterface {
         case 'test_name':
             return $key->num_parts === 1 ? $this->test_name : null;
         case 'time':
+            if ($key->num_parts === 1) {
+                return $this->time;
+            }
             if ($key->num_parts === 2) {
                 return $this->time[$key->part2];
             }

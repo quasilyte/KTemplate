@@ -114,12 +114,73 @@ class Compiler {
         case Token::KEYWORD_SET:
             $this->compileSet();
             return;
+        case Token::KEYWORD_FOR:
+            $this->compileFor();
+            return;
         }
 
         if ($tok->kind === Token::IDENT) {
             $this->failToken($tok, 'unexpected control token: ' . $this->lexer->tokenText($tok));
         }
         $this->failToken($tok, 'unexpected control token: ' . Token::prettyKindString($tok->kind));
+    }
+
+    private function compileFor() {
+        $tok = $this->lexer->scan();
+        if ($tok->kind !== Token::DOLLAR_IDENT) {
+            $this->failToken($tok, 'for loop var names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
+        }
+        $val_var_name = '';
+        $key_var_name = $this->lexer->dollarVarName($tok);
+        if ($this->lexer->consume(Token::COMMA)) {
+            $tok = $this->lexer->scan();
+            if ($tok->kind !== Token::DOLLAR_IDENT) {
+                $this->failToken($tok, 'for loop var names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
+            }
+            $val_var_name = $this->lexer->dollarVarName($tok);
+        } else {
+            $val_var_name = $key_var_name;
+            $key_var_name = '';
+        }
+        $this->expectToken(Token::KEYWORD_IN);
+        $seq_expr = $this->parser->parseRootExpr($this->lexer);
+        $this->expectToken(Token::CONTROL_END);
+
+        $this->frame->enterScope();
+        $this->compileRootExpr(0, $seq_expr);
+        $key_slot = 0;
+        if ($key_var_name) {
+            $key_slot = $this->frame->allocVarSlot($key_var_name);
+        }
+        $val_slot = $this->frame->allocVarSlot($val_var_name);
+        $this->compileForBody($key_slot, $val_slot);
+        $this->frame->leaveScope();
+    }
+
+    /**
+     * @param int $key_slot
+     * @param int $val_slot
+     */
+    private function compileForBody($key_slot, $val_slot) {
+        $label_end = $this->newLabel();
+        if ($key_slot) {
+            $this->emit((Op::FOR_KEY_VAL) | ($label_end << 8) | ($key_slot << 24) | ($val_slot << 32));
+        } else {
+            $this->emit((Op::FOR_VAL) | ($label_end << 8) | ($val_slot << 24));
+        }
+
+        while (true) {
+            $tok = $this->lexer->scan();
+            if ($tok->kind === Token::CONTROL_START) {
+                if ($this->lexer->consume(Token::KEYWORD_ENDFOR)) {
+                    $this->expectToken(Token::CONTROL_END);
+                    $this->emit(Op::RETURN);
+                    $this->bindLabel($label_end);
+                    break;
+                }
+            }
+            $this->compileToken($tok);
+        }
     }
 
     private function compileSet() {
@@ -550,13 +611,11 @@ class Compiler {
      * @param int $type
      */
     private function compileTypedMove($dst, $e, $type) {
-        $op = 0;
+        $op = Op::MOVE;
         switch ($type) {
         case Types::BOOL:
             $op = Op::MOVE_BOOL;
             break;
-        default:
-            $this->failExpr($e, 'unsupported typed move for type ' . Types::typeString($type));
         }
         $src_slot = $this->compileTempExpr($e);
         $this->emit2dst($op, $dst, $src_slot);

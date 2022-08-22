@@ -116,3 +116,10 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {% set $myvar = 4.6 %}
 {{ assert_true($myvar == 4.6) }}
 {{ assert_true($myvar == 3.6) }}
+{% for $x in time %}
+  {{ $x }}
+{% endfor %}
+{% for $k, $v in time %}{{ $k ~ ':' ~ $v }}
+{% endfor %}
+{% set $myvar = time %}
+{% for $k, $v in $myvar %}{{ $k ~ '=>' ~ $v ~ ';' }}{% endfor %}
