@@ -236,7 +236,7 @@ class LexerTest extends TestCase {
                     $have[] = $kind_string;
                 }
             }
-            $this->assertEquals($have, $want);
+            $this->assertEquals($want, $have);
         }
     }
 }
