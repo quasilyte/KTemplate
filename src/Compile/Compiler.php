@@ -531,10 +531,6 @@ class Compiler {
             $this->compileUnaryExpr($dst, Op::NEG, $e);
             return Types::UNKNOWN;
 
-        case Expr::CONCAT:
-            $this->compileBinaryExprNode($dst, $e);
-            return Types::STRING;
-
         case Expr::GT:
             $this->compileReversedBinaryExprNode($dst, Op::LT, $e);
             return Types::BOOL;
@@ -542,19 +538,17 @@ class Compiler {
             $this->compileReversedBinaryExprNode($dst, Op::LT_EQ, $e);
             return Types::BOOL;
 
+        case Expr::CONCAT:
         case Expr::EQ:
         case Expr::LT:
         case Expr::LT_EQ:
         case Expr::NOT_EQ:
-            $this->compileBinaryExprNode($dst, $e);
-            return Types::BOOL;
         case Expr::ADD:
         case Expr::SUB:
         case Expr::MUL:
         case Expr::QUO:
         case Expr::MOD:
-            $this->compileBinaryExprNode($dst, $e);
-            return Types::UNKNOWN;
+            return $this->compileBinaryExprNode($dst, $e);
 
         case Expr::NULL_LIT:
             $this->emit1dst(Op::LOAD_NULL, $dst);
@@ -830,12 +824,14 @@ class Compiler {
     /**
      * @param int $dst
      * @param Expr $e
+     * @return int
      */
     private function compileBinaryExprNode($dst, $e) {
         $lhs_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
         $rhs_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
         $op = $this->opByBinaryExprKind($e->kind);
         $this->compileBinaryExpr($dst, $op, $lhs_slot, $rhs_slot);
+        return Op::opcodeResultType($op);
     }
 
     /**
