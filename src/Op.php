@@ -306,12 +306,12 @@ class Op {
     
     // Encoding: 0x3e dst:wslot arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const NEG = 62;
     
     // Encoding: 0x3f arg:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const NEG_SLOT0 = 63;
     
     // Encoding: 0x40 dst:wslot arg1:rslot arg2:rslot
@@ -386,52 +386,52 @@ class Op {
     
     // Encoding: 0x4e dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const ADD = 78;
     
     // Encoding: 0x4f arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const ADD_SLOT0 = 79;
     
     // Encoding: 0x50 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const SUB = 80;
     
     // Encoding: 0x51 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const SUB_SLOT0 = 81;
     
     // Encoding: 0x52 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const MUL = 82;
     
     // Encoding: 0x53 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const MUL_SLOT0 = 83;
     
     // Encoding: 0x54 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const QUO = 84;
     
     // Encoding: 0x55 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const QUO_SLOT0 = 85;
     
     // Encoding: 0x56 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const MOD = 86;
     
     // Encoding: 0x57 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::NUMERIC
     public const MOD_SLOT0 = 87;
     
 
@@ -662,6 +662,10 @@ class Op {
             return Types::BOOL;
         case self::NOT_SLOT0:
             return Types::BOOL;
+        case self::NEG:
+            return Types::NUMERIC;
+        case self::NEG_SLOT0:
+            return Types::NUMERIC;
         case self::OR:
             return Types::BOOL;
         case self::OR_SLOT0:
@@ -690,6 +694,26 @@ class Op {
             return Types::BOOL;
         case self::NOT_EQ_SLOT0:
             return Types::BOOL;
+        case self::ADD:
+            return Types::NUMERIC;
+        case self::ADD_SLOT0:
+            return Types::NUMERIC;
+        case self::SUB:
+            return Types::NUMERIC;
+        case self::SUB_SLOT0:
+            return Types::NUMERIC;
+        case self::MUL:
+            return Types::NUMERIC;
+        case self::MUL_SLOT0:
+            return Types::NUMERIC;
+        case self::QUO:
+            return Types::NUMERIC;
+        case self::QUO_SLOT0:
+            return Types::NUMERIC;
+        case self::MOD:
+            return Types::NUMERIC;
+        case self::MOD_SLOT0:
+            return Types::NUMERIC;
         default:
             return Types::UNKNOWN;
         }

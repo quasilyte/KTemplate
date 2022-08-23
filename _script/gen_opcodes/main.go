@@ -32,6 +32,7 @@ var (
 	boolType    = "Types::BOOL"
 	intType     = "Types::INT"
 	floatType   = "Types::FLOAT"
+	numericType = "Types::NUMERIC"
 	stringType  = "Types::STRING"
 	nullType    = "Types::NULL"
 	unknownType = "Types::UNKNOWN"
@@ -108,8 +109,8 @@ var rawOpcodes = []opcodeTemplate{
 
 	{"NOT", "op dst:wslot arg:rslot", boolType},
 	{"NOT_SLOT0", "op *slot0 arg:rslot", boolType},
-	{"NEG", "op dst:wslot arg:rslot", unknownType},
-	{"NEG_SLOT0", "op *slot0 arg:rslot", unknownType},
+	{"NEG", "op dst:wslot arg:rslot", numericType},
+	{"NEG_SLOT0", "op *slot0 arg:rslot", numericType},
 
 	{"OR", "op dst:wslot arg1:rslot arg2:rslot", boolType},
 	{"OR_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
@@ -125,16 +126,16 @@ var rawOpcodes = []opcodeTemplate{
 	{"LT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
 	{"NOT_EQ", "op dst:wslot arg1:rslot arg2:rslot", boolType},
 	{"NOT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
-	{"ADD", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
-	{"ADD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", unknownType},
-	{"SUB", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
-	{"SUB_SLOT0", "op *slot0 arg1:rslot arg2:rslot", unknownType},
-	{"MUL", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
-	{"MUL_SLOT0", "op *slot0 arg1:rslot arg2:rslot", unknownType},
-	{"QUO", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
-	{"QUO_SLOT0", "op *slot0 arg1:rslot arg2:rslot", unknownType},
-	{"MOD", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
-	{"MOD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", unknownType},
+	{"ADD", "op dst:wslot arg1:rslot arg2:rslot", numericType},
+	{"ADD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
+	{"SUB", "op dst:wslot arg1:rslot arg2:rslot", numericType},
+	{"SUB_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
+	{"MUL", "op dst:wslot arg1:rslot arg2:rslot", numericType},
+	{"MUL_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
+	{"QUO", "op dst:wslot arg1:rslot arg2:rslot", numericType},
+	{"QUO_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
+	{"MOD", "op dst:wslot arg1:rslot arg2:rslot", numericType},
+	{"MOD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
 }
 
 func getOpcodeInfo(data opcodeTemplate) opcodeInfo {

@@ -7,8 +7,9 @@ class Types {
     public const BOOL = 1;
     public const INT = 2;
     public const FLOAT = 3;
-    public const STRING = 4;
-    public const NULL = 5;
+    public const NUMERIC = 4; // INT|FLOAT
+    public const STRING = 5;
+    public const NULL = 6;
 
     /**
      * @param int $type
