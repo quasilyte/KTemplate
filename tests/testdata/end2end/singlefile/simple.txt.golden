@@ -126,7 +126,7 @@ year:2022
 month:August
 
 
-year=>2022;month=>August;
+year=&gt;2022;month=&gt;August;
 empty
 non-empty
 
@@ -140,3 +140,9 @@ non-empty
   
   OK
 
+
+a%20b%20c
+&lt;b&gt;boom&lt;/b&gt;
+&lt;b&gt;boom&lt;/b&gt;
+11
+23

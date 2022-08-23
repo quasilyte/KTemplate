@@ -29,13 +29,14 @@ type argumentInfo struct {
 }
 
 var (
-	boolType    = "Types::BOOL"
-	intType     = "Types::INT"
-	floatType   = "Types::FLOAT"
-	numericType = "Types::NUMERIC"
-	stringType  = "Types::STRING"
-	nullType    = "Types::NULL"
-	unknownType = "Types::UNKNOWN"
+	boolType       = "Types::BOOL"
+	intType        = "Types::INT"
+	floatType      = "Types::FLOAT"
+	numericType    = "Types::NUMERIC"
+	stringType     = "Types::STRING"
+	safeStringType = "Types::SAFE_STRING"
+	nullType       = "Types::NULL"
+	unknownType    = "Types::UNKNOWN"
 )
 
 var rawOpcodes = []opcodeTemplate{
@@ -43,11 +44,14 @@ var rawOpcodes = []opcodeTemplate{
 
 	{"OUTPUT", "op arg:rslot", unknownType},
 	{"OUTPUT_SLOT0", "op *slot0", unknownType},
-	{"OUTPUT_INT_CONST", "op val:intindex", unknownType},
+	{"OUTPUT_SAFE", "op arg:rslot", unknownType},
+	{"OUTPUT_SAFE_SLOT0", "op *slot0", unknownType},
 	{"OUTPUT_STRING_CONST", "op val:strindex", unknownType},
-	{"OUTPUT_EXTDATA_1", "op cache:cacheslot k:keyoffset", unknownType},
-	{"OUTPUT_EXTDATA_2", "op cache:cacheslot k:keyoffset", unknownType},
-	{"OUTPUT_EXTDATA_3", "op cache:cacheslot k:keyoffset", unknownType},
+	{"OUTPUT_SAFE_STRING_CONST", "op val:strindex", unknownType},
+	{"OUTPUT_SAFE_INT_CONST", "op val:intindex", unknownType},
+	{"OUTPUT_EXTDATA_1", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType},
+	{"OUTPUT_EXTDATA_2", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType},
+	{"OUTPUT_EXTDATA_3", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType},
 
 	{"LOAD_BOOL", "op dst:wslot val:imm8", boolType},
 	{"LOAD_SLOT0_BOOL", "op *slot0 val:imm8", boolType},
@@ -106,6 +110,10 @@ var rawOpcodes = []opcodeTemplate{
 	{"LENGTH_SLOT0_FILTER", "op dst:wslot arg1:rslot", intType},
 	{"DEFAULT_FILTER", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
 	{"DEFAULT_SLOT0_FILTER", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
+	{"ESCAPE_FILTER1", "op dst:wslot src:rslot", safeStringType},
+	{"ESCAPE_SLOT0_FILTER1", "op *slot0 src:rslot", safeStringType},
+	{"ESCAPE_FILTER2", "op dst:wslot src:rslot strategy:strindex", safeStringType},
+	{"ESCAPE_SLOT0_FILTER2", "op *slot0 src:rslot strategy:strindex", safeStringType},
 
 	{"NOT", "op dst:wslot arg:rslot", boolType},
 	{"NOT_SLOT0", "op *slot0 arg:rslot", boolType},

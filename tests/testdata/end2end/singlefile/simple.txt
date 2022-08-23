@@ -131,3 +131,9 @@ $i2 < $i1->{{ $i2 < $i1 }}
   {% endfor %}
   OK
 {% endfor %}
+{% let $with_spaces = "a b c" %}
+{{ $with_spaces|escape("url") }}
+{{ html_chunk }}
+{{ html_chunk|escape }}
+{{ html_chunk|length }}
+{{ html_chunk|escape|length }}

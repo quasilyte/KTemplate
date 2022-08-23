@@ -89,6 +89,8 @@ class SimpleTestDataProvider implements DataProviderInterface {
 
     public function getData($key) {
         switch ($key->part1) {
+        case 'html_chunk':
+            return '<b>boom</b>';
         case 'test_name':
             return $key->num_parts === 1 ? $this->test_name : null;
         case 'time':

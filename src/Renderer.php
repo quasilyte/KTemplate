@@ -45,22 +45,32 @@ class Renderer {
                 return;
 
             case Op::OUTPUT:
-                $state->buf .= $state->slots[($opdata >> 8) & 0xff];
+                $state->buf .= self::escape($env, (string)$state->slots[($opdata >> 8) & 0xff]);
                 break;
             case Op::OUTPUT_SLOT0:
+                $state->buf .= self::escape($env, (string)$slot0);
+                break;
+            case Op::OUTPUT_SAFE:
+                $state->buf .= $state->slots[($opdata >> 8) & 0xff];
+                break;
+            case Op::OUTPUT_SAFE_SLOT0:
                 $state->buf .= $slot0;
                 break;
-            case Op::OUTPUT_STRING_CONST:
+            case Op::OUTPUT_SAFE_STRING_CONST:
                 $state->buf .= $t->string_values[($opdata >> 8) & 0xff];
                 break;
-            case Op::OUTPUT_INT_CONST:
+            case Op::OUTPUT_STRING_CONST:
+                $state->buf .= self::escape($env, $t->string_values[($opdata >> 8) & 0xff]);
+                break;
+            case Op::OUTPUT_SAFE_INT_CONST:
                 $state->buf .= $t->int_values[($opdata >> 8) & 0xff];
                 break;
             case Op::OUTPUT_EXTDATA_1:
                 $cache_slot = ($opdata >> 8) & 0xff;
                 $cache_mask = 1 << ($cache_slot - 1);
+                $escape_bit = ($opdata >> 24) & 0xff;
                 if (($state->cache_bitset & $cache_mask) !== 0) {
-                    $state->buf .= $state->slots[$cache_slot];
+                    $state->buf .= $escape_bit ? self::escape($env, (string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
                     break;
                 }
                 $key_offset = ($opdata >> 16) & 0xff;
@@ -69,13 +79,14 @@ class Renderer {
                 $v = $state->data_provider->getData($key);
                 $state->cache_bitset |= $cache_mask;
                 $state->slots[$cache_slot] = $v;
-                $state->buf .= $v;
+                $state->buf .= $escape_bit ? self::escape($env, (string)$v) : $v;
                 break;
             case Op::OUTPUT_EXTDATA_2:
                 $cache_slot = ($opdata >> 8) & 0xff;
                 $cache_mask = 1 << ($cache_slot - 1);
+                $escape_bit = ($opdata >> 24) & 0xff;
                 if (($state->cache_bitset & $cache_mask) !== 0) {
-                    $state->buf .= $state->slots[$cache_slot];
+                    $state->buf .= $escape_bit ? self::escape($env, (string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
                     break;
                 }
                 $key_offset = ($opdata >> 16) & 0xff;
@@ -85,13 +96,14 @@ class Renderer {
                 $v = $state->data_provider->getData($key);
                 $state->cache_bitset |= $cache_mask;
                 $state->slots[$cache_slot] = $v;
-                $state->buf .= $v;
+                $state->buf .= $escape_bit ? self::escape($env, (string)$v) : $v;
                 break;
             case Op::OUTPUT_EXTDATA_3:
                 $cache_slot = ($opdata >> 8) & 0xff;
                 $cache_mask = 1 << ($cache_slot - 1);
+                $escape_bit = ($opdata >> 24) & 0xff;
                 if (($state->cache_bitset & $cache_mask) !== 0) {
-                    $state->buf .= $state->slots[$cache_slot];
+                    $state->buf .= $escape_bit ? self::escape($env, (string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
                     break;
                 }
                 $key_offset = ($opdata >> 16) & 0xff;
@@ -102,7 +114,7 @@ class Renderer {
                 $v = $state->data_provider->getData($key);
                 $state->cache_bitset |= $cache_mask;
                 $state->slots[$cache_slot] = $v;
-                $state->buf .= $v;
+                $state->buf .= $escape_bit ? self::escape($env, (string)$v) : $v;
                 break;
             
             case Op::MOVE:
@@ -496,12 +508,44 @@ class Renderer {
                 $arg2 = $state->slots[($opdata >> 16) & 0xff];
                 $slot0 = self::defaultFilter($arg1, $arg2);
                 break;
+            case Op::ESCAPE_FILTER1:
+                $state->slots[($opdata >> 8) & 0xff] = self::escape($env, (string)$state->slots[($opdata >> 16) & 0xff]);
+                break;
+            case Op::ESCAPE_SLOT0_FILTER1:
+                $slot0 = self::escape($env, (string)$state->slots[($opdata >> 8) & 0xff]);
+                break;
+            case Op::ESCAPE_FILTER2:
+                $state->slots[($opdata >> 8) & 0xff] = self::escapeWithStrategy($env, (string)$state->slots[($opdata >> 16) & 0xff], $t->string_values[($opdata >> 24) & 0xff]);
+                break;
+            case Op::ESCAPE_SLOT0_FILTER2:
+                $slot0 = self::escapeWithStrategy($env, (string)$state->slots[($opdata >> 8) & 0xff], $t->string_values[($opdata >> 16) & 0xff]);
+                break;
 
             default:
-                fprintf(STDERR, "%s\n", Op::opcodeString($op));
                 return;
             }
         }
+    }
+
+    /**
+     * @param Env $env
+     * @param string $x
+     * @return string
+     */
+    private static function escape($env, $x) {
+        $escape_filter = $env->escape_func;
+        return $escape_filter($x, $env->escape_default_strategy);
+    }
+
+    /**
+     * @param Env $env
+     * @param string $x
+     * @param string $strategy
+     * @return string
+     */
+    private static function escapeWithStrategy($env, $x, $strategy) {
+        $escape_filter = $env->escape_func;
+        return $escape_filter($x, $strategy);
     }
 
     /**

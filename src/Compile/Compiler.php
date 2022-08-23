@@ -86,7 +86,7 @@ class Compiler {
         case Token::COMMENT:
             return; // Just skip the comment
         case Token::TEXT:
-            $this->compileOutputStringConst($this->lexer->tokenText($tok));
+            $this->compileOutputStringConst($this->lexer->tokenText($tok), !$this->env->escape_config->escape_text);
             return;
         case Token::ECHO_START:
             $this->compileEcho();
@@ -272,18 +272,24 @@ class Compiler {
     private function compileEcho() {
         $e = $this->parser->parseRootExpr($this->lexer);
         if (!$this->tryCompileDirectOutput($e)) {
-            $this->compileRootExpr(0, $e);
-            $this->emit(Op::OUTPUT_SLOT0);
+            $type = $this->compileRootExpr(0, $e);
+            $op = $this->needsEscaping($type) ? Op::OUTPUT_SLOT0 : Op::OUTPUT_SAFE_SLOT0;
+            $this->emit($op);
         }
         $this->expectToken(Token::ECHO_END);
     }
 
     /**
      * @param string $v
+     * @param bool $safe
      */
-    private function compileOutputStringConst($v) {
+    private function compileOutputStringConst($v, $safe) {
         $string_id = $this->internString($v);
-        $this->emit1(Op::OUTPUT_STRING_CONST, $string_id);
+        if ($this->env->escape_func && !$safe) {
+            $this->emit1(Op::OUTPUT_STRING_CONST, $string_id);
+        } else {
+            $this->emit1(Op::OUTPUT_SAFE_STRING_CONST, $string_id);
+        }
     }
 
     /**
@@ -291,7 +297,7 @@ class Compiler {
      */
     private function compileOutputIntConst($v) {
         $int_id = $this->internInt($v);
-        $this->emit1(Op::OUTPUT_INT_CONST, $int_id);
+        $this->emit1(Op::OUTPUT_SAFE_INT_CONST, $int_id);
     }
 
     /**
@@ -304,13 +310,16 @@ class Compiler {
         }
         switch ($e->kind) {
         case Expr::DOLLAR_IDENT:
-            $this->emit1(Op::OUTPUT, $this->lookupLocalVar($e));
+            $var_slot = $this->lookupLocalVar($e);
+            $op = $this->needsEscaping(Types::UNKNOWN) ? Op::OUTPUT : Op::OUTPUT_SAFE;
+            $this->emit1($op, $var_slot);
             return true;
         case Expr::IDENT:
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
-            $this->emit2(Op::OUTPUT_EXTDATA_1, $cache_slot, $key_offset);
+            $escape_bit = $this->needsEscaping(Types::UNKNOWN) ? 1 : 0;
+            $this->emit3(Op::OUTPUT_EXTDATA_1, $cache_slot, $key_offset, $escape_bit);
             return true;
         case Expr::DOT_ACCESS:
             [$p1, $p2, $p3] = $this->decodeDotAccess($e);
@@ -320,8 +329,9 @@ class Compiler {
             $cache_slot_info = $this->frame->getCacheSlotInfo($p1, $p2, $p3);
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
+            $escape_bit = $this->needsEscaping(Types::UNKNOWN) ? 1 : 0;
             $op = $p3 === '' ? Op::OUTPUT_EXTDATA_2 : Op::OUTPUT_EXTDATA_3;
-            $this->emit2($op, $cache_slot, $key_offset);
+            $this->emit3($op, $cache_slot, $key_offset, $escape_bit);
             return true;
         }
         return false;
@@ -361,7 +371,7 @@ class Compiler {
             if (is_int($const_value)) {
                 $this->compileOutputIntConst((int)$const_value);
             } else if (is_string($const_value)) {
-                $this->compileOutputStringConst((string)$const_value);
+                $this->compileOutputStringConst((string)$const_value, !$this->env->escape_config->escape_const_expr);
             } else {
                 $this->failExpr($e, 'unexpected value type: ' . gettype($const_value));
             }
@@ -417,6 +427,39 @@ class Compiler {
      */
     private function compileFloatConst($dst, $value) {
         $this->emit2dst(Op::LOAD_FLOAT_CONST, $dst, $this->internFloat($value));
+    }
+
+    /**
+     * @param int $type
+     * @param bool $is_const
+     * @return bool
+     */
+    private function needsEscaping($type, $is_const = false) {
+        if ($this->env->escape_func === null) {
+            return false;
+        }
+        if ($is_const) {
+            return $this->env->escape_config->escape_const_expr;
+        }
+        switch ($type) {
+        case Types::BOOL:
+        case Types::NULL;
+        case Types::SAFE_STRING:
+        case Types::INT:
+        case Types::FLOAT:
+        case Types::NUMERIC:
+            return false;
+        default:
+            return $this->env->escape_config->escape_expr;
+        }
+    }
+
+    /**
+     * @param int $dst
+     * @param int $type
+     */
+    private function maybeEscape($dst, $type) {
+        
     }
 
     /**
@@ -491,7 +534,7 @@ class Compiler {
             return Types::UNKNOWN;
 
         case Expr::DOLLAR_IDENT:
-            $this->compileTypedMove($dst, $e, $type);
+            $this->compileTypedMoveNode($dst, $e, $type);
             return $type;
 
         case Expr::IDENT:
@@ -576,12 +619,10 @@ class Compiler {
 
         case Expr::FILTER:
             if ($this->parser->getExprMember($e, 1)->kind === Expr::IDENT) {
-                $this->compileFilter1($dst, $e);
-                return Types::UNKNOWN;
+                return $this->compileFilter1($dst, $e);
             }
             if ($this->parser->getExprMember($e, 1)->kind === Expr::CALL) {
-                $this->compileFilter2($dst, $e);
-                return Types::UNKNOWN;
+                return $this->compileFilter2($dst, $e);
             }
             $this->failExpr($e, 'compile expr: invalid filter, expected a call or ident');
         }
@@ -614,18 +655,31 @@ class Compiler {
 
     /**
      * @param int $dst
-     * @param Expr $e
+     * @param int $src
      * @param int $type
      */
-    private function compileTypedMove($dst, $e, $type) {
+    private function compileTypedMove($dst, $src, $type) {
         $op = Op::MOVE;
         switch ($type) {
         case Types::BOOL:
             $op = Op::MOVE_BOOL;
             break;
         }
+        if ($op === Op::MOVE && $dst === $src) {
+            return; // Do nothing
+        }
+        $this->emit2dst($op, $dst, $src);
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     * @param int $type
+     */
+    private function compileTypedMoveNode($dst, $e, $type) {
         $src_slot = $this->compileTempExpr($e);
-        $this->emit2dst($op, $dst, $src_slot);
+        $this->compileTypedMove($dst, $src_slot, $type);
+        
     }
 
     private function compileAndOr($jump_op, $dst, $e) {
@@ -731,13 +785,23 @@ class Compiler {
             $this->failExpr($e, 'too many arguments for a filter');
         }
         $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
-        $arg2_slot = $this->compileTempExpr($this->parser->getExprMember($rhs, 1));
         $filter_name = (string)$this->parser->getExprMember($rhs, 0)->value;
         $filter_id = $this->env->getFilterID($filter_name, 2);
+        $arg2_expr = $this->parser->getExprMember($rhs, 1);
+        if ($filter_id === -1 && $filter_name === 'escape') {
+            $arg2_const_value = $this->const_folder->fold($arg2_expr);
+            if (!is_string($arg2_const_value)) {
+                $this->failExpr($arg2_expr, 'escape filter expects a const expr string argument');
+            }
+            $strategy = $this->internString((string)$arg2_const_value);
+            $this->emit3dst(Op::ESCAPE_FILTER2, $dst, $arg1_slot, $strategy);
+            return Types::SAFE_STRING;
+        }
+        $arg2_slot = $this->compileTempExpr($arg2_expr);
         if ($filter_id === -1) {
             if ($filter_name === 'default') {
                 $this->emit3dst(Op::DEFAULT_FILTER, $dst, $arg1_slot, $arg2_slot);
-                return;
+                return Types::UNKNOWN;
             }
             $this->failExpr($this->parser->getExprMember($rhs, 0), "$filter_name filter is not defined");
         }
@@ -746,6 +810,7 @@ class Compiler {
         } else {
             $this->emitCall3(Op::CALL_FILTER2, $dst, $arg1_slot, $arg2_slot, $filter_id);
         }
+        return Types::UNKNOWN;
     }
 
     /**
@@ -754,12 +819,20 @@ class Compiler {
      */
     private function compileFilter1($dst, $e) {
         $rhs = $this->parser->getExprMember($e, 1);
-        $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
         $filter_id = $this->env->getFilterID((string)$rhs->value, 1);
+        if ($filter_id === -1 && $rhs->value === 'raw') {
+            $this->compileExpr($dst, $this->parser->getExprMember($e, 0));
+            return Types::SAFE_STRING;
+        }
+        $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 0));
         if ($filter_id === -1) {
             if ($rhs->value === 'length') {
                 $this->emit2dst(Op::LENGTH_FILTER, $dst, $arg1_slot);
-                return;
+                return Types::INT;
+            }
+            if ($rhs->value === 'escape') {
+                $this->emit2dst(Op::ESCAPE_FILTER1, $dst, $arg1_slot);
+                return Types::SAFE_STRING;
             }
             $this->failExpr($rhs, "$rhs->value filter is not defined");
         }
@@ -768,6 +841,7 @@ class Compiler {
         } else {
             $this->emitCall2(Op::CALL_FILTER1, $dst, $arg1_slot, $filter_id);
         }
+        return Types::UNKNOWN;
     }
 
     /**

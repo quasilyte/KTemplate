@@ -9,7 +9,8 @@ class Types {
     public const FLOAT = 3;
     public const NUMERIC = 4; // INT|FLOAT
     public const STRING = 5;
-    public const NULL = 6;
+    public const SAFE_STRING = 6;
+    public const NULL = 8;
 
     /**
      * @param int $type
@@ -25,7 +26,10 @@ class Types {
             return 'int';
         case self::FLOAT:
             return 'float';
+        case self::NUMERIC:
+            return 'int|float';
         case self::STRING:
+        case self::SAFE_STRING:
             return 'string';
         case self::NULL:
             return 'null';

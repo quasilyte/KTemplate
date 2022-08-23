@@ -40,6 +40,31 @@ class Env {
     public $encoding = 'UTF-8';
 
     /**
+     * @var EscapeConfig
+     */
+    public $escape_config;
+
+    public $escape_default_strategy = 'html';
+
+    /**
+     * A function to be used for escape filter (both auto-escape and explicit).
+     * This function signature is (string $s, string $strategy) => string.
+     * The strategy could be 'html', 'url', etc.
+     * 
+     * By default, FilterLibrary::escape function is used.
+     * 
+     * If null, no escaping will be performed.
+     * 
+     * @var callable(string,string):string
+     */
+    public $escape_func;
+
+    public function __construct() {
+        $this->escape_config = new EscapeConfig();
+        $this->escape_func = [FilterLibrary::class, 'escape'];
+    }
+
+    /**
      * @param string $name
      * @param callable():mixed $fn
      */
