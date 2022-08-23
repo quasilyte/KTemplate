@@ -69,6 +69,18 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
+            '{{ x|e }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  ESCAPE_SLOT0_FILTER1 *slot0 slot2',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ x|e("url") }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  ESCAPE_SLOT0_FILTER2 *slot0 slot2 `url`',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  RETURN',
+            ],
 
             // Some expression types are never escaped.
             '{{ x or y }}' => [

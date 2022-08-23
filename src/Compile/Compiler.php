@@ -788,7 +788,7 @@ class Compiler {
         $filter_name = (string)$this->parser->getExprMember($rhs, 0)->value;
         $filter_id = $this->env->getFilterID($filter_name, 2);
         $arg2_expr = $this->parser->getExprMember($rhs, 1);
-        if ($filter_id === -1 && $filter_name === 'escape') {
+        if ($filter_id === -1 && ($filter_name === 'escape' || $filter_name === 'e')) {
             $arg2_const_value = $this->const_folder->fold($arg2_expr);
             if (!is_string($arg2_const_value)) {
                 $this->failExpr($arg2_expr, 'escape filter expects a const expr string argument');
@@ -830,7 +830,7 @@ class Compiler {
                 $this->emit2dst(Op::LENGTH_FILTER, $dst, $arg1_slot);
                 return Types::INT;
             }
-            if ($rhs->value === 'escape') {
+            if ($rhs->value === 'escape' || $rhs->value === 'e') {
                 $this->emit2dst(Op::ESCAPE_FILTER1, $dst, $arg1_slot);
                 return Types::SAFE_STRING;
             }
