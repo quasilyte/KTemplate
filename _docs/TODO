@@ -1,7 +1,8 @@
 * docs: add examples
 * more end2end tests
-* adjusting frame size for the template
 * nested/partial templates
+  * adjusting frame size for the template
+  * block+extends+include
 * filesystem bytecode cache
 * builtin functions
 * macros system

@@ -31,6 +31,9 @@ class CompilationErrorTest extends TestCase {
 
             '{{ a.b.c.d }}' => 'dot access expression is too complex',
 
+            '{{ x|escape(y) }}' => 'escape filter expects a const expr string argument',
+            '{{ x|e(y) }}' => 'escape filter expects a const expr string argument',
+
             '{% for x in %}' => 'for loop var names should be identifiers with leading $, found ident',
             '{% for $x $y %}' => 'expected in, found dollar_ident',
             '{% for $x, 3 in x %}' => 'for loop var names should be identifiers with leading $, found int_lit',
