@@ -77,66 +77,66 @@ class ExprParser {
         $lexer = $this->lexer;
         $tok = $lexer->scan();
         switch ($tok->kind) {
-        case Token::KEYWORD_TRUE:
+        case TokenKind::KEYWORD_TRUE:
             $left->kind = Expr::BOOL_LIT;
             $left->value = true;
             break;
-        case Token::KEYWORD_FALSE:
+        case TokenKind::KEYWORD_FALSE:
             $left->kind = Expr::BOOL_LIT;
             $left->value = false;
             break;
-        case Token::DOLLAR_IDENT:
+        case TokenKind::DOLLAR_IDENT:
             $left->kind = Expr::DOLLAR_IDENT;
             $left->value = $lexer->dollarVarName($tok);
             break;
-        case Token::IDENT:
+        case TokenKind::IDENT:
             $left->kind = Expr::IDENT;
             $left->value = $lexer->tokenText($tok);
-            if ($lexer->consume(Token::LPAREN)) {
+            if ($lexer->consume(TokenKind::LPAREN)) {
                 $this->parseCallExpr($left);
             }
             break;
-        case Token::INT_LIT:
+        case TokenKind::INT_LIT:
             $left->kind = Expr::INT_LIT;
             $left->value = (int)$lexer->tokenText($tok);
             break;
-        case Token::FLOAT_LIT:
+        case TokenKind::FLOAT_LIT:
             $left->kind = Expr::FLOAT_LIT;
             $left->value = (float)$lexer->tokenText($tok);
             break;
-        case Token::STRING_LIT_Q1:
-        case Token::STRING_LIT_Q2:
+        case TokenKind::STRING_LIT_Q1:
+        case TokenKind::STRING_LIT_Q2:
             // We may enable string interpolation inside DQ strings later.
             // For now, they're behaving identically.
             $left->kind = Expr::STRING_LIT;
             $left->value = $this->interpretString($left, $lexer->stringText($tok));
             break;
-        case Token::KEYWORD_NULL:
+        case TokenKind::KEYWORD_NULL:
             $left->kind = Expr::NULL_LIT;
             break;
-        case Token::LPAREN:
+        case TokenKind::LPAREN:
             $this->parseExpr($left, 0);
-            if (!$lexer->consume(Token::RPAREN)) {
+            if (!$lexer->consume(TokenKind::RPAREN)) {
                 $this->setError($left, 'missing )');
             }
             break;
-        case Token::KEYWORD_NOT:
-            $this->parseUnaryExpr($left, Expr::NOT, $this->unaryPrecedence(Token::KEYWORD_NOT));
+        case TokenKind::KEYWORD_NOT:
+            $this->parseUnaryExpr($left, Expr::NOT, $this->unaryPrecedence(TokenKind::KEYWORD_NOT));
             break;
-        case Token::MINUS:
-            if ($lexer->peek()->kind === Token::INT_LIT) {
+        case TokenKind::MINUS:
+            if ($lexer->peek()->kind === TokenKind::INT_LIT) {
                 $tok = $lexer->scan();
                 $left->kind = Expr::INT_LIT;
                 $left->value = -(int)$lexer->tokenText($tok);
                 break;
             }
-            $this->parseUnaryExpr($left, Expr::NEG, $this->unaryPrecedence(Token::MINUS));
+            $this->parseUnaryExpr($left, Expr::NEG, $this->unaryPrecedence(TokenKind::MINUS));
             break;
-        case Token::ERROR:
+        case TokenKind::ERROR:
             $this->setError($left, $this->lexer->getError());
             break;
         default:
-            $this->setError($left, 'unexpected token ' . Token::prettyKindString($tok->kind));
+            $this->setError($left, 'unexpected token ' . $tok->prettyKindName());
         }
 
         while (true) {
@@ -146,57 +146,57 @@ class ExprParser {
             }
             $tok = $lexer->scan();
             switch ($tok->kind) {
-            case Token::LBRACKET:
+            case TokenKind::LBRACKET:
                 $this->parseIndexExpr($left);
                 break;
-            case Token::PIPE:
+            case TokenKind::PIPE:
                 $this->parseBinaryExpr($left, Expr::FILTER, $right_prec);
                 break;
-            case Token::DOT:
+            case TokenKind::DOT:
                 $this->parseBinaryExpr($left, Expr::DOT_ACCESS, $right_prec);
                 break;
-            case Token::PLUS:
+            case TokenKind::PLUS:
                 $this->parseBinaryExpr($left, Expr::ADD, $right_prec);
                 break;
-            case Token::MINUS:
+            case TokenKind::MINUS:
                 $this->parseBinaryExpr($left, Expr::SUB, $right_prec);
                 break;
-            case Token::STAR:
+            case TokenKind::STAR:
                 $this->parseBinaryExpr($left, Expr::MUL, $right_prec);
                 break;
-            case Token::SLASH:
+            case TokenKind::SLASH:
                 $this->parseBinaryExpr($left, Expr::QUO, $right_prec);
                 break;
-            case Token::PERCENT:
+            case TokenKind::PERCENT:
                 $this->parseBinaryExpr($left, Expr::MOD, $right_prec);
                 break;
-            case Token::TILDE:
+            case TokenKind::TILDE:
                 $this->parseBinaryExpr($left, Expr::CONCAT, $right_prec);
                 break;
-            case Token::KEYWORD_AND:
+            case TokenKind::KEYWORD_AND:
                 // Parse AND as right-associative to simplify the compilation.
                 $this->parseBinaryExpr($left, Expr::AND, $right_prec - 1);
                 break;
-            case Token::KEYWORD_OR:
+            case TokenKind::KEYWORD_OR:
                 // Parse OR as right-associative to simplify the compilation.
                 $this->parseBinaryExpr($left, Expr::OR, $right_prec - 1);
                 break;
-            case Token::EQ:
+            case TokenKind::EQ:
                 $this->parseBinaryExpr($left, Expr::EQ, $right_prec);
                 break;
-            case Token::NOT_EQ:
+            case TokenKind::NOT_EQ:
                 $this->parseBinaryExpr($left, Expr::NOT_EQ, $right_prec);
                 break;
-            case Token::LT:
+            case TokenKind::LT:
                 $this->parseBinaryExpr($left, Expr::LT, $right_prec);
                 break;
-            case Token::LT_EQ:
+            case TokenKind::LT_EQ:
                 $this->parseBinaryExpr($left, Expr::LT_EQ, $right_prec);
                 break;
-            case Token::GT:
+            case TokenKind::GT:
                 $this->parseBinaryExpr($left, Expr::GT, $right_prec);
                 break;
-            case Token::GT_EQ:
+            case TokenKind::GT_EQ:
                 $this->parseBinaryExpr($left, Expr::GT_EQ, $right_prec);
                 break;
             }
@@ -212,7 +212,7 @@ class ExprParser {
         $this->tmp->assign($left);
         $left->kind = Expr::CALL;
         $left->value = 0; // Number of arguments
-        if ($this->lexer->consume(Token::RPAREN)) {
+        if ($this->lexer->consume(TokenKind::RPAREN)) {
             // A small optimization: we can allocate exactly 1 member
             // for empty argument list.
             $this->allocateExprMembers($left, 1);
@@ -226,7 +226,7 @@ class ExprParser {
         $this->parseExpr($this->getExprMember($left, 1), 0);
         $left->value++;
         while (true) {
-            if (!$this->lexer->consume(Token::COMMA)) {
+            if (!$this->lexer->consume(TokenKind::COMMA)) {
                 break;
             }
             if ($left->value >= $max_call_args) {
@@ -236,9 +236,9 @@ class ExprParser {
             $this->parseExpr($this->getExprMember($left, (int)$left->value + 1), 0);
             $left->value++;
         }
-        if (!$this->lexer->consume(Token::RPAREN)) {
+        if (!$this->lexer->consume(TokenKind::RPAREN)) {
             $tok = $this->lexer->peek();
-            $this->setError($left, 'expected ) to close a call expr argument list, found ' . Token::prettyKindString($tok->kind));
+            $this->setError($left, 'expected ) to close a call expr argument list, found ' . $tok->prettyKindName());
         }
     }
 
@@ -268,9 +268,9 @@ class ExprParser {
         $this->allocateExprMembers($left, 2);
         $this->getExprMember($left, 0)->assign($this->tmp);
         $this->parseExpr($this->getExprMember($left, 1), 0);
-        if (!$this->lexer->consume(Token::RBRACKET)) {
+        if (!$this->lexer->consume(TokenKind::RBRACKET)) {
             $tok = $this->lexer->peek();
-            $this->setError($left, 'expected ] to close indexing expr, found ' . Token::prettyKindString($tok->kind));
+            $this->setError($left, 'expected ] to close indexing expr, found ' . $tok->prettyKindName());
         }
     }
 
@@ -289,10 +289,10 @@ class ExprParser {
 
     private function unaryPrecedence(int $kind): int {
         switch ($kind) {
-        case Token::KEYWORD_NOT:
+        case TokenKind::KEYWORD_NOT:
             return 6;
-        case Token::PLUS:
-        case Token::MINUS:
+        case TokenKind::PLUS:
+        case TokenKind::MINUS:
             return 11;
         default:
             return -1;
@@ -303,30 +303,30 @@ class ExprParser {
         // For the reference:
         // https://github.com/twigphp/Twig/blob/760341fa8c41c764a5a819a31deb3c5ad66befb1/src/Extension/CoreExtension.php#L261
         switch ($tok->kind) {
-        case Token::KEYWORD_OR:
+        case TokenKind::KEYWORD_OR:
             return 1;
-        case Token::KEYWORD_AND:
+        case TokenKind::KEYWORD_AND:
             return 3;
-        case Token::EQ:
-        case Token::NOT_EQ:
-        case Token::LT:
-        case Token::LT_EQ:
-        case Token::GT:
-        case Token::GT_EQ:
+        case TokenKind::EQ:
+        case TokenKind::NOT_EQ:
+        case TokenKind::LT:
+        case TokenKind::LT_EQ:
+        case TokenKind::GT:
+        case TokenKind::GT_EQ:
             return 4;
-        case Token::PLUS:
-        case Token::MINUS:
-        case Token::TILDE:
+        case TokenKind::PLUS:
+        case TokenKind::MINUS:
+        case TokenKind::TILDE:
             return 5;
-        case Token::STAR:
-        case Token::SLASH:
-        case Token::PERCENT:
+        case TokenKind::STAR:
+        case TokenKind::SLASH:
+        case TokenKind::PERCENT:
             return 7;
-        case Token::LBRACKET:
+        case TokenKind::LBRACKET:
             return 9;
-        case Token::PIPE:
+        case TokenKind::PIPE:
             return 13;
-        case Token::DOT:
+        case TokenKind::DOT:
             return 14;
         default:
             return -1;

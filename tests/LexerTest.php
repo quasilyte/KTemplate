@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use KTemplate\Compile\TokenKind;
 use KTemplate\Compile\Token;
 use KTemplate\Compile\Lexer;
 
@@ -222,15 +223,15 @@ class LexerTest extends TestCase {
             $want = array_merge($want, $want_toks);
             while (true) {
                 $tok = $lexer->scan();
-                if ($tok->kind === Token::ERROR) {
+                if ($tok->kind === TokenKind::ERROR) {
                     $this->fail('unexpected error: ' . $lexer->getError());
                     break;
                 }
-                if ($tok->kind === Token::EOF) {
+                if ($tok->kind === TokenKind::EOF) {
                     break;
                 }
-                $kind_string = Token::kindString($tok->kind);
-                if (Token::hasValue($tok->kind)) {
+                $kind_string = $tok->kindName();
+                if ($tok->hasValue()) {
                     $have[] = "$kind_string(" . $lexer->tokenText($tok) . ')';
                 } else {
                     $have[] = $kind_string;

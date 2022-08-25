@@ -61,7 +61,7 @@ class Compiler {
         try {
             while (true) {
                 $tok = $this->lexer->scan();
-                if ($tok->kind === Token::EOF) {
+                if ($tok->kind === TokenKind::EOF) {
                     break;
                 }
                 $this->compileToken($tok);
@@ -83,68 +83,68 @@ class Compiler {
 
     private function compileToken(Token $tok) {
         switch ($tok->kind) {
-        case Token::COMMENT:
+        case TokenKind::COMMENT:
             return; // Just skip the comment
-        case Token::TEXT:
+        case TokenKind::TEXT:
             $this->compileOutputStringConst($this->lexer->tokenText($tok), !$this->env->escape_config->escape_text);
             return;
-        case Token::ECHO_START:
+        case TokenKind::ECHO_START:
             $this->compileEcho();
             return;
-        case Token::CONTROL_START:
+        case TokenKind::CONTROL_START:
             $this->compileControl();
             return;
-        case Token::ERROR:
+        case TokenKind::ERROR:
             $this->failToken($tok, $this->lexer->getError());
             return;
         }
 
-        $this->failToken($tok, 'unexpected top-level token: ' . Token::prettyKindString($tok->kind));
+        $this->failToken($tok, 'unexpected top-level token: ' . $tok->prettyKindName());
     }
 
     private function compileControl() {
         $tok = $this->lexer->scan();
         switch ($tok->kind) {
-        case Token::KEYWORD_IF:
+        case TokenKind::KEYWORD_IF:
             $this->compileIf();
             return;
-        case Token::KEYWORD_LET:
+        case TokenKind::KEYWORD_LET:
             $this->compileLet();
             return;
-        case Token::KEYWORD_SET:
+        case TokenKind::KEYWORD_SET:
             $this->compileSet();
             return;
-        case Token::KEYWORD_FOR:
+        case TokenKind::KEYWORD_FOR:
             $this->compileFor();
             return;
         }
 
-        if ($tok->kind === Token::IDENT) {
+        if ($tok->kind === TokenKind::IDENT) {
             $this->failToken($tok, 'unexpected control token: ' . $this->lexer->tokenText($tok));
         }
-        $this->failToken($tok, 'unexpected control token: ' . Token::prettyKindString($tok->kind));
+        $this->failToken($tok, 'unexpected control token: ' . $tok->prettyKindName());
     }
 
     private function compileFor() {
         $tok = $this->lexer->scan();
-        if ($tok->kind !== Token::DOLLAR_IDENT) {
-            $this->failToken($tok, 'for loop var names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
+        if ($tok->kind !== TokenKind::DOLLAR_IDENT) {
+            $this->failToken($tok, 'for loop var names should be identifiers with leading $, found ' . $tok->prettyKindName());
         }
         $val_var_name = '';
         $key_var_name = $this->lexer->dollarVarName($tok);
-        if ($this->lexer->consume(Token::COMMA)) {
+        if ($this->lexer->consume(TokenKind::COMMA)) {
             $tok = $this->lexer->scan();
-            if ($tok->kind !== Token::DOLLAR_IDENT) {
-                $this->failToken($tok, 'for loop var names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
+            if ($tok->kind !== TokenKind::DOLLAR_IDENT) {
+                $this->failToken($tok, 'for loop var names should be identifiers with leading $, found ' . $tok->prettyKindName());
             }
             $val_var_name = $this->lexer->dollarVarName($tok);
         } else {
             $val_var_name = $key_var_name;
             $key_var_name = '';
         }
-        $this->expectToken(Token::KEYWORD_IN);
+        $this->expectToken(TokenKind::KEYWORD_IN);
         $seq_expr = $this->parser->parseRootExpr($this->lexer);
-        $this->expectToken(Token::CONTROL_END);
+        $this->expectToken(TokenKind::CONTROL_END);
 
         $this->frame->enterScope();
         $this->compileRootExpr(0, $seq_expr);
@@ -173,9 +173,9 @@ class Compiler {
         $has_else = false;
         while (true) {
             $tok = $this->lexer->scan();
-            if ($tok->kind === Token::CONTROL_START) {
-                if ($this->lexer->consume(Token::KEYWORD_ENDFOR)) {
-                    $this->expectToken(Token::CONTROL_END);
+            if ($tok->kind === TokenKind::CONTROL_START) {
+                if ($this->lexer->consume(TokenKind::KEYWORD_ENDFOR)) {
+                    $this->expectToken(TokenKind::CONTROL_END);
                     if (!$has_else) {
                         $this->emit(Op::RETURN);
                     }
@@ -183,9 +183,9 @@ class Compiler {
                     $this->tryBindLabel($label_else);
                     break;
                 }
-                if (!$has_else && $this->lexer->consume(Token::KEYWORD_ELSE)) {
+                if (!$has_else && $this->lexer->consume(TokenKind::KEYWORD_ELSE)) {
                     $has_else = true;
-                    $this->expectToken(Token::CONTROL_END);
+                    $this->expectToken(TokenKind::CONTROL_END);
                     $this->emit(Op::RETURN);
                     $this->bindLabel($label_else);
                     $this->emitCondJump(Op::JUMP_TRUTHY, 0, $label_end);
@@ -198,40 +198,40 @@ class Compiler {
 
     private function compileSet() {
         $tok = $this->lexer->scan();
-        if ($tok->kind !== Token::DOLLAR_IDENT) {
-            $this->failToken($tok, 'set names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
+        if ($tok->kind !== TokenKind::DOLLAR_IDENT) {
+            $this->failToken($tok, 'set names should be identifiers with leading $, found ' . $tok->prettyKindName());
         }
         $var_name = $this->lexer->dollarVarName($tok);
         $var_slot = $this->frame->lookupLocal($var_name);
         if ($var_slot === -1) {
             $this->failToken($tok, "assigning to undefined local var $var_name");
         }
-        $this->expectToken(Token::ASSIGN);
+        $this->expectToken(TokenKind::ASSIGN);
         $e = $this->parser->parseRootExpr($this->lexer);
         $this->compileRootExpr($var_slot, $e);
-        $this->expectToken(Token::CONTROL_END);
+        $this->expectToken(TokenKind::CONTROL_END);
     }
 
     private function compileLet() {
         $tok = $this->lexer->scan();
-        if ($tok->kind !== Token::DOLLAR_IDENT) {
-            $this->failToken($tok, 'let names should be identifiers with leading $, found ' . Token::prettyKindString($tok->kind));
+        if ($tok->kind !== TokenKind::DOLLAR_IDENT) {
+            $this->failToken($tok, 'let names should be identifiers with leading $, found ' . $tok->prettyKindName());
         }
         $var_name = $this->lexer->dollarVarName($tok);
         if ($this->frame->lookupLocalInCurrentScope($var_name) !== -1) {
             $this->failToken($tok, "variable $var_name is already declared in this scope");
         }
         $var_slot = $this->frame->allocVarSlot($var_name);
-        $this->expectToken(Token::ASSIGN);
+        $this->expectToken(TokenKind::ASSIGN);
         $e = $this->parser->parseRootExpr($this->lexer);
         $this->compileRootExpr($var_slot, $e);
-        $this->expectToken(Token::CONTROL_END);
+        $this->expectToken(TokenKind::CONTROL_END);
     }
 
     private function compileIf() {
         $e = $this->parser->parseRootExpr($this->lexer);
         $this->compileRootExpr(0, $e);
-        $this->expectToken(Token::CONTROL_END);
+        $this->expectToken(TokenKind::CONTROL_END);
 
         $this->frame->enterScope();
         $this->compileIfBody();
@@ -244,20 +244,20 @@ class Compiler {
         $this->emitCondJump(Op::JUMP_FALSY, 0, $label_next);
         while (true) {
             $tok = $this->lexer->scan();
-            if ($tok->kind === Token::CONTROL_START) {
-                if ($this->lexer->consume(Token::KEYWORD_ENDIF)) {
-                    $this->expectToken(Token::CONTROL_END);
+            if ($tok->kind === TokenKind::CONTROL_START) {
+                if ($this->lexer->consume(TokenKind::KEYWORD_ENDIF)) {
+                    $this->expectToken(TokenKind::CONTROL_END);
                     $this->tryBindLabel($label_next);
                     $this->bindLabel($label_end);
                     break;
                 }
-                if ($this->lexer->consume(Token::KEYWORD_ELSE)) {
+                if ($this->lexer->consume(TokenKind::KEYWORD_ELSE)) {
                     $this->emitJump($label_end);
-                    $this->expectToken(Token::CONTROL_END);
+                    $this->expectToken(TokenKind::CONTROL_END);
                     $this->bindLabel($label_next);
                     continue;
                 }
-                if ($this->lexer->consume(Token::KEYWORD_ELSEIF)) {
+                if ($this->lexer->consume(TokenKind::KEYWORD_ELSEIF)) {
                     $this->emitJump($label_end);
                     $this->bindLabel($label_next);
                     $this->compileIf();
@@ -276,7 +276,7 @@ class Compiler {
             $op = $this->needsEscaping($type) ? Op::OUTPUT_SLOT0 : Op::OUTPUT_SAFE_SLOT0;
             $this->emit($op);
         }
-        $this->expectToken(Token::ECHO_END);
+        $this->expectToken(TokenKind::ECHO_END);
     }
 
     /**
@@ -1153,7 +1153,7 @@ class Compiler {
         if ($tok->kind === $kind) {
             return;
         }
-        $this->failToken($tok, 'expected ' . Token::prettyKindString($kind) . ', found ' . Token::prettyKindString($tok->kind));
+        $this->failToken($tok, 'expected ' . TokenKind::prettyName($kind) . ', found ' . $tok->prettyKindName());
     }
 
     /**
