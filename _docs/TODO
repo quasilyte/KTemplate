@@ -8,3 +8,5 @@
 * macros system
 * compile errors for long jumps/too many consts and vars, etc
 * move internal classes to internal folders
+* a flag to do Twig-like `~` newline trimming
+* reconsider default autoescape strategy
