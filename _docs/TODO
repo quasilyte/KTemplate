@@ -10,3 +10,4 @@
 * move internal classes to internal folders
 * a flag to do Twig-like `~` newline trimming
 * reconsider default autoescape strategy
+* use codegen for Expr class and expr kind predicates
