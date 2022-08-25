@@ -22,27 +22,17 @@ class TemplateSerializer {
         $data->code = $t->code;
         $data->frame_size = $t->frame_size;
 
-        return (string)instance_serialize($data);
+        return self::encodeData($data);
     }
 
     /**
      * @param string $s
-     * @return Template
      * @throws \Exception
+     * @return Template
      */
     public static function decode($s) {
         $t = new Template();
-        self::decodeInto($t, $s);
-        return $t;
-    }
-
-    /**
-     * @param Template $t
-     * @param string $s
-     * @throws \Exception
-     */
-    public static function decodeInto($t, $s) {
-        $data = instance_deserialize($s, TemplateData::class);
+        $data = self::decodeData($s);
         if ($data->version !== self::$format_version) {
             throw new \Exception("invalid template data version: $data->version vs " . self::$format_version);
         }
@@ -53,5 +43,28 @@ class TemplateSerializer {
         $t->float_values = $data->float_values;
         $t->code = $data->code;
         $t->frame_size = $data->frame_size;
+        return $t;
+    }
+
+    /**
+     * @param TemplateData $data
+     * @return string
+     */
+    private static function encodeData($data) {
+#ifndef KPHP
+        return serialize($data);
+#endif
+        return (string)instance_serialize($data);
+    }
+
+    /**
+     * @param string $s
+     * @return TemplateData
+     */
+    private static function decodeData($s) {
+#ifndef KPHP
+        return unserialize($s);
+#endif
+        return instance_deserialize($s, TemplateData::class);
     }
 }

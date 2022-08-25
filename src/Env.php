@@ -29,6 +29,12 @@ class Env {
     /** @var int[] */
     private $func3_id_by_name = [];
 
+    /** @var LoaderInterface */
+    private $loader;
+
+    /** @var Renderer */
+    private $renderer;
+
     /**
      * Implied text encoding.
      * Used as an argument to mb_* functions.
@@ -59,9 +65,24 @@ class Env {
      */
     public $escape_func;
 
-    public function __construct() {
+    /**
+     * @param LoaderInterface $loader
+     */
+    public function __construct($loader) {
+        $this->renderer = new Renderer();
+        $this->loader = $loader;
         $this->escape_config = new EscapeConfig();
         $this->escape_func = [FilterLibrary::class, 'escape'];
+    }
+
+    /**
+     * @param string $path
+     * @param DataProviderInterface $data_provider
+     * @return string
+     */
+    public function render($path, $data_provider = null) {
+        $t = $this->loader->load($this, $path);
+        return $this->renderer->render($this, $t, $data_provider);
     }
 
     /**

@@ -22,7 +22,7 @@ class End2EndTest extends TestCase {
             $tests[] = $filename;
         }
 
-        $env = new Env();
+        $env = new Env(null);
         
         $env->registerFilter1('strlen', function ($s) { return strlen($s); });
         $env->registerFilter1('add1', function ($x) { return $x + 1; });

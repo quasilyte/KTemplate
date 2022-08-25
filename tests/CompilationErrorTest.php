@@ -62,7 +62,7 @@ class CompilationErrorTest extends TestCase {
             '{# aa' => 'missing #}',
         ];
 
-        $env = new Env();
+        $env = new Env(null);
         $env->registerFunction1('strlen', function ($x) { return strlen($x); });
         foreach ($tests as $input => $want) {
             $have = '';

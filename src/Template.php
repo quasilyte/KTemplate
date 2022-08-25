@@ -21,6 +21,9 @@ class Template {
     public $frame_size = 1;
 
     /**
+     * Note: the serialization results are different for PHP and KPHP.
+     * You can't share the serialized representations between the two.
+     *
      * @return string
      */
     public function serialize() {
@@ -35,13 +38,4 @@ class Template {
     public static function unserialize($s) {
         return TemplateSerializer::decode($s);
     }
-
-    /**
-     * @param string $s
-     * @param Template $t
-     * @throws \Exception
-     */
-    public static function unserializeInto($t, $s) {
-        TemplateSerializer::decodeInto($t, $s);
-    } 
 }
