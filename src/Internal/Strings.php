@@ -5,6 +5,14 @@ namespace KTemplate\Internal;
 class Strings {
     /**
      * @param string $s
+     * @return bool
+     */
+    public static function isWhitespaceOnly($s) {
+        return strlen(trim($s)) === 0;
+    }
+
+    /**
+     * @param string $s
      * @param string $prefix
      * @return bool
      */

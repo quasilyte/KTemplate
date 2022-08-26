@@ -99,32 +99,32 @@ class Op {
     
     // Encoding: 0x14 dst:wslot cache:cacheslot k:keyoffset
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const LOAD_EXTDATA_1 = 20;
     
     // Encoding: 0x15 cache:cacheslot k:keyoffset
     // Flags: FLAG_IMPLICIT_SLOT0
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const LOAD_SLOT0_EXTDATA_1 = 21;
     
     // Encoding: 0x16 dst:wslot cache:cacheslot k:keyoffset
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const LOAD_EXTDATA_2 = 22;
     
     // Encoding: 0x17 cache:cacheslot k:keyoffset
     // Flags: FLAG_IMPLICIT_SLOT0
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const LOAD_SLOT0_EXTDATA_2 = 23;
     
     // Encoding: 0x18 dst:wslot cache:cacheslot k:keyoffset
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const LOAD_EXTDATA_3 = 24;
     
     // Encoding: 0x19 cache:cacheslot k:keyoffset
     // Flags: FLAG_IMPLICIT_SLOT0
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const LOAD_SLOT0_EXTDATA_3 = 25;
     
     // Encoding: 0x1a dst:wslot
@@ -138,42 +138,42 @@ class Op {
     
     // Encoding: 0x1c dst:wslot src:rslot key:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const INDEX = 28;
     
     // Encoding: 0x1d src:rslot key:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const INDEX_SLOT0 = 29;
     
     // Encoding: 0x1e dst:wslot src:rslot key:intindex
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const INDEX_INT_KEY = 30;
     
     // Encoding: 0x1f src:rslot key:intindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const INDEX_SLOT0_INT_KEY = 31;
     
     // Encoding: 0x20 dst:wslot src:rslot key:strindex
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const INDEX_STRING_KEY = 32;
     
     // Encoding: 0x21 src:rslot key:strindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const INDEX_SLOT0_STRING_KEY = 33;
     
     // Encoding: 0x22 dst:wslot src:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const MOVE = 34;
     
     // Encoding: 0x23 src:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const MOVE_SLOT0 = 35;
     
     // Encoding: 0x24 dst:wslot src:rslot
@@ -232,62 +232,62 @@ class Op {
     
     // Encoding: 0x2f dst:wslot arg1:rslot fn:filterid
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_FILTER1 = 47;
     
     // Encoding: 0x30 arg1:rslot fn:filterid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_SLOT0_FILTER1 = 48;
     
     // Encoding: 0x31 dst:wslot arg1:rslot arg2:rslot fn:filterid
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_FILTER2 = 49;
     
     // Encoding: 0x32 arg1:rslot arg2:rslot fn:filterid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_SLOT0_FILTER2 = 50;
     
     // Encoding: 0x33 dst:wslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_FUNC0 = 51;
     
     // Encoding: 0x34 fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_SLOT0_FUNC0 = 52;
     
     // Encoding: 0x35 dst:wslot arg1:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_FUNC1 = 53;
     
     // Encoding: 0x36 arg1:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_SLOT0_FUNC1 = 54;
     
     // Encoding: 0x37 dst:wslot arg1:rslot arg2:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_FUNC2 = 55;
     
     // Encoding: 0x38 arg1:rslot arg2:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_SLOT0_FUNC2 = 56;
     
     // Encoding: 0x39 dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_FUNC3 = 57;
     
     // Encoding: 0x3a arg1:rslot arg2:rslot arg3:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const CALL_SLOT0_FUNC3 = 58;
     
     // Encoding: 0x3b dst:wslot arg1:rslot
@@ -302,12 +302,12 @@ class Op {
     
     // Encoding: 0x3d dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const DEFAULT_FILTER = 61;
     
     // Encoding: 0x3e dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
+    // Result type: Types::MIXED
     public const DEFAULT_SLOT0_FILTER = 62;
     
     // Encoding: 0x3f dst:wslot src:rslot
@@ -469,6 +469,14 @@ class Op {
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
     public const MOD_SLOT0 = 94;
+    
+    // Encoding: 0x5f path:strindex
+    // Result type: unknown/varying
+    public const PREPARE_TEMPLATE = 95;
+    
+    // Encoding: 0x60
+    // Result type: unknown/varying
+    public const INCLUDE_TEMPLATE = 96;
     
 
     /**
@@ -665,6 +673,10 @@ class Op {
             return 'MOD';
         case 94:
             return 'MOD_SLOT0';
+        case 95:
+            return 'PREPARE_TEMPLATE';
+        case 96:
+            return 'INCLUDE_TEMPLATE';
         default:
             return '?';
         }
@@ -692,10 +704,38 @@ class Op {
             return Types::STRING;
         case self::LOAD_SLOT0_STRING_CONST:
             return Types::STRING;
+        case self::LOAD_EXTDATA_1:
+            return Types::MIXED;
+        case self::LOAD_SLOT0_EXTDATA_1:
+            return Types::MIXED;
+        case self::LOAD_EXTDATA_2:
+            return Types::MIXED;
+        case self::LOAD_SLOT0_EXTDATA_2:
+            return Types::MIXED;
+        case self::LOAD_EXTDATA_3:
+            return Types::MIXED;
+        case self::LOAD_SLOT0_EXTDATA_3:
+            return Types::MIXED;
         case self::LOAD_NULL:
             return Types::NULL;
         case self::LOAD_SLOT0_NULL:
             return Types::NULL;
+        case self::INDEX:
+            return Types::MIXED;
+        case self::INDEX_SLOT0:
+            return Types::MIXED;
+        case self::INDEX_INT_KEY:
+            return Types::MIXED;
+        case self::INDEX_SLOT0_INT_KEY:
+            return Types::MIXED;
+        case self::INDEX_STRING_KEY:
+            return Types::MIXED;
+        case self::INDEX_SLOT0_STRING_KEY:
+            return Types::MIXED;
+        case self::MOVE:
+            return Types::MIXED;
+        case self::MOVE_SLOT0:
+            return Types::MIXED;
         case self::MOVE_BOOL:
             return Types::BOOL;
         case self::MOVE_SLOT0_BOOL:
@@ -704,10 +744,38 @@ class Op {
             return Types::BOOL;
         case self::CONV_SLOT0_BOOL:
             return Types::BOOL;
+        case self::CALL_FILTER1:
+            return Types::MIXED;
+        case self::CALL_SLOT0_FILTER1:
+            return Types::MIXED;
+        case self::CALL_FILTER2:
+            return Types::MIXED;
+        case self::CALL_SLOT0_FILTER2:
+            return Types::MIXED;
+        case self::CALL_FUNC0:
+            return Types::MIXED;
+        case self::CALL_SLOT0_FUNC0:
+            return Types::MIXED;
+        case self::CALL_FUNC1:
+            return Types::MIXED;
+        case self::CALL_SLOT0_FUNC1:
+            return Types::MIXED;
+        case self::CALL_FUNC2:
+            return Types::MIXED;
+        case self::CALL_SLOT0_FUNC2:
+            return Types::MIXED;
+        case self::CALL_FUNC3:
+            return Types::MIXED;
+        case self::CALL_SLOT0_FUNC3:
+            return Types::MIXED;
         case self::LENGTH_FILTER:
             return Types::INT;
         case self::LENGTH_SLOT0_FILTER:
             return Types::INT;
+        case self::DEFAULT_FILTER:
+            return Types::MIXED;
+        case self::DEFAULT_SLOT0_FILTER:
+            return Types::MIXED;
         case self::ESCAPE_FILTER1:
             return Types::SAFE_STRING;
         case self::ESCAPE_SLOT0_FILTER1:
@@ -971,6 +1039,10 @@ class Op {
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case 94: // MOD_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 95: // PREPARE_TEMPLATE
+            return 0;
+        case 96: // INCLUDE_TEMPLATE
+            return 0;
         default:
             return 0;
         }
@@ -1071,5 +1143,7 @@ class Op {
         self::QUO_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::MOD => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::MOD_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::PREPARE_TEMPLATE => [OpInfo::ARG_STRING_CONST],
+        self::INCLUDE_TEMPLATE => [],
     ];
 }

@@ -13,7 +13,7 @@ class FilesystemLoader implements LoaderInterface {
     private $cache = [];
 
     /**
-     * @param string
+     * @var string
      */
     private $cache_dir = '';
 

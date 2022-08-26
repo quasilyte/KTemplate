@@ -3,6 +3,8 @@
 use PHPUnit\Framework\TestCase;
 use KTemplate\Compile\Compiler;
 use KTemplate\Env;
+use KTemplate\LoaderInterface;
+use KTemplate\ArrayLoader;
 use KTemplate\Disasm;
 
 class CompilerTest extends TestCase {
@@ -11,6 +13,95 @@ class CompilerTest extends TestCase {
 
     public static function setUpBeforeClass(): void {
         self::$compiler = new Compiler();
+    }
+
+    public function testCompileInclude() {
+        $tests = [
+            [
+                'sources' => [
+                    'main' => '{% include "a" %}{% end %}',
+                    'a' => 'hello',
+                ],
+                'disasm' => [
+                    'main' => [
+                        '  PREPARE_TEMPLATE `a`',
+                        '  INCLUDE_TEMPLATE',
+                        '  RETURN',
+                    ],
+                    'a' => [
+                        '  OUTPUT_SAFE_STRING_CONST `hello`',
+                        '  RETURN',
+                    ],
+                ],
+            ],
+
+            [
+                'sources' => [
+                    'main' => '{% include "a" %}{% arg $x = 10 %}{% end %}',
+                    'a' => '{% param $x = 0 %}{{ $x }}',
+                ],
+                'disasm' => [
+                    'main' => [
+                        '  PREPARE_TEMPLATE `a`',
+                        '  LOAD_INT_CONST arg1 10',
+                        '  INCLUDE_TEMPLATE',
+                        '  RETURN',
+                    ],
+                    'a' => [
+                        '  OUTPUT slot1',
+                        '  RETURN',
+                    ],
+                ],
+            ],
+
+            [
+                'sources' => [
+                    'main' => '{% include "a" %}{% arg $x = 10 %}{% arg $foo = 0 %}{% end %}',
+                    'a' => '{% param $foo = 0 %}{% param $x = 0 %}{% include "b" %}{% arg $x = $x %}{% end %}',
+                    'b' => '{% param $x = 0 %}{{ $x }}',
+                ],
+                'disasm' => [
+                    'main' => [
+                        '  PREPARE_TEMPLATE `a`',
+                        '  LOAD_INT_CONST arg2 10',
+                        '  LOAD_INT_CONST arg1 0',
+                        '  INCLUDE_TEMPLATE',
+                        '  RETURN',
+                    ],
+                    'a' => [
+                        '  PREPARE_TEMPLATE `b`',
+                        '  MOVE arg1 slot2',
+                        '  INCLUDE_TEMPLATE',
+                        '  RETURN',
+                    ],
+                    'b' => [
+                        '  OUTPUT slot1',
+                        '  RETURN',
+                    ],
+                ],
+            ],
+        ];
+
+        foreach ($tests as $test) {
+            $sources = [];
+            foreach ($test['sources'] as $path => $src) {
+                $sources[$path] = (string)$src;
+            }
+            $loader = new ArrayLoader($sources);
+            $env = $this->newTestEnv($loader);
+
+            self::$compiler->compile($env, 'main', (string)$test['sources']['main']);
+            foreach ($test['disasm'] as $name => $want) {
+                $input = (string)$test['sources'][$name];
+                $t = $env->getTemplate((string)$name);
+                $have = Disasm::getBytecode($env, $t);
+                $have_pretty = [];
+                foreach ($have as $s) {
+                    $have_pretty[] = "'$s',";
+                }
+                $this->assertEquals($want, $have, "input=$input\n" . implode("\n", $have_pretty));
+            }
+        }
     }
 
     public function testCompileDefault() {
@@ -568,14 +659,14 @@ class CompilerTest extends TestCase {
             ],
 
             // If blocks.
-            '{% if 1 %}a{% endif %}' => [
+            '{% if 1 %}a{% end %}' => [
                 '  LOAD_SLOT0_INT_CONST *slot0 1',
                 '  JUMP_SLOT0_FALSY *slot0 L0',
                 '  OUTPUT_SAFE_STRING_CONST `a`',
                 'L0:',
                 '  RETURN',
             ],
-            '{% if 1 %}a{% else %}b{% endif %}' => [
+            '{% if 1 %}a{% else %}b{% end %}' => [
                 '  LOAD_SLOT0_INT_CONST *slot0 1',
                 '  JUMP_SLOT0_FALSY *slot0 L0',
                 '  OUTPUT_SAFE_STRING_CONST `a`',
@@ -585,7 +676,7 @@ class CompilerTest extends TestCase {
                 'L1:',
                 '  RETURN',
             ],
-            '{% if 1 %}a{% elseif 2 %}b{% endif %}' => [
+            '{% if 1 %}a{% elseif 2 %}b{% end %}' => [
                 '  LOAD_SLOT0_INT_CONST *slot0 1',
                 '  JUMP_SLOT0_FALSY *slot0 L0',
                 '  OUTPUT_SAFE_STRING_CONST `a`',
@@ -597,7 +688,7 @@ class CompilerTest extends TestCase {
                 'L1:',
                 '  RETURN',
             ],
-            '{% if 1 %}a{% elseif 2 %}b{% elseif 3 %}c{% endif %}' => [
+            '{% if 1 %}a{% elseif 2 %}b{% elseif 3 %}c{% end %}' => [
                 '  LOAD_SLOT0_INT_CONST *slot0 1',
                 '  JUMP_SLOT0_FALSY *slot0 L0',
                 '  OUTPUT_SAFE_STRING_CONST `a`',
@@ -614,7 +705,7 @@ class CompilerTest extends TestCase {
                 'L1:',
                 '  RETURN',
             ],
-            '{% if 1 %}a{% elseif 2 %}b{% else %}c{% endif %}' => [
+            '{% if 1 %}a{% elseif 2 %}b{% else %}c{% end %}' => [
                 '  LOAD_SLOT0_INT_CONST *slot0 1',
                 '  JUMP_SLOT0_FALSY *slot0 L0',
                 '  OUTPUT_SAFE_STRING_CONST `a`',
@@ -681,7 +772,7 @@ class CompilerTest extends TestCase {
             ],
             
             // Loops.
-            '{% for $x in xs %}{{ $x }}{% endfor %}' => [
+            '{% for $x in xs %}{{ $x }}{% end %}' => [
                 '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
                 '  FOR_VAL *slot0 L0 slot2',
                 '  OUTPUT_SAFE slot2',
@@ -689,7 +780,7 @@ class CompilerTest extends TestCase {
                 'L0:',
                 '  RETURN',
             ],
-            '{% for $k, $v in xs %}{{ $k ~ "/" ~ $v }}{% endfor %}' => [
+            '{% for $k, $v in xs %}{{ $k ~ "/" ~ $v }}{% end %}' => [
                 '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
                 '  FOR_KEY_VAL *slot0 L0 slot2 slot3',
                 '  LOAD_STRING_CONST slot5 `/`',
@@ -700,7 +791,7 @@ class CompilerTest extends TestCase {
                 'L0:',
                 '  RETURN',
             ],
-            '{% let $arr = arr %}{% for $x in $arr %}{{ $x }}{% endfor %}' => [
+            '{% let $arr = arr %}{% for $x in $arr %}{{ $x }}{% end %}' => [
                 '  LOAD_EXTDATA_1 slot2 slot1 arr',
                 '  MOVE_SLOT0 *slot0 slot2',
                 '  FOR_VAL *slot0 L0 slot3',
@@ -709,7 +800,7 @@ class CompilerTest extends TestCase {
                 'L0:',
                 '  RETURN',
             ],
-            '{% for $x in xs %}1{% else %}2{% endfor %}' => [
+            '{% for $x in xs %}1{% else %}2{% end %}' => [
                 '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
                 '  FOR_VAL *slot0 L0 slot2',
                 '  OUTPUT_SAFE_STRING_CONST `1`',
@@ -736,10 +827,11 @@ class CompilerTest extends TestCase {
     }
 
     /**
+     * @param LoaderInterface $loader
      * @return Env
      */
-    private function newTestEnv() {
-        $env = new Env(null);
+    private function newTestEnv($loader = null) {
+        $env = new Env($loader);
         $env->registerFilter1('strlen', function ($s) { return strlen($s); });
         $env->registerFilter1('add1', function ($x) { return $x + 1; });
         $env->registerFilter1('sub1', function ($x) { return $x - 1; });

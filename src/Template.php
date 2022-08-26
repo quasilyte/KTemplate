@@ -20,6 +20,17 @@ class Template {
     /** @var int */
     public $frame_size = 1;
 
+    /** @var int */
+    public $frame_args_size = 0;
+
+    /**
+     * An ordered list of template params with their default values.
+     * Keys are param names, values are default initializers.
+     *
+     * @var mixed[]
+     **/
+    public $params = [];
+
     /**
      * Note: the serialization results are different for PHP and KPHP.
      * You can't share the serialized representations between the two.

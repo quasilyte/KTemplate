@@ -7,6 +7,8 @@ use KTemplate\Template;
 use KTemplate\Op;
 use KTemplate\OpInfo;
 use KTemplate\Internal\Assert;
+use KTemplate\Internal\Strings;
+use KTemplate\Internal\Arrays;
 
 class Compiler {
     /** @var Lexer */
@@ -39,6 +41,19 @@ class Compiler {
     /** @var int[] */
     private $float_values;
 
+    /** @var bool */
+    private $parsing_header = true;
+
+    /**
+     * [$pc] => tuple($template_load_path, $arg_name)
+     * @var tuple(string, string)[]
+     */
+    private $template_arg_deps = [];
+    /** @var string */
+    private $current_template_path = '';
+    /** @var string */
+    private $current_template_arg = '';
+
     public function __construct() {
         $this->lexer = new Lexer();
         $this->parser = new ExprParser();
@@ -57,8 +72,11 @@ class Compiler {
         /** @var ?\Throwable $exception */
         $exception = null;
 
-        $this->frame->enterScope();
+        /** @var Template $result */
+        $result = null;
+
         try {
+            $this->frame->enterScope();
             while (true) {
                 $tok = $this->lexer->scan();
                 if ($tok->kind === TokenKind::EOF) {
@@ -67,18 +85,17 @@ class Compiler {
                 $this->compileToken($tok);
             }
             $this->emit(Op::RETURN);
-            $this->finalizeTemplate();
-            return $this->result;
+            $this->frame->leaveScope();
+            $result = $this->finalizeTemplate();
         } catch (\Throwable $e) {
             $exception = $e;
         }
-        $this->frame->leaveScope();
 
         $this->finish();
         if ($exception) {
             throw $exception;
         }
-        return $this->result;
+        return $result;
     }
 
     private function compileToken(Token $tok) {
@@ -104,25 +121,80 @@ class Compiler {
 
     private function compileControl() {
         $tok = $this->lexer->scan();
+        $is_header_token = false;
+        // Preserve for the error handling
+        $tok_kind = $tok->kind;
+        $tok_pos = $tok->pos_from;
         switch ($tok->kind) {
+        case TokenKind::KEYWORD_PARAM:
+            $is_header_token = true;
+            $this->compileParam();
+            break;
         case TokenKind::KEYWORD_IF:
             $this->compileIf();
-            return;
+            break;
         case TokenKind::KEYWORD_LET:
             $this->compileLet();
-            return;
+            break;
         case TokenKind::KEYWORD_SET:
             $this->compileSet();
-            return;
+            break;
         case TokenKind::KEYWORD_FOR:
             $this->compileFor();
-            return;
+            break;
+        case TokenKind::KEYWORD_INCLUDE:
+            $this->compileInclude();
+            break;
+        default:
+            if ($tok->kind === TokenKind::IDENT) {
+                $this->failToken($tok, 'unexpected control token: ' . $this->lexer->tokenText($tok));
+            }
+            $this->failToken($tok, 'unexpected control token: ' . $tok->prettyKindName());
         }
 
-        if ($tok->kind === TokenKind::IDENT) {
-            $this->failToken($tok, 'unexpected control token: ' . $this->lexer->tokenText($tok));
+        if (!$this->parsing_header && $is_header_token) {
+            $message = TokenKind::prettyName($tok_kind) . ' can only be used in the beginning of template';
+            $this->fail($this->lexer->getLineByPos($tok_pos), $message);
         }
-        $this->failToken($tok, 'unexpected control token: ' . $tok->prettyKindName());
+        $this->parsing_header = $is_header_token;
+    }
+
+    private function compileInclude() {
+        $e = $this->parser->parseRootExpr($this->lexer);
+        $path_value = $this->const_folder->fold($e);
+        if (!is_string($path_value)) {
+            $this->failExpr($e, 'include expects a const expr string argument');
+        }
+        if ($this->current_template_path) {
+            $this->failExpr($e, "attempted to include $path_value while including $this->current_template_path");
+        }
+        $this->current_template_path = (string)$path_value;
+        $this->frame->enterTemplateCall();
+        $this->expectToken(TokenKind::CONTROL_END);
+        $this->emit1(Op::PREPARE_TEMPLATE, $this->internString($this->current_template_path));
+        while (true) {
+            $tok = $this->lexer->scan();
+            if ($tok->kind === TokenKind::TEXT) {
+                if (!Strings::isWhitespaceOnly($this->lexer->tokenText($tok))) {
+                    $this->failToken($tok, 'include block can only contain args and whitespace, found text');
+                }
+                continue;
+            }
+            if ($tok->kind === TokenKind::CONTROL_START) {
+                if ($this->lexer->consume(TokenKind::KEYWORD_ARG)) {
+                    $this->compileTemplateArg();
+                    continue;
+                }
+                if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
+                    $this->expectToken(TokenKind::CONTROL_END);
+                    $this->emit(Op::INCLUDE_TEMPLATE);
+                    break;
+                }
+            }
+            $this->failToken($tok, 'include block can only contain args and whitespace');
+        }
+        $this->current_template_path = '';
+        $this->frame->leaveTemplateCall();
     }
 
     private function compileFor() {
@@ -174,7 +246,7 @@ class Compiler {
         while (true) {
             $tok = $this->lexer->scan();
             if ($tok->kind === TokenKind::CONTROL_START) {
-                if ($this->lexer->consume(TokenKind::KEYWORD_ENDFOR)) {
+                if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
                     $this->expectToken(TokenKind::CONTROL_END);
                     if (!$has_else) {
                         $this->emit(Op::RETURN);
@@ -228,6 +300,46 @@ class Compiler {
         $this->expectToken(TokenKind::CONTROL_END);
     }
 
+    private function compileParam() {
+        $tok = $this->lexer->scan();
+        if ($tok->kind !== TokenKind::DOLLAR_IDENT) {
+            $this->failToken($tok, 'param names should be identifiers with leading $, found ' . $tok->prettyKindName());
+        }
+        $var_name = $this->lexer->dollarVarName($tok);
+        if ($this->frame->lookupLocalInCurrentScope($var_name) !== -1) {
+            $this->failToken($tok, "can't declare $var_name param: name is already in use");
+        }
+        $var_slot = $this->frame->allocVarSlot($var_name);
+        $this->expectToken(TokenKind::ASSIGN);
+        $e = $this->parser->parseRootExpr($this->lexer);
+        $const_value = $this->const_folder->fold($e);
+        if ($const_value === null) {
+            $this->failExpr($e, "can only use non-null const expr values for $var_name param default initializer");
+        }
+        $this->expectToken(TokenKind::CONTROL_END);
+        $this->result->params[$var_name] = $const_value;
+    }
+
+    private function compileTemplateArg() {
+        $tok = $this->lexer->scan();
+        if ($tok->kind !== TokenKind::DOLLAR_IDENT) {
+            $this->failToken($tok, 'arg names should be identifiers with leading $, found ' . $tok->prettyKindName());
+        }
+        $arg_name = $this->lexer->dollarVarName($tok);
+        if ($this->current_template_arg) {
+            $this->failToken($tok, "attempted to define $arg_name argument while defining $this->current_template_arg");
+        }
+        if (!$this->frame->addTemplateArg($arg_name)) {
+            $this->failToken($tok, "duplicated $arg_name argument");
+        }
+        $this->current_template_arg = $arg_name;
+        $this->expectToken(TokenKind::ASSIGN);
+        $e = $this->parser->parseRootExpr($this->lexer);
+        $this->compileRootExpr(Frame::ARG_SLOT_PLACEHOLDER, $e);
+        $this->expectToken(TokenKind::CONTROL_END);
+        $this->current_template_arg = '';
+    }
+
     private function compileIf() {
         $e = $this->parser->parseRootExpr($this->lexer);
         $this->compileRootExpr(0, $e);
@@ -245,7 +357,7 @@ class Compiler {
         while (true) {
             $tok = $this->lexer->scan();
             if ($tok->kind === TokenKind::CONTROL_START) {
-                if ($this->lexer->consume(TokenKind::KEYWORD_ENDIF)) {
+                if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
                     $this->expectToken(TokenKind::CONTROL_END);
                     $this->tryBindLabel($label_next);
                     $this->bindLabel($label_end);
@@ -311,14 +423,14 @@ class Compiler {
         switch ($e->kind) {
         case Expr::DOLLAR_IDENT:
             $var_slot = $this->lookupLocalVar($e);
-            $op = $this->needsEscaping(Types::UNKNOWN) ? Op::OUTPUT : Op::OUTPUT_SAFE;
+            $op = $this->needsEscaping(Types::MIXED) ? Op::OUTPUT : Op::OUTPUT_SAFE;
             $this->emit1($op, $var_slot);
             return true;
         case Expr::IDENT:
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
-            $escape_bit = $this->needsEscaping(Types::UNKNOWN) ? 1 : 0;
+            $escape_bit = $this->needsEscaping(Types::MIXED) ? 1 : 0;
             $this->emit3(Op::OUTPUT_EXTDATA_1, $cache_slot, $key_offset, $escape_bit);
             return true;
         case Expr::DOT_ACCESS:
@@ -329,7 +441,7 @@ class Compiler {
             $cache_slot_info = $this->frame->getCacheSlotInfo($p1, $p2, $p3);
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
-            $escape_bit = $this->needsEscaping(Types::UNKNOWN) ? 1 : 0;
+            $escape_bit = $this->needsEscaping(Types::MIXED) ? 1 : 0;
             $op = $p3 === '' ? Op::OUTPUT_EXTDATA_2 : Op::OUTPUT_EXTDATA_3;
             $this->emit3($op, $cache_slot, $key_offset, $escape_bit);
             return true;
@@ -483,7 +595,7 @@ class Compiler {
      * @param int $type
      * @return int
      */
-    private function compileExpr($dst, $e, $type = Types::UNKNOWN) {
+    private function compileExpr($dst, $e, $type = Types::MIXED) {
         // First try to constant-fold the expression.
         $const_value = $this->const_folder->fold($e);
         if (is_int($const_value)) {
@@ -523,7 +635,7 @@ class Compiler {
                         Assert::unreachable('unexpected const-folded value type');
                     }
                     $this->compileBinaryExpr($dst, $op, $lhs_lhs_slot, $rhs_slot);
-                    return Types::UNKNOWN;
+                    return Types::MIXED;
                 }
             }
         }
@@ -542,7 +654,7 @@ class Compiler {
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
             $this->emit3dst(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
-            return Types::UNKNOWN;
+            return Types::MIXED;
 
         case Expr::DOT_ACCESS:
             [$p1, $p2, $p3] = $this->decodeDotAccess($e);
@@ -554,11 +666,11 @@ class Compiler {
             $key_offset = ($slot_info >> 8) & 0xff;
             $op = $p3 === '' ? Op::LOAD_EXTDATA_2 : Op::LOAD_EXTDATA_3;
             $this->emit3dst($op, $dst, $cache_slot, $key_offset);
-            return Types::UNKNOWN;
+            return Types::MIXED;
 
         case Expr::INDEX:
             $this->compileIndex($dst, $e);
-            return Types::UNKNOWN;
+            return Types::MIXED;
 
         case Expr::OR:
             $this->compileOr($dst, $e);
@@ -572,7 +684,7 @@ class Compiler {
             return Types::BOOL;
         case Expr::NEG:
             $this->compileUnaryExpr($dst, Op::NEG, $e);
-            return Types::UNKNOWN;
+            return Types::NUMERIC;
 
         case Expr::GT:
             $this->compileReversedBinaryExprNode($dst, Op::LT, $e);
@@ -615,7 +727,7 @@ class Compiler {
 
         case Expr::CALL:
             $this->compileCall($dst, $e);
-            return Types::UNKNOWN;
+            return Types::MIXED;
 
         case Expr::FILTER:
             if ($this->parser->getExprMember($e, 1)->kind === Expr::IDENT) {
@@ -739,38 +851,22 @@ class Compiler {
 
         switch ($e->value) {
         case 0:
-            if ($dst === 0) {
-                $this->emitCall0(Op::CALL_SLOT0_FUNC0, $func_id);
-            } else {
-                $this->emitCall1(Op::CALL_FUNC0, $dst, $func_id);
-            }
+            $this->emit2dst(Op::CALL_FUNC0, $dst, $func_id);
             break;
         case 1:
             $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
-            if ($dst === 0) {
-                $this->emitCall1(Op::CALL_SLOT0_FUNC1, $arg1_slot, $func_id);
-            } else {
-                $this->emitCall2(Op::CALL_FUNC1, $dst, $arg1_slot, $func_id);
-            }
+            $this->emit3dst(Op::CALL_FUNC1, $dst, $arg1_slot, $func_id);
             break;
         case 2:
             $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
             $arg2_slot = $this->compileTempExpr($this->parser->getExprMember($e, 2));
-            if ($dst === 0) {
-                $this->emitCall2(Op::CALL_SLOT0_FUNC2, $arg1_slot, $arg2_slot, $func_id);
-            } else {
-                $this->emitCall3(Op::CALL_FUNC2, $dst, $arg1_slot, $arg2_slot, $func_id);
-            }
+            $this->emit4dst(Op::CALL_FUNC2, $dst, $arg1_slot, $arg2_slot, $func_id);
             break;
         case 3:
             $arg1_slot = $this->compileTempExpr($this->parser->getExprMember($e, 1));
             $arg2_slot = $this->compileTempExpr($this->parser->getExprMember($e, 2));
             $arg3_slot = $this->compileTempExpr($this->parser->getExprMember($e, 3));
-            if ($dst === 0) {
-                $this->emitCall3(Op::CALL_SLOT0_FUNC3, $arg1_slot, $arg2_slot, $arg3_slot, $func_id);
-            } else {
-                $this->emitCall4(Op::CALL_FUNC3, $dst, $arg1_slot, $arg2_slot, $arg3_slot, $func_id);
-            }
+            $this->emit5dst(Op::CALL_FUNC3, $dst, $arg1_slot, $arg2_slot, $arg3_slot, $func_id);
             break;
         }
     }
@@ -801,16 +897,12 @@ class Compiler {
         if ($filter_id === -1) {
             if ($filter_name === 'default') {
                 $this->emit3dst(Op::DEFAULT_FILTER, $dst, $arg1_slot, $arg2_slot);
-                return Types::UNKNOWN;
+                return Types::MIXED;
             }
             $this->failExpr($this->parser->getExprMember($rhs, 0), "$filter_name filter is not defined");
         }
-        if ($dst === 0) {
-            $this->emitCall2(Op::CALL_SLOT0_FILTER2, $arg1_slot, $arg2_slot, $filter_id);
-        } else {
-            $this->emitCall3(Op::CALL_FILTER2, $dst, $arg1_slot, $arg2_slot, $filter_id);
-        }
-        return Types::UNKNOWN;
+        $this->emit4dst(Op::CALL_FILTER2, $dst, $arg1_slot, $arg2_slot, $filter_id);
+        return Types::MIXED;
     }
 
     /**
@@ -836,12 +928,8 @@ class Compiler {
             }
             $this->failExpr($rhs, "$rhs->value filter is not defined");
         }
-        if ($dst === 0) {
-            $this->emitCall1(Op::CALL_SLOT0_FILTER1, $arg1_slot, $filter_id);
-        } else {
-            $this->emitCall2(Op::CALL_FILTER1, $dst, $arg1_slot, $filter_id);
-        }
-        return Types::UNKNOWN;
+        $this->emit3dst(Op::CALL_FILTER1, $dst, $arg1_slot, $filter_id);
+        return Types::MIXED;
     }
 
     /**
@@ -851,11 +939,7 @@ class Compiler {
      * @param int $rhs_slot
      */
     private function compileBinaryExpr($dst, $op, $lhs_slot, $rhs_slot) {
-        if ($dst === 0) {
-            $this->emit2($op + 1, $lhs_slot, $rhs_slot);
-            return;
-        }
-        $this->emit3($op, $dst, $lhs_slot, $rhs_slot);
+        $this->emit3dst($op, $dst, $lhs_slot, $rhs_slot);
     }
 
     /**
@@ -958,6 +1042,11 @@ class Compiler {
         $this->float_values = [];
         $this->addr_by_label_id = [];
         $this->label_seq = 0;
+        $this->parsing_header = true;
+
+        $this->template_arg_deps = [];
+        $this->current_template_path = '';
+        $this->current_template_arg = '';
     }
 
     /**
@@ -989,6 +1078,9 @@ class Compiler {
             $this->emit($op+1);
             return;
         }
+        if ($dst === Frame::ARG_SLOT_PLACEHOLDER) {
+            $this->template_arg_deps[$this->getPC()] = tuple($this->current_template_path, $this->current_template_arg);
+        }
         $this->emit1($op, $dst);
     }
 
@@ -1001,6 +1093,9 @@ class Compiler {
         if ($dst === 0) {
             $this->emit1($op+1, $arg1);
             return;
+        }
+        if ($dst === Frame::ARG_SLOT_PLACEHOLDER) {
+            $this->template_arg_deps[$this->getPC()] = tuple($this->current_template_path, $this->current_template_arg);
         }
         $this->emit2($op, $dst, $arg1);
     }
@@ -1016,57 +1111,47 @@ class Compiler {
             $this->emit2($op+1, $arg1, $arg2);
             return;
         }
+        if ($dst === Frame::ARG_SLOT_PLACEHOLDER) {
+            $this->template_arg_deps[$this->getPC()] = tuple($this->current_template_path, $this->current_template_arg);
+        }
         $this->emit3($op, $dst, $arg1, $arg2);
     }
 
     /**
      * @param int $op
-     * @param int $func_id - 16bit
-     */
-    private function emitCall0($op, $func_id) {
-        $this->result->code[] = $op | ($func_id << 8);
-    }
-
-    /**
-     * @param int $op
-     * @param int $arg1
-     * @param int $func_id - 16bit
-     */
-    private function emitCall1($op, $arg1, $func_id) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($func_id << 16);
-    }
-
-    /**
-     * @param int $op
-     * @param int $arg1
-     * @param int $arg2
-     * @param int $func_id - 16bit
-     */
-    private function emitCall2($op, $arg1, $arg2, $func_id) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($func_id << 24);
-    }
-
-    /**
-     * @param int $op
+     * @param int $dst
      * @param int $arg1
      * @param int $arg2
      * @param int $arg3
-     * @param int $func_id - 16bit
      */
-    private function emitCall3($op, $arg1, $arg2, $arg3, $func_id) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($func_id << 32);
+    private function emit4dst($op, $dst, $arg1, $arg2, $arg3) {
+        if ($dst === 0) {
+            $this->emit3($op+1, $arg1, $arg2, $arg3);
+            return;
+        }
+        if ($dst === Frame::ARG_SLOT_PLACEHOLDER) {
+            $this->template_arg_deps[$this->getPC()] = tuple($this->current_template_path, $this->current_template_arg);
+        }
+        $this->emit4($op, $dst, $arg1, $arg2, $arg3);
     }
 
     /**
      * @param int $op
+     * @param int $dst
      * @param int $arg1
      * @param int $arg2
      * @param int $arg3
      * @param int $arg4
-     * @param int $func_id - 16bit
      */
-    private function emitCall4($op, $arg1, $arg2, $arg3, $arg4, $func_id) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32) | ($func_id << 40);
+    private function emit5dst($op, $dst, $arg1, $arg2, $arg3, $arg4) {
+        if ($dst === 0) {
+            $this->emit4($op+1, $arg1, $arg2, $arg3, $arg4);
+            return;
+        }
+        if ($dst === Frame::ARG_SLOT_PLACEHOLDER) {
+            $this->template_arg_deps[$this->getPC()] = tuple($this->current_template_path, $this->current_template_arg);
+        }
+        $this->emit5($op, $dst, $arg1, $arg2, $arg3, $arg4);
     }
 
     /**
@@ -1101,6 +1186,29 @@ class Compiler {
      */
     private function emit3($op, $arg1, $arg2, $arg3) {
         $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24);
+    }
+
+    /**
+     * @param int $op
+     * @param int $arg1
+     * @param int $arg2
+     * @param int $arg3
+     * @param int $arg4
+     */
+    private function emit4($op, $arg1, $arg2, $arg3, $arg4) {
+        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32);
+    }
+
+    /**
+     * @param int $op
+     * @param int $arg1
+     * @param int $arg2
+     * @param int $arg3
+     * @param int $arg4
+     * @param int $arg5
+     */
+    private function emit5($op, $arg1, $arg2, $arg3, $arg4, $arg5) {
+        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32) | ($arg5 << 40);
     }
 
     /**
@@ -1175,18 +1283,72 @@ class Compiler {
     /**
      * @param int $line
      * @param string $message
+     * @param string $filename
      */
-    private function fail($line, $message) {
+    private function fail($line, $message, $filename = '') {
         $e = new CompilationException($message);
         $e->source_line = $line;
-        $e->source_filename = $this->lexer->getFilename();
+        $e->source_filename = $filename ?: $this->lexer->getFilename();
         throw $e;
     }
 
+    /**
+     * @return Template
+     */
     private function finalizeTemplate() {
         $this->linkJumps();
         $this->reallocateSlots();
-        $this->result->frame_size = 1 + count($this->frame->cache_slots) + $this->frame->num_locals;
+        $this->result->frame_size = count($this->frame->cache_slots) + $this->frame->num_locals;
+        $this->result->frame_args_size = $this->frame->max_num_args;
+        return $this->resolveTemplateDeps();
+    }
+
+    private function resolveTemplateDeps() {
+        // This is a hard part.
+        // When compiling a different template, the same compiler instance
+        // can be used; and we want to allow that.
+        //
+        // Save all the state we'll need to continue and do not depend
+        // on the $this state after the dependency is compiled.
+
+        $result = $this->result;
+        $env = $this->env;
+        $filename = $this->lexer->getFilename();
+        $template_arg_deps = $this->template_arg_deps;
+
+        // Accessing $this beyond this point could be a bad idea.
+        // Always re-check what you're using and whether it's safe in this context.
+
+        /** @var Template[] $template_cache */
+        $template_cache = [];
+        $dst_mask = 0xff << 8;
+        $frame_slot_offset = 1; // Skil slot0 index
+        foreach ($template_arg_deps as $pc => $tup) {
+            [$load_path, $arg_name] = $tup;
+            /** @var Template $t */
+            $t = null;
+            // Although getTemplate() usually caches the results,
+            // it's faster to use a local cache map here.
+            if (isset($template_cache[$load_path])) {
+                $t = $template_cache[$load_path];
+            } else {
+                $t = $env->getTemplate($load_path);
+            }
+            $arg_index = Arrays::stringKeyOffset($t->params, $arg_name);
+            if ($arg_index === -1) {
+                // TODO: -1 is not a good error location.
+                $this->fail(-1, "template $load_path doesn't have $arg_name param", $filename);
+            }
+            $arg_slot = $result->frame_size + $arg_index + $frame_slot_offset;
+            // We have a guarantee that all expression-like operations
+            // have dst at fixed offset.
+            $opdata = $result->code[$pc];
+            Assert::true((($opdata >> 8) & 0xff) === Frame::ARG_SLOT_PLACEHOLDER, 'bad argument slot placeholder');
+            $opdata = ($opdata & (~$dst_mask)) | ($arg_slot << 8);
+            $result->code[$pc] = $opdata;
+        }
+
+        return $result;
     }
 
     private function reallocateSlots() {
@@ -1248,8 +1410,14 @@ class Compiler {
         if (array_key_exists($label_id, $this->addr_by_label_id)) {
             $this->fail(-1, "internal error: binding label with id=$label_id twice");
         }
-        $pc = count($this->result->code);
-        $this->addr_by_label_id[$label_id] = $pc;
+        $this->addr_by_label_id[$label_id] = $this->getPC();
+    }
+
+    /**
+     * @return int
+     */
+    private function getPC() {
+        return count($this->result->code);
     }
 
     /**

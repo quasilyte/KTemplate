@@ -4,6 +4,7 @@ use PHPUnit\Framework\TestCase;
 use KTemplate\Compile\Compiler;
 use KTemplate\Compile\CompilationException;
 use KTemplate\Env;
+use KTemplate\ArrayLoader;
 use KTemplate\Internal\Strings;
 
 class CompilationErrorTest extends TestCase {
@@ -53,16 +54,39 @@ class CompilationErrorTest extends TestCase {
             '{{ 1' => 'expected }}, found eof',
 
             '{% if 1 }}' => 'expected %}, found }}',
-            '{% if 1 %}{% endif 1' => 'expected %}, found int_lit',
+            '{% if 1 %}{% end 1' => 'expected %}, found int_lit',
             '{% if 1 %}{% else "a"' => 'expected %}, found string_lit_q2',
 
             '{{ (1 }}' => 'missing )',
 
             '{{ "a }}' => 'unterminated string literal',
             '{# aa' => 'missing #}',
+
+            '{% include $x %}' => 'include expects a const expr string argument',
+            '{% param $x = $y %}' => 'can only use non-null const expr values for x param default initializer',
+
+            '{% include "a" %}{% include "b"}' => 'include block can only contain args and whitespace',
+            '{% include "a" %}xxx{% end %}' => 'include block can only contain args and whitespace',
+            '{% include "a" %}' => 'include block can only contain args and whitespace',
+
+            '{% include "a" %}{% arg $x = 1 %}{% arg $x = 2 %}' => 'duplicated x argument',
+
+            '{% include "example" %}{% arg $foo = 5 %}{% end %}' => "template example doesn't have foo param",
+
+            '{% let $x = 1 %}{% param $y = 2 %}' => 'param can only be used in the beginning of template',
+            '{% let $x = 1 %}{% param $x = 2 %}' => "can't declare x param: name is already in use",
+            '{% param $x = 1 %}{% param $x = 2 %}' => "can't declare x param: name is already in use",
+            '{% param x = 1 %}' => 'param names should be identifiers with leading $, found ident',
         ];
 
-        $env = new Env(null);
+        $loader = new ArrayLoader([
+            'example' => '
+                {% param $title = "Example" %}
+                {{ $title }}
+            ',
+        ]);
+
+        $env = new Env($loader);
         $env->registerFunction1('strlen', function ($x) { return strlen($x); });
         foreach ($tests as $input => $want) {
             $have = '';

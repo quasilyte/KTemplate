@@ -50,16 +50,8 @@ class LexerTest extends TestCase {
                 ['CONTROL_START', 'IF', 'INT_LIT(1)', 'CONTROL_END'],
             ],
             [
-                '{% endif %}',
-                ['CONTROL_START', 'ENDIF', 'CONTROL_END'],
-            ],
-            [
-                '{% endfor %}',
-                ['CONTROL_START', 'ENDFOR', 'CONTROL_END'],
-            ],
-            [
-                '{%endfor%}',
-                ['CONTROL_START', 'ENDFOR', 'CONTROL_END'],
+                '{% end %}',
+                ['CONTROL_START', 'END', 'CONTROL_END'],
             ],
             [
                 '{% else %}',
@@ -70,8 +62,8 @@ class LexerTest extends TestCase {
                 ['CONTROL_START', 'ELSEIF', 'CONTROL_END'],
             ],
             [
-                '{% arg endarg param include endinclude %}',
-                ['CONTROL_START', 'ARG', 'ENDARG', 'PARAM', 'INCLUDE', 'ENDINCLUDE', 'CONTROL_END'],
+                '{% arg param include %}',
+                ['CONTROL_START', 'ARG', 'PARAM', 'INCLUDE', 'CONTROL_END'],
             ],
 
             // Numeric literals.

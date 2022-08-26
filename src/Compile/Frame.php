@@ -6,8 +6,16 @@ use KTemplate\Template;
 use KTemplate\Internal\Assert;
 
 class Frame {
+    public const ARG_SLOT_PLACEHOLDER = 255;
+
     /** @var int */
     public $num_locals;
+
+    /** @var int */
+    public $max_num_args;
+
+    /** @var bool[] */
+    private $passed_args = [];
     
     /** @var int[] */
     public $cache_slots = [];
@@ -32,14 +40,38 @@ class Frame {
      */
     public function reset($template) {
         $this->template = $template;
-        $this->num_locals = 1;
+        $this->num_locals = 1; // Includes slot0
+        $this->max_num_args = 0;
+        $this->passed_args = [];
         $this->cache_slots = [];
         $this->id_seq = 1;
-        $this->num_temps;
+        $this->num_temps = 0;
         $this->in_temp_block = false;
         $this->popVars(count($this->vars));
         $this->popVarIDs(count($this->var_ids));
         $this->popDepths(count($this->depths));
+    }
+
+    public function enterTemplateCall() {
+        $this->passed_args = [];
+    }
+
+    /**
+     * @var string $arg_name
+     * @return bool
+     */
+    public function addTemplateArg($arg_name) {
+        if (isset($this->passed_args[$arg_name])) {
+            return false;
+        }
+        $this->passed_args[$arg_name] = true;
+        return true;
+    }
+
+    public function leaveTemplateCall() {
+        if (count($this->passed_args) > $this->max_num_args) {
+            $this->max_num_args = count($this->passed_args);
+        }
     }
 
     public function enterTempBlock() {

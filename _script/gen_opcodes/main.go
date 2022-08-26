@@ -36,6 +36,7 @@ var (
 	stringType     = "Types::STRING"
 	safeStringType = "Types::SAFE_STRING"
 	nullType       = "Types::NULL"
+	mixedType      = "Types::MIXED"
 	unknownType    = "Types::UNKNOWN"
 )
 
@@ -61,24 +62,24 @@ var rawOpcodes = []opcodeTemplate{
 	{"LOAD_SLOT0_FLOAT_CONST", "op *slot0 val:floatindex", floatType},
 	{"LOAD_STRING_CONST", "op dst:wslot val:strindex", stringType},
 	{"LOAD_SLOT0_STRING_CONST", "op *slot0 val:strindex", stringType},
-	{"LOAD_EXTDATA_1", "op dst:wslot cache:cacheslot k:keyoffset", unknownType},
-	{"LOAD_SLOT0_EXTDATA_1", "op *slot0 cache:cacheslot k:keyoffset", unknownType},
-	{"LOAD_EXTDATA_2", "op dst:wslot cache:cacheslot k:keyoffset", unknownType},
-	{"LOAD_SLOT0_EXTDATA_2", "op *slot0 cache:cacheslot k:keyoffset", unknownType},
-	{"LOAD_EXTDATA_3", "op dst:wslot cache:cacheslot k:keyoffset", unknownType},
-	{"LOAD_SLOT0_EXTDATA_3", "op *slot0 cache:cacheslot k:keyoffset", unknownType},
+	{"LOAD_EXTDATA_1", "op dst:wslot cache:cacheslot k:keyoffset", mixedType},
+	{"LOAD_SLOT0_EXTDATA_1", "op *slot0 cache:cacheslot k:keyoffset", mixedType},
+	{"LOAD_EXTDATA_2", "op dst:wslot cache:cacheslot k:keyoffset", mixedType},
+	{"LOAD_SLOT0_EXTDATA_2", "op *slot0 cache:cacheslot k:keyoffset", mixedType},
+	{"LOAD_EXTDATA_3", "op dst:wslot cache:cacheslot k:keyoffset", mixedType},
+	{"LOAD_SLOT0_EXTDATA_3", "op *slot0 cache:cacheslot k:keyoffset", mixedType},
 	{"LOAD_NULL", "op dst:wslot", nullType},
 	{"LOAD_SLOT0_NULL", "op", nullType},
 
-	{"INDEX", "op dst:wslot src:rslot key:rslot", unknownType},
-	{"INDEX_SLOT0", "op *slot0 src:rslot key:rslot", unknownType},
-	{"INDEX_INT_KEY", "op dst:wslot src:rslot key:intindex", unknownType},
-	{"INDEX_SLOT0_INT_KEY", "op *slot0 src:rslot key:intindex", unknownType},
-	{"INDEX_STRING_KEY", "op dst:wslot src:rslot key:strindex", unknownType},
-	{"INDEX_SLOT0_STRING_KEY", "op *slot0 src:rslot key:strindex", unknownType},
+	{"INDEX", "op dst:wslot src:rslot key:rslot", mixedType},
+	{"INDEX_SLOT0", "op *slot0 src:rslot key:rslot", mixedType},
+	{"INDEX_INT_KEY", "op dst:wslot src:rslot key:intindex", mixedType},
+	{"INDEX_SLOT0_INT_KEY", "op *slot0 src:rslot key:intindex", mixedType},
+	{"INDEX_STRING_KEY", "op dst:wslot src:rslot key:strindex", mixedType},
+	{"INDEX_SLOT0_STRING_KEY", "op *slot0 src:rslot key:strindex", mixedType},
 
-	{"MOVE", "op dst:wslot src:rslot", unknownType},
-	{"MOVE_SLOT0", "op *slot0 src:rslot", unknownType},
+	{"MOVE", "op dst:wslot src:rslot", mixedType},
+	{"MOVE_SLOT0", "op *slot0 src:rslot", mixedType},
 	{"MOVE_BOOL", "op dst:wslot src:rslot", boolType},
 	{"MOVE_SLOT0_BOOL", "op *slot0 src:rslot", boolType},
 
@@ -94,22 +95,22 @@ var rawOpcodes = []opcodeTemplate{
 	{"FOR_VAL", "op *slot0 pcdelta:rel16 val:wslot", unknownType},
 	{"FOR_KEY_VAL", "op *slot0 pcdelta:rel16 key:wslot val:wslot", unknownType},
 
-	{"CALL_FILTER1", "op dst:wslot arg1:rslot fn:filterid", unknownType},
-	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid", unknownType},
-	{"CALL_FILTER2", "op dst:wslot arg1:rslot arg2:rslot fn:filterid", unknownType},
-	{"CALL_SLOT0_FILTER2", "op *slot0 arg1:rslot arg2:rslot fn:filterid", unknownType},
-	{"CALL_FUNC0", "op dst:wslot fn:funcid", unknownType},
-	{"CALL_SLOT0_FUNC0", "op *slot0 fn:funcid", unknownType},
-	{"CALL_FUNC1", "op dst:wslot arg1:rslot fn:funcid", unknownType},
-	{"CALL_SLOT0_FUNC1", "op *slot0 arg1:rslot fn:funcid", unknownType},
-	{"CALL_FUNC2", "op dst:wslot arg1:rslot arg2:rslot fn:funcid", unknownType},
-	{"CALL_SLOT0_FUNC2", "op *slot0 arg1:rslot arg2:rslot fn:funcid", unknownType},
-	{"CALL_FUNC3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid", unknownType},
-	{"CALL_SLOT0_FUNC3", "op *slot0 arg1:rslot arg2:rslot arg3:rslot fn:funcid", unknownType},
+	{"CALL_FILTER1", "op dst:wslot arg1:rslot fn:filterid", mixedType},
+	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid", mixedType},
+	{"CALL_FILTER2", "op dst:wslot arg1:rslot arg2:rslot fn:filterid", mixedType},
+	{"CALL_SLOT0_FILTER2", "op *slot0 arg1:rslot arg2:rslot fn:filterid", mixedType},
+	{"CALL_FUNC0", "op dst:wslot fn:funcid", mixedType},
+	{"CALL_SLOT0_FUNC0", "op *slot0 fn:funcid", mixedType},
+	{"CALL_FUNC1", "op dst:wslot arg1:rslot fn:funcid", mixedType},
+	{"CALL_SLOT0_FUNC1", "op *slot0 arg1:rslot fn:funcid", mixedType},
+	{"CALL_FUNC2", "op dst:wslot arg1:rslot arg2:rslot fn:funcid", mixedType},
+	{"CALL_SLOT0_FUNC2", "op *slot0 arg1:rslot arg2:rslot fn:funcid", mixedType},
+	{"CALL_FUNC3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType},
+	{"CALL_SLOT0_FUNC3", "op *slot0 arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType},
 	{"LENGTH_FILTER", "op dst:wslot arg1:rslot", intType},
 	{"LENGTH_SLOT0_FILTER", "op dst:wslot arg1:rslot", intType},
-	{"DEFAULT_FILTER", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
-	{"DEFAULT_SLOT0_FILTER", "op dst:wslot arg1:rslot arg2:rslot", unknownType},
+	{"DEFAULT_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType},
+	{"DEFAULT_SLOT0_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType},
 	{"ESCAPE_FILTER1", "op dst:wslot src:rslot", safeStringType},
 	{"ESCAPE_SLOT0_FILTER1", "op *slot0 src:rslot", safeStringType},
 	{"ESCAPE_FILTER2", "op dst:wslot src:rslot strategy:strindex", safeStringType},
@@ -144,6 +145,9 @@ var rawOpcodes = []opcodeTemplate{
 	{"QUO_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
 	{"MOD", "op dst:wslot arg1:rslot arg2:rslot", numericType},
 	{"MOD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
+
+	{"PREPARE_TEMPLATE", "op path:strindex", unknownType},
+	{"INCLUDE_TEMPLATE", "op", unknownType},
 }
 
 func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
@@ -164,11 +168,15 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 	var flagparts []string
 	var encparts []string
 	hasSlotArg := false
+	numDst := 0
+	dstPos := -1
+	argPos := 0
 	for _, p := range strings.Split(desc, " ") {
 		if p == "*slot0" {
 			flagparts = append(flagparts, "OpInfo::FLAG_IMPLICIT_SLOT0")
 			continue
 		}
+		argPos++
 		var arg argumentInfo
 		parts := strings.Split(p, ":")
 		if len(parts) != 2 {
@@ -176,7 +184,12 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 		}
 		kind := parts[1]
 		switch kind {
-		case "wslot", "rslot":
+		case "wslot":
+			dstPos = argPos
+			numDst++
+			hasSlotArg = true
+			arg.Kind = "OpInfo::ARG_SLOT"
+		case "rslot":
 			hasSlotArg = true
 			arg.Kind = "OpInfo::ARG_SLOT"
 		case "cacheslot":
@@ -206,6 +219,15 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 
 	if hasSlotArg {
 		flagparts = append(flagparts, "OpInfo::FLAG_HAS_SLOT_ARG")
+	}
+
+	if data.resultType != unknownType {
+		if numDst > 1 {
+			panic(fmt.Sprintf("%s: more than 1 wslot", data.name))
+		}
+		if numDst == 1 && dstPos != 1 {
+			panic(fmt.Sprintf("%s: wslot at arg pos %d", data.name, dstPos))
+		}
 	}
 
 	result.Enc = strings.Join(encparts, " ")

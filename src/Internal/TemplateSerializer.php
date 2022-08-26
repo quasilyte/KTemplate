@@ -21,6 +21,8 @@ class TemplateSerializer {
         $data->float_values = $t->float_values;
         $data->code = $t->code;
         $data->frame_size = $t->frame_size;
+        $data->frame_args_size = $t->frame_args_size;
+        $data->params = $t->params;
 
         return self::encodeData($data);
     }
@@ -43,6 +45,8 @@ class TemplateSerializer {
         $t->float_values = $data->float_values;
         $t->code = $data->code;
         $t->frame_size = $data->frame_size;
+        $t->frame_args_size = $data->frame_args_size;
+        $t->params = $data->params;
         return $t;
     }
 

@@ -44,25 +44,22 @@ class TokenKind {
     public const KEYWORD_NOT = 35;
     public const KEYWORD_TRUE = 36;
     public const KEYWORD_FALSE = 37;
-    public const KEYWORD_ENDIF = 38;
-    public const KEYWORD_ENDFOR = 39;
-    public const KEYWORD_ELSE = 40;
-    public const KEYWORD_ELSEIF = 41;
-    public const KEYWORD_LET = 42;
-    public const KEYWORD_IN = 43;
-    public const KEYWORD_NULL = 44;
-    public const KEYWORD_INCLUDE = 45;
-    public const KEYWORD_ENDINCLUDE = 46;
-    public const KEYWORD_PARAM = 47;
-    public const KEYWORD_ARG = 48;
-    public const KEYWORD_ENDARG = 49;
-    public const DOLLAR_IDENT = 50;
-    public const IDENT = 51;
-    public const TEXT = 52;
-    public const INT_LIT = 53;
-    public const FLOAT_LIT = 54;
-    public const STRING_LIT_Q1 = 55;
-    public const STRING_LIT_Q2 = 56;
+    public const KEYWORD_END = 38;
+    public const KEYWORD_ELSE = 39;
+    public const KEYWORD_ELSEIF = 40;
+    public const KEYWORD_LET = 41;
+    public const KEYWORD_IN = 42;
+    public const KEYWORD_NULL = 43;
+    public const KEYWORD_INCLUDE = 44;
+    public const KEYWORD_PARAM = 45;
+    public const KEYWORD_ARG = 46;
+    public const DOLLAR_IDENT = 47;
+    public const IDENT = 48;
+    public const TEXT = 49;
+    public const INT_LIT = 50;
+    public const FLOAT_LIT = 51;
+    public const STRING_LIT_Q1 = 52;
+    public const STRING_LIT_Q2 = 53;
 
     /**
      * @param int $kind
@@ -225,10 +222,8 @@ class TokenKind {
             return 'TRUE';
         case self::KEYWORD_FALSE:
             return 'FALSE';
-        case self::KEYWORD_ENDIF:
-            return 'ENDIF';
-        case self::KEYWORD_ENDFOR:
-            return 'ENDFOR';
+        case self::KEYWORD_END:
+            return 'END';
         case self::KEYWORD_ELSE:
             return 'ELSE';
         case self::KEYWORD_ELSEIF:
@@ -241,14 +236,10 @@ class TokenKind {
             return 'NULL';
         case self::KEYWORD_INCLUDE:
             return 'INCLUDE';
-        case self::KEYWORD_ENDINCLUDE:
-            return 'ENDINCLUDE';
         case self::KEYWORD_PARAM:
             return 'PARAM';
         case self::KEYWORD_ARG:
             return 'ARG';
-        case self::KEYWORD_ENDARG:
-            return 'ENDARG';
         case self::DOLLAR_IDENT:
             return 'DOLLAR_IDENT';
         case self::IDENT:

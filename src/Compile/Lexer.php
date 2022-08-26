@@ -377,6 +377,10 @@ class Lexer {
                 return;
             }
         case 3:
+            if (substr_compare($this->src, 'end', $dst->pos_from, strlen('end')) === 0) {
+                $dst->kind = TokenKind::KEYWORD_END;
+                return;
+            }
             if (substr_compare($this->src, 'not', $dst->pos_from, strlen('not')) === 0) {
                 $dst->kind = TokenKind::KEYWORD_NOT;
                 return;
@@ -423,35 +427,18 @@ class Lexer {
                 $dst->kind = TokenKind::KEYWORD_FALSE;
                 return;
             }
-            if (substr_compare($this->src, 'endif', $dst->pos_from, strlen('endif')) === 0) {
-                $dst->kind = TokenKind::KEYWORD_ENDIF;
-                return;
-            }
             if (substr_compare($this->src, 'param', $dst->pos_from, strlen('param')) === 0) {
                 $dst->kind = TokenKind::KEYWORD_PARAM;
                 return;
             }
         case 6:
-            if (substr_compare($this->src, 'endfor', $dst->pos_from, strlen('endfor')) === 0) {
-                $dst->kind = TokenKind::KEYWORD_ENDFOR;
-                return;
-            }
             if (substr_compare($this->src, 'elseif', $dst->pos_from, strlen('elseif')) === 0) {
                 $dst->kind = TokenKind::KEYWORD_ELSEIF;
-                return;
-            }
-            if (substr_compare($this->src, 'endarg', $dst->pos_from, strlen('endarg')) === 0) {
-                $dst->kind = TokenKind::KEYWORD_ENDARG;
                 return;
             }
         case 7:
             if (substr_compare($this->src, 'include', $dst->pos_from, strlen('include')) === 0) {
                 $dst->kind = TokenKind::KEYWORD_INCLUDE;
-                return;
-            }
-        case 10:
-            if (substr_compare($this->src, 'endinclude', $dst->pos_from, strlen('endinclude')) === 0) {
-                $dst->kind = TokenKind::KEYWORD_ENDINCLUDE;
                 return;
             }
         }

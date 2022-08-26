@@ -89,12 +89,12 @@ Operator precedence groups:
 
 ### If
 
-The simplest form includes only `if` and `endif`:
+The simplest form includes only `if` and `end`:
 
 ```html
 {% if <expr> %}
     This text will be rendered if <expr> evaluates to true.
-{% endif %}
+{% end %}
 ```
 
 `else` and `elseif` can be used to write a chain of conditions:
@@ -106,7 +106,7 @@ The simplest form includes only `if` and `endif`:
     The second conditional text.
 {% else %}
     The text that is rendered otherwise.
-{% endif %}
+{% end %}
 ```
 
 ### Let
@@ -126,6 +126,6 @@ Note that local variables are block-scoped. You can't access that variable outsi
 {% if cond %}
     {% let $x = 10 %}
     {{ $x }} {# OK, can use $x here #}
-{% endif }   {# This tag closes the block started by if #}
+{% end %}   {# This tag closes the block started by if #}
 {{ $x }}     {# Compile time error: can't use $x here }
 ```

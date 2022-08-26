@@ -86,6 +86,14 @@ class Env {
     }
 
     /**
+     * @param string $path
+     * @return Template
+     */
+    public function getTemplate($path) {
+        return $this->loader->load($this, $path);
+    }
+
+    /**
      * @param string $name
      * @param callable():mixed $fn
      */

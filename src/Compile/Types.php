@@ -11,6 +11,7 @@ class Types {
     public const STRING = 5;
     public const SAFE_STRING = 6;
     public const NULL = 8;
+    public const MIXED = 9;
 
     /**
      * @param int $type
@@ -33,6 +34,8 @@ class Types {
             return 'string';
         case self::NULL:
             return 'null';
+        case self::MIXED:
+            return 'mixed';
         default:
             return 'invalid';
         }

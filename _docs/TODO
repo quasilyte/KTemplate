@@ -1,8 +1,5 @@
 * docs: add examples
 * more end2end tests
-* nested/partial templates
-  * adjusting frame size for the template
-  * block+extends+include
 * builtin functions
 * macros system
 * compile errors for long jumps/too many consts and vars, etc
@@ -10,3 +7,5 @@
 * a flag to do Twig-like `~` newline trimming
 * reconsider default autoescape strategy
 * use codegen for Expr class and expr kind predicates
+* introduce Engine class for the user-friendly public API
+* add bytecode caching to ArrayLoader
