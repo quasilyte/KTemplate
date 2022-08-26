@@ -69,6 +69,10 @@ class LexerTest extends TestCase {
                 '{% elseif %}',
                 ['CONTROL_START', 'ELSEIF', 'CONTROL_END'],
             ],
+            [
+                '{% arg endarg param include endinclude %}',
+                ['CONTROL_START', 'ARG', 'ENDARG', 'PARAM', 'INCLUDE', 'ENDINCLUDE', 'CONTROL_END'],
+            ],
 
             // Numeric literals.
             [

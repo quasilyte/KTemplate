@@ -51,13 +51,18 @@ class TokenKind {
     public const KEYWORD_LET = 42;
     public const KEYWORD_IN = 43;
     public const KEYWORD_NULL = 44;
-    public const DOLLAR_IDENT = 45;
-    public const IDENT = 46;
-    public const TEXT = 47;
-    public const INT_LIT = 48;
-    public const FLOAT_LIT = 49;
-    public const STRING_LIT_Q1 = 50;
-    public const STRING_LIT_Q2 = 51;
+    public const KEYWORD_INCLUDE = 45;
+    public const KEYWORD_ENDINCLUDE = 46;
+    public const KEYWORD_PARAM = 47;
+    public const KEYWORD_ARG = 48;
+    public const KEYWORD_ENDARG = 49;
+    public const DOLLAR_IDENT = 50;
+    public const IDENT = 51;
+    public const TEXT = 52;
+    public const INT_LIT = 53;
+    public const FLOAT_LIT = 54;
+    public const STRING_LIT_Q1 = 55;
+    public const STRING_LIT_Q2 = 56;
 
     /**
      * @param int $kind
@@ -234,6 +239,16 @@ class TokenKind {
             return 'IN';
         case self::KEYWORD_NULL:
             return 'NULL';
+        case self::KEYWORD_INCLUDE:
+            return 'INCLUDE';
+        case self::KEYWORD_ENDINCLUDE:
+            return 'ENDINCLUDE';
+        case self::KEYWORD_PARAM:
+            return 'PARAM';
+        case self::KEYWORD_ARG:
+            return 'ARG';
+        case self::KEYWORD_ENDARG:
+            return 'ENDARG';
         case self::DOLLAR_IDENT:
             return 'DOLLAR_IDENT';
         case self::IDENT:
