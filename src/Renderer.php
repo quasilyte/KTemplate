@@ -14,7 +14,7 @@ class Renderer {
     public function __construct() {
         if (self::$empty_template === null) {
             self::$empty_template = new Template();
-            self::$empty_template->frame_size = 0;
+            self::$empty_template->setExtraInfo(0, 0, 0);
         }
         $this->state = new RendererState();
     }
@@ -39,7 +39,7 @@ class Renderer {
     private function prepareTemplateFrame($t, $slot_offset) {
         $state = $this->state;
 
-        $need_slots = $t->frame_size + $t->frame_args_size;
+        $need_slots = $t->frameSize() + $t->frameArgsSize();
         $state->reserve($need_slots);
 
         // Now bind the default template param values.
@@ -58,9 +58,9 @@ class Renderer {
      */
     private function execTemplate($env, $current_template, $t) {
         $cache_bitset = $this->state->cache_bitset;
-        $this->state->slot_offset += $current_template->frame_size;
+        $this->state->slot_offset += $current_template->frameSize();
         $this->eval($env, $t);
-        $this->state->slot_offset -= $current_template->frame_size;
+        $this->state->slot_offset -= $current_template->frameSize();
         $this->state->cache_bitset = $cache_bitset;
     }
 
@@ -566,7 +566,7 @@ class Renderer {
 
             case Op::PREPARE_TEMPLATE:
                 $state->template = $env->getTemplate($t->string_values[($opdata >> 8) & 0xff]);
-                $this->prepareTemplateFrame($state->template, $slot_offset + $t->frame_size);
+                $this->prepareTemplateFrame($state->template, $slot_offset + $t->frameSize());
                 break;
             case Op::INCLUDE_TEMPLATE:
                 $this->execTemplate($env, $t, $state->template);

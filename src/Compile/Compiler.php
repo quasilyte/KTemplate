@@ -1298,8 +1298,12 @@ class Compiler {
     private function finalizeTemplate() {
         $this->linkJumps();
         $this->reallocateSlots();
-        $this->result->frame_size = count($this->frame->cache_slots) + $this->frame->num_locals;
-        $this->result->frame_args_size = $this->frame->max_num_args;
+
+        $frame_size = count($this->frame->cache_slots) + $this->frame->num_locals;
+        $frame_args_size = $this->frame->max_num_args;
+        $num_cache_slots = count($this->frame->cache_slots);
+        $this->result->setExtraInfo($frame_size, $frame_args_size, $num_cache_slots);
+
         return $this->resolveTemplateDeps();
     }
 
@@ -1322,7 +1326,7 @@ class Compiler {
         /** @var Template[] $template_cache */
         $template_cache = [];
         $dst_mask = 0xff << 8;
-        $frame_slot_offset = 1; // Skil slot0 index
+        $frame_slot_offset = 1; // Skip slot0 index
         foreach ($template_arg_deps as $pc => $tup) {
             [$load_path, $arg_name] = $tup;
             /** @var Template $t */
@@ -1339,7 +1343,7 @@ class Compiler {
                 // TODO: -1 is not a good error location.
                 $this->fail(-1, "template $load_path doesn't have $arg_name param", $filename);
             }
-            $arg_slot = $result->frame_size + $arg_index + $frame_slot_offset;
+            $arg_slot = $result->frameSize() + $t->numCacheSlots() + $arg_index + $frame_slot_offset;
             // We have a guarantee that all expression-like operations
             // have dst at fixed offset.
             $opdata = $result->code[$pc];

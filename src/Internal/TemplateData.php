@@ -43,17 +43,11 @@ class TemplateData {
      * @var int
      * @kphp-serialized-field 7
      */
-    public $frame_size;
-
-    /**
-     * @var int
-     * @kphp-serialized-field 8
-     */
-    public $frame_args_size;
+    public $extra_info;
 
     /**
      * @var mixed[]
-     * @kphp-serialized-field 9
+     * @kphp-serialized-field 8
      */
     public $params;
 }

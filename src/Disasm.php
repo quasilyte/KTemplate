@@ -48,10 +48,10 @@ class Disasm {
                 switch ($a) {
                 case OpInfo::ARG_SLOT:
                 case OpInfo::ARG_CACHE_SLOT:
-                    if ($v <= $t->frame_size) {
+                    if ($v <= $t->frameSize()) {
                         $parts[] = "slot$v";
                     } else {
-                        $parts[] = "arg" . ($v - $t->frame_size);
+                        $parts[] = "arg" . ($v - $t->frameSize());
                     }
                     break;
                 case OpInfo::ARG_STRING_CONST:

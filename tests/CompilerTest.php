@@ -80,6 +80,27 @@ class CompilerTest extends TestCase {
                     ],
                 ],
             ],
+
+            [
+                'sources' => [
+                    'main' => '{% include "a" %}{% arg $x = 10 %}{% end %}',
+                    'a' => '{% param $x = 0 %}{{ $x + date.year }}',
+                ],
+                'disasm' => [
+                    'main' => [
+                        '  PREPARE_TEMPLATE `a`',
+                        '  LOAD_INT_CONST arg2 10',
+                        '  INCLUDE_TEMPLATE',
+                        '  RETURN',
+                    ],
+                    'a' => [
+                        '  LOAD_EXTDATA_2 slot3 slot1 date.year',
+                        '  ADD_SLOT0 *slot0 slot2 slot3',
+                        '  OUTPUT_SAFE_SLOT0 *slot0',
+                        '  RETURN',
+                    ],
+                ],
+            ],
         ];
 
         foreach ($tests as $test) {
