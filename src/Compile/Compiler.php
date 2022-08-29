@@ -4,8 +4,8 @@ namespace KTemplate\Compile;
 
 use KTemplate\Env;
 use KTemplate\Template;
-use KTemplate\Op;
-use KTemplate\OpInfo;
+use KTemplate\Internal\Op;
+use KTemplate\Internal\OpInfo;
 use KTemplate\Internal\Assert;
 use KTemplate\Internal\Strings;
 use KTemplate\Internal\Arrays;

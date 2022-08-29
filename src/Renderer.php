@@ -2,6 +2,8 @@
 
 namespace KTemplate;
 
+use KTemplate\Internal\Op;
+
 class Renderer {
     /**
      * @var Template
@@ -191,19 +193,19 @@ class Renderer {
                 $state->slots[$slot_offset + (($opdata >> 8) & 0xff)] = $t->int_values[($opdata >> 16) & 0xff];
                 break;
             case Op::LOAD_SLOT0_INT_CONST:
-                $slot0 = $t->int_values[($opdata >> 8) & 0xff];
+                $slot0 = (int)$t->int_values[($opdata >> 8) & 0xff];
                 break;
             case Op::LOAD_FLOAT_CONST:
                 $state->slots[$slot_offset + (($opdata >> 8) & 0xff)] = $t->float_values[($opdata >> 16) & 0xff];
                 break;
             case Op::LOAD_SLOT0_FLOAT_CONST:
-                $slot0 = $t->float_values[($opdata >> 8) & 0xff];
+                $slot0 = (float)$t->float_values[($opdata >> 8) & 0xff];
                 break;
             case Op::LOAD_STRING_CONST:
                 $state->slots[$slot_offset + (($opdata >> 8) & 0xff)] = $t->string_values[($opdata >> 16) & 0xff];
                 break;
             case Op::LOAD_SLOT0_STRING_CONST:
-                $slot0 = $t->string_values[($opdata >> 8) & 0xff];
+                $slot0 = (string)$t->string_values[($opdata >> 8) & 0xff];
                 break;
             case Op::LOAD_NULL:
                 $state->slots[$slot_offset + (($opdata >> 8) & 0xff)] = null;

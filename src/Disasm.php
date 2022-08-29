@@ -2,6 +2,9 @@
 
 namespace KTemplate;
 
+use KTemplate\Internal\Op;
+use KTemplate\Internal\OpInfo;
+
 class Disasm {
     /**
      * @param Env $env

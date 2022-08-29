@@ -1,6 +1,6 @@
 <?php
 
-namespace KTemplate;
+namespace KTemplate\Internal;
 
 class OpInfo {
     public const ARG_SLOT = 0;
