@@ -100,6 +100,8 @@ class OpInfo {
         case Op::JUMP_SLOT0_FALSY:
         case Op::JUMP_TRUTHY:
         case Op::JUMP_SLOT0_TRUTHY:
+        case Op::JUMP_NOT_NULL:
+        case Op::JUMP_SLOT0_NOT_NULL:
         case Op::FOR_VAL:
         case Op::FOR_KEY_VAL:
             return true;

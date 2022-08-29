@@ -220,263 +220,273 @@ class Op {
     // Result type: unknown/varying
     public const JUMP_SLOT0_TRUTHY = 44;
     
-    // Encoding: 0x2d pcdelta:rel16 val:wslot
+    // Encoding: 0x2d pcdelta:rel16 cond:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    // Result type: unknown/varying
+    public const JUMP_NOT_NULL = 45;
+    
+    // Encoding: 0x2e pcdelta:rel16 cond:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    // Result type: unknown/varying
+    public const JUMP_SLOT0_NOT_NULL = 46;
+    
+    // Encoding: 0x2f pcdelta:rel16 val:wslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const FOR_VAL = 45;
+    public const FOR_VAL = 47;
     
-    // Encoding: 0x2e pcdelta:rel16 key:wslot val:wslot
+    // Encoding: 0x30 pcdelta:rel16 key:wslot val:wslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const FOR_KEY_VAL = 46;
+    public const FOR_KEY_VAL = 48;
     
-    // Encoding: 0x2f dst:wslot arg1:rslot fn:filterid
+    // Encoding: 0x31 dst:wslot arg1:rslot fn:filterid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FILTER1 = 47;
+    public const CALL_FILTER1 = 49;
     
-    // Encoding: 0x30 arg1:rslot fn:filterid
+    // Encoding: 0x32 arg1:rslot fn:filterid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FILTER1 = 48;
+    public const CALL_SLOT0_FILTER1 = 50;
     
-    // Encoding: 0x31 dst:wslot arg1:rslot arg2:rslot fn:filterid
+    // Encoding: 0x33 dst:wslot arg1:rslot arg2:rslot fn:filterid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FILTER2 = 49;
+    public const CALL_FILTER2 = 51;
     
-    // Encoding: 0x32 arg1:rslot arg2:rslot fn:filterid
+    // Encoding: 0x34 arg1:rslot arg2:rslot fn:filterid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FILTER2 = 50;
+    public const CALL_SLOT0_FILTER2 = 52;
     
-    // Encoding: 0x33 dst:wslot fn:funcid
+    // Encoding: 0x35 dst:wslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC0 = 51;
+    public const CALL_FUNC0 = 53;
     
-    // Encoding: 0x34 fn:funcid
+    // Encoding: 0x36 fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC0 = 52;
+    public const CALL_SLOT0_FUNC0 = 54;
     
-    // Encoding: 0x35 dst:wslot arg1:rslot fn:funcid
+    // Encoding: 0x37 dst:wslot arg1:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC1 = 53;
+    public const CALL_FUNC1 = 55;
     
-    // Encoding: 0x36 arg1:rslot fn:funcid
+    // Encoding: 0x38 arg1:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC1 = 54;
+    public const CALL_SLOT0_FUNC1 = 56;
     
-    // Encoding: 0x37 dst:wslot arg1:rslot arg2:rslot fn:funcid
+    // Encoding: 0x39 dst:wslot arg1:rslot arg2:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC2 = 55;
+    public const CALL_FUNC2 = 57;
     
-    // Encoding: 0x38 arg1:rslot arg2:rslot fn:funcid
+    // Encoding: 0x3a arg1:rslot arg2:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC2 = 56;
+    public const CALL_SLOT0_FUNC2 = 58;
     
-    // Encoding: 0x39 dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid
+    // Encoding: 0x3b dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC3 = 57;
+    public const CALL_FUNC3 = 59;
     
-    // Encoding: 0x3a arg1:rslot arg2:rslot arg3:rslot fn:funcid
+    // Encoding: 0x3c arg1:rslot arg2:rslot arg3:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC3 = 58;
+    public const CALL_SLOT0_FUNC3 = 60;
     
-    // Encoding: 0x3b dst:wslot arg1:rslot
+    // Encoding: 0x3d dst:wslot arg1:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::INT
-    public const LENGTH_FILTER = 59;
+    public const LENGTH_FILTER = 61;
     
-    // Encoding: 0x3c dst:wslot arg1:rslot
+    // Encoding: 0x3e dst:wslot arg1:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::INT
-    public const LENGTH_SLOT0_FILTER = 60;
+    public const LENGTH_SLOT0_FILTER = 62;
     
-    // Encoding: 0x3d dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x3f dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const DEFAULT_FILTER = 61;
+    public const DEFAULT_FILTER = 63;
     
-    // Encoding: 0x3e dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x40 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const DEFAULT_SLOT0_FILTER = 62;
+    public const DEFAULT_SLOT0_FILTER = 64;
     
-    // Encoding: 0x3f dst:wslot src:rslot
+    // Encoding: 0x41 dst:wslot src:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_FILTER1 = 63;
+    public const ESCAPE_FILTER1 = 65;
     
-    // Encoding: 0x40 src:rslot
+    // Encoding: 0x42 src:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_SLOT0_FILTER1 = 64;
+    public const ESCAPE_SLOT0_FILTER1 = 66;
     
-    // Encoding: 0x41 dst:wslot src:rslot strategy:strindex
+    // Encoding: 0x43 dst:wslot src:rslot strategy:strindex
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_FILTER2 = 65;
+    public const ESCAPE_FILTER2 = 67;
     
-    // Encoding: 0x42 src:rslot strategy:strindex
+    // Encoding: 0x44 src:rslot strategy:strindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_SLOT0_FILTER2 = 66;
-    
-    // Encoding: 0x43 dst:wslot arg:rslot
-    // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const NOT = 67;
-    
-    // Encoding: 0x44 arg:rslot
-    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const NOT_SLOT0 = 68;
+    public const ESCAPE_SLOT0_FILTER2 = 68;
     
     // Encoding: 0x45 dst:wslot arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const NEG = 69;
+    // Result type: Types::BOOL
+    public const NOT = 69;
     
     // Encoding: 0x46 arg:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const NEG_SLOT0 = 70;
+    // Result type: Types::BOOL
+    public const NOT_SLOT0 = 70;
     
-    // Encoding: 0x47 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x47 dst:wslot arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const OR = 71;
+    // Result type: Types::NUMERIC
+    public const NEG = 71;
     
-    // Encoding: 0x48 arg1:rslot arg2:rslot
+    // Encoding: 0x48 arg:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const OR_SLOT0 = 72;
+    // Result type: Types::NUMERIC
+    public const NEG_SLOT0 = 72;
     
     // Encoding: 0x49 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const AND = 73;
+    public const OR = 73;
     
     // Encoding: 0x4a arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const AND_SLOT0 = 74;
+    public const OR_SLOT0 = 74;
     
     // Encoding: 0x4b dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::STRING
-    public const CONCAT = 75;
+    // Result type: Types::BOOL
+    public const AND = 75;
     
     // Encoding: 0x4c arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::STRING
-    public const CONCAT_SLOT0 = 76;
+    // Result type: Types::BOOL
+    public const AND_SLOT0 = 76;
     
     // Encoding: 0x4d dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const EQ = 77;
+    // Result type: Types::STRING
+    public const CONCAT = 77;
     
     // Encoding: 0x4e arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const EQ_SLOT0 = 78;
+    // Result type: Types::STRING
+    public const CONCAT_SLOT0 = 78;
     
     // Encoding: 0x4f dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT = 79;
+    public const EQ = 79;
     
     // Encoding: 0x50 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_SLOT0 = 80;
+    public const EQ_SLOT0 = 80;
     
     // Encoding: 0x51 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_EQ = 81;
+    public const LT = 81;
     
     // Encoding: 0x52 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_EQ_SLOT0 = 82;
+    public const LT_SLOT0 = 82;
     
     // Encoding: 0x53 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT_EQ = 83;
+    public const LT_EQ = 83;
     
     // Encoding: 0x54 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT_EQ_SLOT0 = 84;
+    public const LT_EQ_SLOT0 = 84;
     
     // Encoding: 0x55 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const ADD = 85;
+    // Result type: Types::BOOL
+    public const NOT_EQ = 85;
     
     // Encoding: 0x56 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const ADD_SLOT0 = 86;
+    // Result type: Types::BOOL
+    public const NOT_EQ_SLOT0 = 86;
     
     // Encoding: 0x57 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const SUB = 87;
+    public const ADD = 87;
     
     // Encoding: 0x58 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const SUB_SLOT0 = 88;
+    public const ADD_SLOT0 = 88;
     
     // Encoding: 0x59 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MUL = 89;
+    public const SUB = 89;
     
     // Encoding: 0x5a arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MUL_SLOT0 = 90;
+    public const SUB_SLOT0 = 90;
     
     // Encoding: 0x5b dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const QUO = 91;
+    public const MUL = 91;
     
     // Encoding: 0x5c arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const QUO_SLOT0 = 92;
+    public const MUL_SLOT0 = 92;
     
     // Encoding: 0x5d dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MOD = 93;
+    public const QUO = 93;
     
     // Encoding: 0x5e arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MOD_SLOT0 = 94;
+    public const QUO_SLOT0 = 94;
     
-    // Encoding: 0x5f path:strindex
-    // Result type: unknown/varying
-    public const PREPARE_TEMPLATE = 95;
+    // Encoding: 0x5f dst:wslot arg1:rslot arg2:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    // Result type: Types::NUMERIC
+    public const MOD = 95;
     
-    // Encoding: 0x60
+    // Encoding: 0x60 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    // Result type: Types::NUMERIC
+    public const MOD_SLOT0 = 96;
+    
+    // Encoding: 0x61 path:strindex
     // Result type: unknown/varying
-    public const INCLUDE_TEMPLATE = 96;
+    public const PREPARE_TEMPLATE = 97;
+    
+    // Encoding: 0x62
+    // Result type: unknown/varying
+    public const INCLUDE_TEMPLATE = 98;
     
 
     /**
@@ -574,108 +584,112 @@ class Op {
         case 44:
             return 'JUMP_SLOT0_TRUTHY';
         case 45:
-            return 'FOR_VAL';
+            return 'JUMP_NOT_NULL';
         case 46:
-            return 'FOR_KEY_VAL';
+            return 'JUMP_SLOT0_NOT_NULL';
         case 47:
-            return 'CALL_FILTER1';
+            return 'FOR_VAL';
         case 48:
-            return 'CALL_SLOT0_FILTER1';
+            return 'FOR_KEY_VAL';
         case 49:
-            return 'CALL_FILTER2';
+            return 'CALL_FILTER1';
         case 50:
-            return 'CALL_SLOT0_FILTER2';
+            return 'CALL_SLOT0_FILTER1';
         case 51:
-            return 'CALL_FUNC0';
+            return 'CALL_FILTER2';
         case 52:
-            return 'CALL_SLOT0_FUNC0';
+            return 'CALL_SLOT0_FILTER2';
         case 53:
-            return 'CALL_FUNC1';
+            return 'CALL_FUNC0';
         case 54:
-            return 'CALL_SLOT0_FUNC1';
+            return 'CALL_SLOT0_FUNC0';
         case 55:
-            return 'CALL_FUNC2';
+            return 'CALL_FUNC1';
         case 56:
-            return 'CALL_SLOT0_FUNC2';
+            return 'CALL_SLOT0_FUNC1';
         case 57:
-            return 'CALL_FUNC3';
+            return 'CALL_FUNC2';
         case 58:
-            return 'CALL_SLOT0_FUNC3';
+            return 'CALL_SLOT0_FUNC2';
         case 59:
-            return 'LENGTH_FILTER';
+            return 'CALL_FUNC3';
         case 60:
-            return 'LENGTH_SLOT0_FILTER';
+            return 'CALL_SLOT0_FUNC3';
         case 61:
-            return 'DEFAULT_FILTER';
+            return 'LENGTH_FILTER';
         case 62:
-            return 'DEFAULT_SLOT0_FILTER';
+            return 'LENGTH_SLOT0_FILTER';
         case 63:
-            return 'ESCAPE_FILTER1';
+            return 'DEFAULT_FILTER';
         case 64:
-            return 'ESCAPE_SLOT0_FILTER1';
+            return 'DEFAULT_SLOT0_FILTER';
         case 65:
-            return 'ESCAPE_FILTER2';
+            return 'ESCAPE_FILTER1';
         case 66:
-            return 'ESCAPE_SLOT0_FILTER2';
+            return 'ESCAPE_SLOT0_FILTER1';
         case 67:
-            return 'NOT';
+            return 'ESCAPE_FILTER2';
         case 68:
-            return 'NOT_SLOT0';
+            return 'ESCAPE_SLOT0_FILTER2';
         case 69:
-            return 'NEG';
+            return 'NOT';
         case 70:
-            return 'NEG_SLOT0';
+            return 'NOT_SLOT0';
         case 71:
-            return 'OR';
+            return 'NEG';
         case 72:
-            return 'OR_SLOT0';
+            return 'NEG_SLOT0';
         case 73:
-            return 'AND';
+            return 'OR';
         case 74:
-            return 'AND_SLOT0';
+            return 'OR_SLOT0';
         case 75:
-            return 'CONCAT';
+            return 'AND';
         case 76:
-            return 'CONCAT_SLOT0';
+            return 'AND_SLOT0';
         case 77:
-            return 'EQ';
+            return 'CONCAT';
         case 78:
-            return 'EQ_SLOT0';
+            return 'CONCAT_SLOT0';
         case 79:
-            return 'LT';
+            return 'EQ';
         case 80:
-            return 'LT_SLOT0';
+            return 'EQ_SLOT0';
         case 81:
-            return 'LT_EQ';
+            return 'LT';
         case 82:
-            return 'LT_EQ_SLOT0';
+            return 'LT_SLOT0';
         case 83:
-            return 'NOT_EQ';
+            return 'LT_EQ';
         case 84:
-            return 'NOT_EQ_SLOT0';
+            return 'LT_EQ_SLOT0';
         case 85:
-            return 'ADD';
+            return 'NOT_EQ';
         case 86:
-            return 'ADD_SLOT0';
+            return 'NOT_EQ_SLOT0';
         case 87:
-            return 'SUB';
+            return 'ADD';
         case 88:
-            return 'SUB_SLOT0';
+            return 'ADD_SLOT0';
         case 89:
-            return 'MUL';
+            return 'SUB';
         case 90:
-            return 'MUL_SLOT0';
+            return 'SUB_SLOT0';
         case 91:
-            return 'QUO';
+            return 'MUL';
         case 92:
-            return 'QUO_SLOT0';
+            return 'MUL_SLOT0';
         case 93:
-            return 'MOD';
+            return 'QUO';
         case 94:
-            return 'MOD_SLOT0';
+            return 'QUO_SLOT0';
         case 95:
-            return 'PREPARE_TEMPLATE';
+            return 'MOD';
         case 96:
+            return 'MOD_SLOT0';
+        case 97:
+            return 'PREPARE_TEMPLATE';
+        case 98:
             return 'INCLUDE_TEMPLATE';
         default:
             return '?';
@@ -939,109 +953,113 @@ class Op {
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case 44: // JUMP_SLOT0_TRUTHY
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 45: // FOR_VAL
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 46: // FOR_KEY_VAL
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 47: // CALL_FILTER1
+        case 45: // JUMP_NOT_NULL
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 48: // CALL_SLOT0_FILTER1
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 49: // CALL_FILTER2
+        case 46: // JUMP_SLOT0_NOT_NULL
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 50: // CALL_SLOT0_FILTER2
+        case 47: // FOR_VAL
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 51: // CALL_FUNC0
+        case 48: // FOR_KEY_VAL
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 49: // CALL_FILTER1
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 52: // CALL_SLOT0_FUNC0
+        case 50: // CALL_SLOT0_FILTER1
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 51: // CALL_FILTER2
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 52: // CALL_SLOT0_FILTER2
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 53: // CALL_FUNC0
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 54: // CALL_SLOT0_FUNC0
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 53: // CALL_FUNC1
+        case 55: // CALL_FUNC1
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 54: // CALL_SLOT0_FUNC1
+        case 56: // CALL_SLOT0_FUNC1
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 55: // CALL_FUNC2
+        case 57: // CALL_FUNC2
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 56: // CALL_SLOT0_FUNC2
+        case 58: // CALL_SLOT0_FUNC2
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 57: // CALL_FUNC3
+        case 59: // CALL_FUNC3
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 58: // CALL_SLOT0_FUNC3
+        case 60: // CALL_SLOT0_FUNC3
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 59: // LENGTH_FILTER
+        case 61: // LENGTH_FILTER
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 60: // LENGTH_SLOT0_FILTER
+        case 62: // LENGTH_SLOT0_FILTER
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 61: // DEFAULT_FILTER
+        case 63: // DEFAULT_FILTER
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 62: // DEFAULT_SLOT0_FILTER
+        case 64: // DEFAULT_SLOT0_FILTER
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 63: // ESCAPE_FILTER1
+        case 65: // ESCAPE_FILTER1
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 64: // ESCAPE_SLOT0_FILTER1
+        case 66: // ESCAPE_SLOT0_FILTER1
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 65: // ESCAPE_FILTER2
+        case 67: // ESCAPE_FILTER2
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 66: // ESCAPE_SLOT0_FILTER2
+        case 68: // ESCAPE_SLOT0_FILTER2
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 67: // NOT
+        case 69: // NOT
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 68: // NOT_SLOT0
+        case 70: // NOT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 69: // NEG
+        case 71: // NEG
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 70: // NEG_SLOT0
+        case 72: // NEG_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 71: // OR
+        case 73: // OR
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 72: // OR_SLOT0
+        case 74: // OR_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 73: // AND
+        case 75: // AND
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 74: // AND_SLOT0
+        case 76: // AND_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 75: // CONCAT
+        case 77: // CONCAT
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 76: // CONCAT_SLOT0
+        case 78: // CONCAT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 77: // EQ
+        case 79: // EQ
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 78: // EQ_SLOT0
+        case 80: // EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 79: // LT
+        case 81: // LT
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 80: // LT_SLOT0
+        case 82: // LT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 81: // LT_EQ
+        case 83: // LT_EQ
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 82: // LT_EQ_SLOT0
+        case 84: // LT_EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 83: // NOT_EQ
+        case 85: // NOT_EQ
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 84: // NOT_EQ_SLOT0
+        case 86: // NOT_EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 85: // ADD
+        case 87: // ADD
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 86: // ADD_SLOT0
+        case 88: // ADD_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 87: // SUB
+        case 89: // SUB
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 88: // SUB_SLOT0
+        case 90: // SUB_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 89: // MUL
+        case 91: // MUL
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 90: // MUL_SLOT0
+        case 92: // MUL_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 91: // QUO
+        case 93: // QUO
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 92: // QUO_SLOT0
+        case 94: // QUO_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 93: // MOD
+        case 95: // MOD
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 94: // MOD_SLOT0
+        case 96: // MOD_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 95: // PREPARE_TEMPLATE
+        case 97: // PREPARE_TEMPLATE
             return 0;
-        case 96: // INCLUDE_TEMPLATE
+        case 98: // INCLUDE_TEMPLATE
             return 0;
         default:
             return 0;
@@ -1093,6 +1111,8 @@ class Op {
         self::JUMP_SLOT0_FALSY => [OpInfo::ARG_REL16],
         self::JUMP_TRUTHY => [OpInfo::ARG_REL16, OpInfo::ARG_SLOT],
         self::JUMP_SLOT0_TRUTHY => [OpInfo::ARG_REL16],
+        self::JUMP_NOT_NULL => [OpInfo::ARG_REL16, OpInfo::ARG_SLOT],
+        self::JUMP_SLOT0_NOT_NULL => [OpInfo::ARG_REL16, OpInfo::ARG_SLOT],
         self::FOR_VAL => [OpInfo::ARG_REL16, OpInfo::ARG_SLOT],
         self::FOR_KEY_VAL => [OpInfo::ARG_REL16, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::CALL_FILTER1 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_FILTER_ID],

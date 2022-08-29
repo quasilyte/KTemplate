@@ -91,6 +91,8 @@ var rawOpcodes = []opcodeTemplate{
 	{"JUMP_SLOT0_FALSY", "op *slot0 pcdelta:rel16", unknownType},
 	{"JUMP_TRUTHY", "op pcdelta:rel16 cond:rslot", unknownType},
 	{"JUMP_SLOT0_TRUTHY", "op *slot0 pcdelta:rel16", unknownType},
+	{"JUMP_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType},
+	{"JUMP_SLOT0_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType},
 
 	{"FOR_VAL", "op *slot0 pcdelta:rel16 val:wslot", unknownType},
 	{"FOR_KEY_VAL", "op *slot0 pcdelta:rel16 key:wslot val:wslot", unknownType},
@@ -174,6 +176,9 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 	for _, p := range strings.Split(desc, " ") {
 		if p == "*slot0" {
 			flagparts = append(flagparts, "OpInfo::FLAG_IMPLICIT_SLOT0")
+			if !strings.Contains(data.name, "SLOT0") && data.resultType != unknownType {
+				panic(fmt.Sprintf("%s has slot0 arument but it's not reflected in the opcode name", data.name))
+			}
 			continue
 		}
 		argPos++

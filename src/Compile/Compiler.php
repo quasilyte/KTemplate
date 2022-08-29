@@ -309,15 +309,23 @@ class Compiler {
         if ($this->frame->lookupLocalInCurrentScope($var_name) !== -1) {
             $this->failToken($tok, "can't declare $var_name param: name is already in use");
         }
-        $this->frame->allocVarSlot($var_name);
+        $var_slot = $this->frame->allocVarSlot($var_name);
         $this->expectToken(TokenKind::ASSIGN);
         $e = $this->parser->parseRootExpr($this->lexer);
+        if ($e->kind === Expr::NULL_LIT) {
+            $this->failExpr($e, "$var_name param default initializer can't have null value");
+        }
         $const_value = $this->const_folder->fold($e);
-        if ($const_value === null) {
-            $this->failExpr($e, "can only use non-null const expr values for $var_name param default initializer");
+        if ($const_value !== null) {
+            $this->result->params[$var_name] = $const_value;
+        } else {
+            $this->result->params[$var_name] = null;
+            $label_end = $this->newLabel();
+            $this->emitCondJump(Op::JUMP_NOT_NULL, $var_slot, $label_end);
+            $this->compileRootExpr($var_slot, $e);
+            $this->bindLabel($label_end);
         }
         $this->expectToken(TokenKind::CONTROL_END);
-        $this->result->params[$var_name] = $const_value;
     }
 
     private function compileTemplateArg() {
@@ -335,6 +343,9 @@ class Compiler {
         $this->current_template_arg = $arg_name;
         $this->expectToken(TokenKind::ASSIGN);
         $e = $this->parser->parseRootExpr($this->lexer);
+        if ($e->kind === Expr::NULL_LIT) {
+            $this->failExpr($e, "passing null will cause the param to be default-initialized");
+        }
         $this->compileRootExpr(Frame::ARG_SLOT_PLACEHOLDER, $e);
         $this->expectToken(TokenKind::CONTROL_END);
         $this->current_template_arg = '';

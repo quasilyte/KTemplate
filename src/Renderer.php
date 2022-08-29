@@ -353,6 +353,16 @@ class Renderer {
                     $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
+            case Op::JUMP_NOT_NULL:
+                if ($state->slots[$slot_offset + (($opdata >> 24) & 0xff)] !== null) {
+                    $pc += ($opdata >> 8) & 0xffff;
+                }
+                break;
+            case Op::JUMP_SLOT0_NOT_NULL:
+                if ($slot0 !== null) {
+                    $pc += ($opdata >> 8) & 0xffff;
+                }
+                break;
 
             case Op::FOR_VAL:
                 $val_slot = ($opdata >> 24) & 0xff;

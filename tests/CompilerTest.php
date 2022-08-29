@@ -101,6 +101,34 @@ class CompilerTest extends TestCase {
                     ],
                 ],
             ],
+
+            // Test param initialized by another param.
+            [
+                'sources' => [
+                    'main' => '{% include "a" %}{% end %}',
+                    'a' => '{% param $x = 0 %}{% param $y = $x %}{% param $z = $x + 10 %}{{ $x + $y + $z }}',
+                ],
+                'disasm' => [
+                    'main' => [
+                        '  PREPARE_TEMPLATE `a`',
+                        '  INCLUDE_TEMPLATE',
+                        '  RETURN',
+                    ],
+                    'a' => [
+                        '  JUMP_NOT_NULL L0 slot2',
+                        '  MOVE slot2 slot1',
+                        'L0:',
+                        '  JUMP_NOT_NULL L1 slot3',
+                        '  LOAD_INT_CONST slot4 10',
+                        '  ADD slot3 slot1 slot4',
+                        'L1:',
+                        '  ADD slot4 slot1 slot2',
+                        '  ADD_SLOT0 *slot0 slot4 slot3',
+                        '  OUTPUT_SAFE_SLOT0 *slot0',
+                        '  RETURN',
+                    ],
+                ],
+            ],
         ];
 
         foreach ($tests as $test) {

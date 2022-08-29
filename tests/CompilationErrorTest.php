@@ -51,6 +51,7 @@ class CompilationErrorTest extends TestCase {
 
             '{% what %}' => 'unexpected control token: what',
             '{% + %}' => 'unexpected control token: +',
+            '{% arg $x = 10 %}' => 'unexpected control token: arg',
             '{{ 1' => 'expected }}, found eof',
 
             '{% if 1 }}' => 'expected %}, found }}',
@@ -63,11 +64,13 @@ class CompilationErrorTest extends TestCase {
             '{# aa' => 'missing #}',
 
             '{% include $x %}' => 'include expects a const expr string argument',
-            '{% param $x = $y %}' => 'can only use non-null const expr values for x param default initializer',
+            '{% param $x = null %}' => "x param default initializer can't have null value",
 
             '{% include "a" %}{% include "b"}' => 'include block can only contain args and whitespace',
             '{% include "a" %}xxx{% end %}' => 'include block can only contain args and whitespace',
             '{% include "a" %}' => 'include block can only contain args and whitespace',
+
+            '{% include "a" %}{% arg $x = null %}{% end %}' => 'passing null will cause the param to be default-initialized',
 
             '{% include "a" %}{% arg $x = 1 %}{% arg $x = 2 %}' => 'duplicated x argument',
 
