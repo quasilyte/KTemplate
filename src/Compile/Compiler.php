@@ -309,7 +309,7 @@ class Compiler {
         if ($this->frame->lookupLocalInCurrentScope($var_name) !== -1) {
             $this->failToken($tok, "can't declare $var_name param: name is already in use");
         }
-        $var_slot = $this->frame->allocVarSlot($var_name);
+        $this->frame->allocVarSlot($var_name);
         $this->expectToken(TokenKind::ASSIGN);
         $e = $this->parser->parseRootExpr($this->lexer);
         $const_value = $this->const_folder->fold($e);
