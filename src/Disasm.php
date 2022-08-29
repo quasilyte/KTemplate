@@ -6,8 +6,9 @@ class Disasm {
     /**
      * @param Env $env
      * @param Template $t
+     * @param int $max_str_len
      */
-    public static function getBytecode($env, $t) {
+    public static function getBytecode($env, $t, $max_str_len = 32) {
         $out = [];
         $code = $t->code;
 
@@ -56,8 +57,8 @@ class Disasm {
                     break;
                 case OpInfo::ARG_STRING_CONST:
                     $s = addcslashes($t->string_values[$v], "\0\t\"\\\n\r");
-                    if (strlen($s) > 32) {
-                        $s = substr($s, 0, 29) . '...';
+                    if (strlen($s) > $max_str_len) {
+                        $s = substr($s, 0, $max_str_len - 3) . '...';
                     } 
                     $parts[] = "`" . $s . "`";
                     break;
