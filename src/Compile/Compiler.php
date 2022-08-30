@@ -103,7 +103,7 @@ class Compiler {
         case TokenKind::COMMENT:
             return; // Just skip the comment
         case TokenKind::TEXT:
-            $this->compileOutputStringConst($this->lexer->tokenText($tok), !$this->env->escape_config->escape_text);
+            $this->compileOutputStringConst($this->lexer->tokenText($tok), !$this->env->escape_config->auto_escape_text);
             return;
         case TokenKind::ECHO_START:
             $this->compileEcho();
@@ -408,7 +408,7 @@ class Compiler {
      */
     private function compileOutputStringConst($v, $safe) {
         $string_id = $this->internString($v);
-        if ($this->env->escape_func && !$safe) {
+        if ($this->env->escape_config->escape_func && !$safe) {
             $this->emit1(Op::OUTPUT_STRING_CONST, $string_id);
         } else {
             $this->emit1(Op::OUTPUT_SAFE_STRING_CONST, $string_id);
@@ -494,7 +494,7 @@ class Compiler {
             if (is_int($const_value)) {
                 $this->compileOutputIntConst((int)$const_value);
             } else if (is_string($const_value)) {
-                $this->compileOutputStringConst((string)$const_value, !$this->env->escape_config->escape_const_expr);
+                $this->compileOutputStringConst((string)$const_value, !$this->env->escape_config->auto_escape_const_expr);
             } else {
                 $this->failExpr($e, 'unexpected value type: ' . gettype($const_value));
             }
@@ -558,11 +558,11 @@ class Compiler {
      * @return bool
      */
     private function needsEscaping($type, $is_const = false) {
-        if ($this->env->escape_func === null) {
+        if ($this->env->escape_config->escape_func === null) {
             return false;
         }
         if ($is_const) {
-            return $this->env->escape_config->escape_const_expr;
+            return $this->env->escape_config->auto_escape_const_expr;
         }
         switch ($type) {
         case Types::BOOL:
@@ -573,7 +573,7 @@ class Compiler {
         case Types::NUMERIC:
             return false;
         default:
-            return $this->env->escape_config->escape_expr;
+            return $this->env->escape_config->auto_escape_expr;
         }
     }
 

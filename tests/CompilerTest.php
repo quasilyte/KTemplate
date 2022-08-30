@@ -863,7 +863,7 @@ class CompilerTest extends TestCase {
         ];
 
         $env = $this->newTestEnv();
-        $env->escape_func = null;
+        $env->escape_config->escape_func = null;
         foreach ($tests as $input => $want) {
             $t = self::$compiler->compile($env, 'test', (string)$input);
             $have = Disasm::getBytecode($env, $t);

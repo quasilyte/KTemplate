@@ -598,8 +598,8 @@ class Renderer {
      * @return string
      */
     private static function escape($env, $x) {
-        $escape_filter = $env->escape_func;
-        return $escape_filter($x, $env->escape_default_strategy);
+        $escape_filter = $env->escape_config->escape_func;
+        return $escape_filter($x, $env->escape_config->default_strategy);
     }
 
     /**
@@ -609,7 +609,7 @@ class Renderer {
      * @return string
      */
     private static function escapeWithStrategy($env, $x, $strategy) {
-        $escape_filter = $env->escape_func;
+        $escape_filter = $env->escape_config->escape_func;
         return $escape_filter($x, $strategy);
     }
 

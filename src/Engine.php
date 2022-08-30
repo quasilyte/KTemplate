@@ -4,6 +4,7 @@ namespace KTemplate;
 
 use KTemplate\Internal\Renderer;
 use KTemplate\Internal\Env;
+use KTemplate\Internal\Disasm;
 
 class Engine {
     /** @var Env */
@@ -17,6 +18,25 @@ class Engine {
      */
     public function __construct($loader) {
         $this->env = new Env($loader);
+    }
+
+    /**
+     * @param EscapeConfig $config
+     */
+    public function setEscapeConfig($config) {
+        $this->env->escape_config = $config;
+    }
+
+    /**
+     * Set the implied text encoding.
+     * Used as an argument to mb_* functions.
+     * 
+     * "UTF-8" is used by default.
+     * 
+     * @param string $encoding
+     */
+    public function setEncoding($encoding) {
+        $this->env->encoding = $encoding;
     }
 
     /**
@@ -34,7 +54,7 @@ class Engine {
      */
     public function render($path, $data_provider = null) {
         $t = $this->env->getTemplate($path);
-        return $this->renderer->render($this->env, $t, $data_provider);
+        return $this->renderTemplate($t, $data_provider);
     }
 
     /**
@@ -54,7 +74,7 @@ class Engine {
      * @param int $max_str_len
      * @return string[]
      */
-    public static function getBytecode($t, $max_str_len = 32) {
+    public function disassembleTemplate($t, $max_str_len = 32) {
         return Disasm::getBytecode($this->env, $t, $max_str_len);
     }
 
