@@ -15,9 +15,10 @@ class Engine {
 
     /**
      * @param LoaderInterface $loader
+     * @param string $cache_dir
      */
-    public function __construct($loader) {
-        $this->env = new Env($loader);
+    public function __construct($loader, $cache_dir = '') {
+        $this->env = new Env($loader, $cache_dir);
     }
 
     /**

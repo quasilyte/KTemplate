@@ -46,9 +46,10 @@ class Env {
 
     /**
      * @param LoaderInterface $loader
+     * @param string $cache_dir
      */
-    public function __construct($loader) {
-        $this->template_cache = new TemplateCache($loader);
+    public function __construct($loader, $cache_dir = '') {
+        $this->template_cache = new TemplateCache($loader, $cache_dir);
         $this->escape_config = new EscapeConfig();
     }
 
