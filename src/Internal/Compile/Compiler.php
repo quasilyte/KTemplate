@@ -54,6 +54,9 @@ class Compiler {
     /** @var string */
     private $current_template_arg = '';
 
+    /** @var string */
+    private $tmp_output_tag = '';
+
     public function __construct() {
         $this->lexer = new Lexer();
         $this->parser = new ExprParser();
@@ -268,6 +271,32 @@ class Compiler {
         }
     }
 
+    /**
+     * @param int $dst
+     * @param string $tag
+     */
+    private function compileBlockAssign($dst, $tag) {
+        $tok = $this->lexer->scan();
+        if ($tok->kind !== TokenKind::CONTROL_END) {
+            $this->failToken($tok, "expected = or %}, found " . $tok->prettyKindName());
+        }
+        if ($this->tmp_output_tag) {
+            $this->failToken($tok, "unsupported block-assign $tag inside $this->tmp_output_tag");
+        }
+        $this->tmp_output_tag = $tag;
+        $this->emit(Op::START_TMP_OUTPUT);
+        while (true) {
+            $tok = $this->lexer->scan();
+            if ($tok->kind === TokenKind::CONTROL_START && $this->lexer->consume(TokenKind::KEYWORD_END)) {
+                $this->expectToken(TokenKind::CONTROL_END);
+                break;
+            }
+            $this->compileToken($tok);
+        }
+        $this->emit1dst(Op::FINISH_TMP_OUTPUT, $dst);
+        $this->tmp_output_tag = '';
+    }
+
     private function compileSet() {
         $tok = $this->lexer->scan();
         if ($tok->kind !== TokenKind::DOLLAR_IDENT) {
@@ -278,10 +307,13 @@ class Compiler {
         if ($var_slot === -1) {
             $this->failToken($tok, "assigning to undefined local var $var_name");
         }
-        $this->expectToken(TokenKind::ASSIGN);
-        $e = $this->parser->parseRootExpr($this->lexer);
-        $this->compileRootExpr($var_slot, $e);
-        $this->expectToken(TokenKind::CONTROL_END);
+        if ($this->lexer->consume(TokenKind::ASSIGN)) {
+            $e = $this->parser->parseRootExpr($this->lexer);
+            $this->compileRootExpr($var_slot, $e);
+            $this->expectToken(TokenKind::CONTROL_END);
+            return;
+        }
+        $this->compileBlockAssign($var_slot, 'set');
     }
 
     private function compileLet() {
@@ -294,10 +326,13 @@ class Compiler {
             $this->failToken($tok, "variable $var_name is already declared in this scope");
         }
         $var_slot = $this->frame->allocVarSlot($var_name);
-        $this->expectToken(TokenKind::ASSIGN);
-        $e = $this->parser->parseRootExpr($this->lexer);
-        $this->compileRootExpr($var_slot, $e);
-        $this->expectToken(TokenKind::CONTROL_END);
+        if ($this->lexer->consume(TokenKind::ASSIGN)) {
+            $e = $this->parser->parseRootExpr($this->lexer);
+            $this->compileRootExpr($var_slot, $e);
+            $this->expectToken(TokenKind::CONTROL_END);
+            return;
+        }
+        $this->compileBlockAssign($var_slot, 'let');
     }
 
     private function compileParam() {
@@ -341,13 +376,16 @@ class Compiler {
             $this->failToken($tok, "duplicated $arg_name argument");
         }
         $this->current_template_arg = $arg_name;
-        $this->expectToken(TokenKind::ASSIGN);
-        $e = $this->parser->parseRootExpr($this->lexer);
-        if ($e->kind === Expr::NULL_LIT) {
-            $this->failExpr($e, "passing null will cause the param to be default-initialized");
+        if ($this->lexer->consume(TokenKind::ASSIGN)) {
+            $e = $this->parser->parseRootExpr($this->lexer);
+            if ($e->kind === Expr::NULL_LIT) {
+                $this->failExpr($e, "passing null will cause the param to be default-initialized");
+            }
+            $this->compileRootExpr(Frame::ARG_SLOT_PLACEHOLDER, $e);
+            $this->expectToken(TokenKind::CONTROL_END);
+        } else {
+            $this->compileBlockAssign(Frame::ARG_SLOT_PLACEHOLDER, 'arg');
         }
-        $this->compileRootExpr(Frame::ARG_SLOT_PLACEHOLDER, $e);
-        $this->expectToken(TokenKind::CONTROL_END);
         $this->current_template_arg = '';
     }
 
@@ -1058,6 +1096,8 @@ class Compiler {
         $this->template_arg_deps = [];
         $this->current_template_path = '';
         $this->current_template_arg = '';
+
+        $this->tmp_output_tag = '';
     }
 
     /**

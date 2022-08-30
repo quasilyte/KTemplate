@@ -577,6 +577,15 @@ class Renderer {
             case Op::ESCAPE_SLOT0_FILTER2:
                 $slot0 = self::escapeWithStrategy($env, (string)$state->slots[$fp +(($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xff]);
                 break;
+            
+            case Op::START_TMP_OUTPUT:
+                $state->swapBuf();
+                break;
+            case Op::FINISH_TMP_OUTPUT:
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->buf;
+                $state->swapBuf();
+                $state->buf2 = '';
+                break;
 
             case Op::PREPARE_TEMPLATE:
                 $state->template = $env->getTemplate($t->string_values[($opdata >> 8) & 0xff]);

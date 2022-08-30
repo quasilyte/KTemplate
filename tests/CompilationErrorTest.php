@@ -50,8 +50,8 @@ class CompilationErrorTest extends TestCase {
             '{% set x = 1 }}' => 'set names should be identifiers with leading $, found ident',
             '{% let x = 1 }}' => 'let names should be identifiers with leading $, found ident',
             '{% let $x = 1 %}{% let $x = 2 %}' => 'variable x is already declared in this scope',
-            '{% let $x 10 %}' => 'expected =, found int_lit',
-            '{% let $x = 10 %}{% set $x 10 %}' => 'expected =, found int_lit',
+            '{% let $x 10 %}' => 'expected = or %}, found int_lit',
+            '{% let $x = 10 %}{% set $x 10 %}' => 'expected = or %}, found int_lit',
             '{% let $x = 10 }}' => 'expected %}, found }}',
             '{% let $x = 10 %}{% set $x = 10 }}' => 'expected %}, found }}',
 
@@ -86,6 +86,11 @@ class CompilationErrorTest extends TestCase {
             '{% let $x = 1 %}{% param $x = 2 %}' => "can't declare x param: name is already in use",
             '{% param $x = 1 %}{% param $x = 2 %}' => "can't declare x param: name is already in use",
             '{% param x = 1 %}' => 'param names should be identifiers with leading $, found ident',
+
+            '{% let $x = 0 %}{% set $x %}1{% let $y %}{% end %}{% end %}' => 'unsupported block-assign let inside set',
+            '{% let $x = 0 %}{% set $x %}1{% set $x %}{% end %}{% end %}' => 'unsupported block-assign set inside set',
+            '{% let $x %}1{% let $y %}{% end %}{% end %}' => 'unsupported block-assign let inside let',
+            '{% let $x %}1{% set $x %}{% end %}{% end %}' => 'unsupported block-assign set inside let',
         ];
         
         foreach ($tests as $input => $want) {

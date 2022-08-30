@@ -480,13 +480,22 @@ class Op {
     // Result type: Types::NUMERIC
     public const MOD_SLOT0 = 96;
     
-    // Encoding: 0x61 path:strindex
+    // Encoding: 0x61
     // Result type: unknown/varying
-    public const PREPARE_TEMPLATE = 97;
+    public const START_TMP_OUTPUT = 97;
     
-    // Encoding: 0x62
+    // Encoding: 0x62 dst:wslot
+    // Flags: FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const INCLUDE_TEMPLATE = 98;
+    public const FINISH_TMP_OUTPUT = 98;
+    
+    // Encoding: 0x63 path:strindex
+    // Result type: unknown/varying
+    public const PREPARE_TEMPLATE = 99;
+    
+    // Encoding: 0x64
+    // Result type: unknown/varying
+    public const INCLUDE_TEMPLATE = 100;
     
 
     /**
@@ -688,8 +697,12 @@ class Op {
         case 96:
             return 'MOD_SLOT0';
         case 97:
-            return 'PREPARE_TEMPLATE';
+            return 'START_TMP_OUTPUT';
         case 98:
+            return 'FINISH_TMP_OUTPUT';
+        case 99:
+            return 'PREPARE_TEMPLATE';
+        case 100:
             return 'INCLUDE_TEMPLATE';
         default:
             return '?';
@@ -1057,9 +1070,13 @@ class Op {
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case 96: // MOD_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 97: // PREPARE_TEMPLATE
+        case 97: // START_TMP_OUTPUT
             return 0;
-        case 98: // INCLUDE_TEMPLATE
+        case 98: // FINISH_TMP_OUTPUT
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 99: // PREPARE_TEMPLATE
+            return 0;
+        case 100: // INCLUDE_TEMPLATE
             return 0;
         default:
             return 0;
@@ -1163,6 +1180,8 @@ class Op {
         self::QUO_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::MOD => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::MOD_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::START_TMP_OUTPUT => [],
+        self::FINISH_TMP_OUTPUT => [OpInfo::ARG_SLOT],
         self::PREPARE_TEMPLATE => [OpInfo::ARG_STRING_CONST],
         self::INCLUDE_TEMPLATE => [],
     ];

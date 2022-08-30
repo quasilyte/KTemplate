@@ -137,3 +137,14 @@ $i2 < $i1->{{ $i2 < $i1 }}
 {{ html_chunk|escape }}
 {{ html_chunk|length }}
 {{ html_chunk|escape|length }}
+{% set $myvar %}
+  {% for $x in time %}{{ $x ~ "!" }}{% end %}
+{% end %}
+{{ $myvar }}
+123
+{% let $example %}
+  Lorem ipsum
+  dolor sit amet,
+  consectetuer adipiscing elit.
+{% end %}
+---{{ $example }}---

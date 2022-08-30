@@ -7,7 +7,11 @@ use KTemplate\DataProviderInterface;
 use KTemplate\Template;
 
 class RendererState {
-    public string $buf = '';
+    /** @var string */
+    public $buf = '';
+
+    /** @var string */
+    public $buf2 = '';
 
     /** @var mixed[] */
     public $slots = [];
@@ -39,8 +43,15 @@ class RendererState {
         $this->data_provider = $data_provider;
         $this->cache_bitset = 0;
         $this->buf = '';
+        $this->buf2 = '';
         $this->slot_offset = 0;
         $this->template = null;
+    }
+
+    public function swapBuf() {
+        $tmp = $this->buf2;
+        $this->buf2 = $this->buf;
+        $this->buf = $tmp;
     }
 
     public function clearSlots() {

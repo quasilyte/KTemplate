@@ -83,13 +83,15 @@ class CompilerTest extends TestCase {
 
             [
                 'sources' => [
-                    'main' => '{% include "a" %}{% arg $x = 10 %}{% end %}',
+                    'main' => '{% include "a" %}{% arg $x %}10{% end %}{% end %}',
                     'a' => '{% param $x = 0 %}{{ $x + date.year }}',
                 ],
                 'disasm' => [
                     'main' => [
                         '  PREPARE_TEMPLATE `a`',
-                        '  LOAD_INT_CONST arg2 10',
+                        '  START_TMP_OUTPUT',
+                        '  OUTPUT_SAFE_STRING_CONST `10`',
+                        '  FINISH_TMP_OUTPUT arg2',
                         '  INCLUDE_TEMPLATE',
                         '  RETURN',
                     ],
@@ -858,6 +860,34 @@ class CompilerTest extends TestCase {
                 '  JUMP_SLOT0_TRUTHY *slot0 L1',
                 '  OUTPUT_SAFE_STRING_CONST `2`',
                 'L1:',
+                '  RETURN',
+            ],
+
+            // Switching output.
+            '{% let $s %}{% end %}' => [
+                '  START_TMP_OUTPUT',
+                '  FINISH_TMP_OUTPUT slot1',
+                '  RETURN',
+            ],
+            '{% let $s %}123{% end %}' => [
+                '  START_TMP_OUTPUT',
+                '  OUTPUT_SAFE_STRING_CONST `123`',
+                '  FINISH_TMP_OUTPUT slot1',
+                '  RETURN',
+            ],
+            '{% let $x = 10 %}{% let $s %}{{ $x }}{{ $x }}{% end %}' => [
+                '  LOAD_INT_CONST slot1 10',
+                '  START_TMP_OUTPUT',
+                '  OUTPUT_SAFE slot1',
+                '  OUTPUT_SAFE slot1',
+                '  FINISH_TMP_OUTPUT slot2',
+                '  RETURN',
+            ],
+            '{% let $x = 1 %}{% set $x %}2{% end %}' => [
+                '  LOAD_INT_CONST slot1 1',
+                '  START_TMP_OUTPUT',
+                '  OUTPUT_SAFE_STRING_CONST `2`',
+                '  FINISH_TMP_OUTPUT slot1',
                 '  RETURN',
             ],
         ];
