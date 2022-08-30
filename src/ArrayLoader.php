@@ -13,7 +13,14 @@ class ArrayLoader implements LoaderInterface {
     /**
      * @param string[] $sources
      */
-    public function __construct($sources) {
+    public function __construct($sources = []) {
+        $this->sources = $sources;
+    }
+
+    /**
+     * @param string[] $sources
+     */
+    public function setSources($sources) {
         $this->sources = $sources;
     }
 

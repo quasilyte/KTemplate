@@ -1,15 +1,15 @@
 <?php
 
-namespace KTemplate;
+namespace KTemplate\Internal;
 
-use KTemplate\Internal\Op;
-use KTemplate\Internal\OpInfo;
+use KTemplate\Template;
 
 class Disasm {
     /**
      * @param Env $env
      * @param Template $t
      * @param int $max_str_len
+     * @return string[]
      */
     public static function getBytecode($env, $t, $max_str_len = 32) {
         $out = [];

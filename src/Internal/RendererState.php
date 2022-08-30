@@ -1,6 +1,10 @@
 <?php
 
-namespace KTemplate;
+namespace KTemplate\Internal;
+
+use KTemplate\DataKey;
+use KTemplate\DataProviderInterface;
+use KTemplate\Template;
 
 class RendererState {
     public string $buf = '';

@@ -2,10 +2,10 @@
 
 use PHPUnit\Framework\TestCase;
 use KTemplate\Compile\Compiler;
-use KTemplate\Env;
 use KTemplate\LoaderInterface;
 use KTemplate\ArrayLoader;
-use KTemplate\Disasm;
+use KTemplate\Internal\Env;
+use KTemplate\Internal\Disasm;
 
 class CompilerTest extends TestCase {
     /** @var Compiler */

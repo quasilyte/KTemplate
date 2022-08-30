@@ -1,8 +1,11 @@
 <?php
 
-namespace KTemplate;
+namespace KTemplate\Internal;
 
-use KTemplate\Internal\TemplateCache;
+use KTemplate\Template;
+use KTemplate\LoaderInterface;
+use KTemplate\EscapeConfig;
+use KTemplate\FilterLibrary;
 
 class Env {
     /** @var (callable(mixed):mixed)[] */
@@ -33,9 +36,6 @@ class Env {
 
     /** @var TemplateCache */
     private $template_cache;
-
-    /** @var Renderer */
-    private $renderer;
 
     /**
      * Implied text encoding.
@@ -71,20 +71,9 @@ class Env {
      * @param LoaderInterface $loader
      */
     public function __construct($loader) {
-        $this->renderer = new Renderer();
         $this->template_cache = new TemplateCache($loader);
         $this->escape_config = new EscapeConfig();
         $this->escape_func = [FilterLibrary::class, 'escape'];
-    }
-
-    /**
-     * @param string $path
-     * @param DataProviderInterface $data_provider
-     * @return string
-     */
-    public function render($path, $data_provider = null) {
-        $t = $this->template_cache->get($this, $path);
-        return $this->renderer->render($this, $t, $data_provider);
     }
 
     /**

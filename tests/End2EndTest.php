@@ -2,8 +2,9 @@
 
 use PHPUnit\Framework\TestCase;
 use KTemplate\Compile\Compiler;
-use KTemplate\Env;
+use KTemplate\Engine;
 use KTemplate\Renderer;
+use KTemplate\ArrayLoader;
 use KTemplate\DataKey;
 use KTemplate\DataProviderInterface;
 use KTemplate\Internal\Strings;
@@ -22,35 +23,35 @@ class End2EndTest extends TestCase {
             $tests[] = $filename;
         }
 
-        $env = new Env(null);
+        $loader = new ArrayLoader();
+        $engine = new Engine($loader);
         
-        $env->registerFilter1('strlen', function ($s) { return strlen($s); });
-        $env->registerFilter1('add1', function ($x) { return $x + 1; });
-        $env->registerFilter1('sub1', function ($x) { return $x - 1; });
+        $engine->registerFilter1('strlen', function ($s) { return strlen($s); });
+        $engine->registerFilter1('add1', function ($x) { return $x + 1; });
+        $engine->registerFilter1('sub1', function ($x) { return $x - 1; });
 
-        $env->registerFilter2('add', function ($x, $delta) { return $x + $delta; });
+        $engine->registerFilter2('add', function ($x, $delta) { return $x + $delta; });
 
-        $env->registerFunction0('zero', function () { return 0; });
-        $env->registerFunction1('abs', function ($x) { return abs($x); });
-        $env->registerFunction2('fmt', function ($format, $x) { return sprintf($format, $x); });
-        $env->registerFunction3('concat3', function ($s1, $s2, $s3) { return "$s1$s2$s3"; });
+        $engine->registerFunction0('zero', function () { return 0; });
+        $engine->registerFunction1('abs', function ($x) { return abs($x); });
+        $engine->registerFunction2('fmt', function ($format, $x) { return sprintf($format, $x); });
+        $engine->registerFunction3('concat3', function ($s1, $s2, $s3) { return "$s1$s2$s3"; });
 
-        $env->registerFunction1('assert_true', function ($x) {
+        $engine->registerFunction1('assert_true', function ($x) {
             return $x === true ? 'yes' : 'no';
         });
-        $env->registerFunction1('assert_false', function ($x) {
+        $engine->registerFunction1('assert_false', function ($x) {
             return $x === false ? 'yes' : 'no';
         });
 
-        $compiler = new Compiler();
-        $renderer = new Renderer();
         $data_provider = new SimpleTestDataProvider();
         foreach ($tests as $test) {
             $full_name = "$dir/$test";
             $source = (string)file_get_contents($full_name);
-            $t = $compiler->compile($env, $full_name, $source);
+            $loader->setSources([$full_name => $source]);
+            $t = $engine->getTemplate($full_name);
             $data_provider->setTestName($test);
-            $have = $renderer->render($env, $t, $data_provider);
+            $have = $engine->renderTemplate($t, $data_provider);
             if (!file_exists("$dir/$test.golden")) {
                 file_put_contents("$dir/$test.golden", $have);
                 $this->fail("$test: no output file found, auto-creating one");

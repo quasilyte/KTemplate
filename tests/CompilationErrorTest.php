@@ -3,16 +3,22 @@
 use PHPUnit\Framework\TestCase;
 use KTemplate\Compile\Compiler;
 use KTemplate\Compile\CompilationException;
-use KTemplate\Env;
+use KTemplate\Engine;
 use KTemplate\ArrayLoader;
 use KTemplate\Internal\Strings;
 
 class CompilationErrorTest extends TestCase {
-    /** @var Compiler */
-    private static $compiler;
+    /** @var Engine */
+    private static $engine;
+
+    /** @var ArrayLoader */
+    private static $loader;
 
     public static function setUpBeforeClass(): void {
-        self::$compiler = new Compiler();
+        self::$loader = new ArrayLoader();
+        self::$engine = new Engine(self::$loader);
+
+        self::$engine->registerFunction1('strlen', function ($x) { return strlen($x); });
     }
 
     public function testSimpleErrors() {
@@ -81,20 +87,18 @@ class CompilationErrorTest extends TestCase {
             '{% param $x = 1 %}{% param $x = 2 %}' => "can't declare x param: name is already in use",
             '{% param x = 1 %}' => 'param names should be identifiers with leading $, found ident',
         ];
-
-        $loader = new ArrayLoader([
-            'example' => '
-                {% param $title = "Example" %}
-                {{ $title }}
-            ',
-        ]);
-
-        $env = new Env($loader);
-        $env->registerFunction1('strlen', function ($x) { return strlen($x); });
+        
         foreach ($tests as $input => $want) {
+            self::$loader->setSources([
+                'example' => '
+                    {% param $title = "Example" %}
+                    {{ $title }}
+                ',
+                'test' => (string)$input,
+            ]);
             $have = '';
             try {
-                $t = self::$compiler->compile($env, 'test', (string)$input);
+                $t = self::$engine->getTemplate('test');
             } catch (CompilationException $e) {
                 $have = $e->getFullMessage();
             }

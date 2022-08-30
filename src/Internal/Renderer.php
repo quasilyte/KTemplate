@@ -1,8 +1,10 @@
 <?php
 
-namespace KTemplate;
+namespace KTemplate\Internal;
 
-use KTemplate\Internal\Op;
+use KTemplate\DataKey;
+use KTemplate\Template;
+use KTemplate\DataProviderInterface;
 
 class Renderer {
     /**

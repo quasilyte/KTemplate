@@ -3,7 +3,6 @@
 namespace KTemplate\Internal;
 
 use KTemplate\Compile\Compiler;
-use KTemplate\Env;
 use KTemplate\LoaderInterface;
 use KTemplate\Template;
 use KTemplate\TemplateCacheKey;

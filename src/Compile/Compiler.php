@@ -2,8 +2,8 @@
 
 namespace KTemplate\Compile;
 
-use KTemplate\Env;
-use KTemplate\Template;
+use KTemplate\Template; 
+use KTemplate\Internal\Env;
 use KTemplate\Internal\Op;
 use KTemplate\Internal\OpInfo;
 use KTemplate\Internal\Assert;
