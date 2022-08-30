@@ -53,7 +53,6 @@ class TemplateCache {
                     $this->loadTemplateInto($env, $cache_item);
                 }
             }
-            echo ">>> MEM CACHE\n";
             return $cache_item->template;
         }
 
@@ -86,14 +85,12 @@ class TemplateCache {
                 $cache_filename = "$cache_file_dir/$load_path_basename.php.$dst->key_mtime.$dst->key_file_size.tdata";
             }
             if (file_exists($cache_filename)) {
-                echo ">>> BYTECODE CACHE\n";
                 $cached_template_data = (string)file_get_contents($cache_filename);
                 $dst->template = Template::unserialize($cached_template_data);
                 return;
             }
         }
 
-        echo ">>> COMPILED\n";
         $file_contents = $this->loader->load($dst->load_path, $dst->full_name);
         $dst->template = $this->compiler->compile($env, $dst->load_path, $file_contents);
 
