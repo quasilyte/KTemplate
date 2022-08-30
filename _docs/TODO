@@ -8,4 +8,3 @@
 * reconsider default autoescape strategy
 * use codegen for Expr class and expr kind predicates
 * introduce Engine class for the user-friendly public API
-* add bytecode caching to ArrayLoader

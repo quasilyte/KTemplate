@@ -4,9 +4,15 @@ namespace KTemplate;
 
 interface LoaderInterface {
     /**
-     * @param Env $env
      * @param string $path
-     * @return Template
+     * @param string $full_name
+     * @return string
      */
-    public function load($env, $path);
+    public function load($path, $full_name);
+
+    /**
+     * @param string $path
+     * @param TemplateCacheKey $key
+     */
+    public function updateCacheKey($path, $key);
 }

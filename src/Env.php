@@ -2,6 +2,8 @@
 
 namespace KTemplate;
 
+use KTemplate\Internal\TemplateCache;
+
 class Env {
     /** @var (callable(mixed):mixed)[] */
     public $filters1 = [];
@@ -29,8 +31,8 @@ class Env {
     /** @var int[] */
     private $func3_id_by_name = [];
 
-    /** @var LoaderInterface */
-    private $loader;
+    /** @var TemplateCache */
+    private $template_cache;
 
     /** @var Renderer */
     private $renderer;
@@ -70,7 +72,7 @@ class Env {
      */
     public function __construct($loader) {
         $this->renderer = new Renderer();
-        $this->loader = $loader;
+        $this->template_cache = new TemplateCache($loader);
         $this->escape_config = new EscapeConfig();
         $this->escape_func = [FilterLibrary::class, 'escape'];
     }
@@ -81,7 +83,7 @@ class Env {
      * @return string
      */
     public function render($path, $data_provider = null) {
-        $t = $this->loader->load($this, $path);
+        $t = $this->template_cache->get($this, $path);
         return $this->renderer->render($this, $t, $data_provider);
     }
 
@@ -90,7 +92,7 @@ class Env {
      * @return Template
      */
     public function getTemplate($path) {
-        return $this->loader->load($this, $path);
+        return $this->template_cache->get($this, $path);
     }
 
     /**
