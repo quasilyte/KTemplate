@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use KTemplate\Compile\Compiler;
+use KTemplate\Internal\Compile\Compiler;
 use KTemplate\LoaderInterface;
 use KTemplate\ArrayLoader;
 use KTemplate\Internal\Env;

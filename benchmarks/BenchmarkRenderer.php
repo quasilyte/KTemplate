@@ -1,7 +1,7 @@
 <?php
 
-use KTemplate\Compile\Compiler;
-use KTemplate\Compile\Lexer;
+use KTemplate\Internal\Compile\Compiler;
+use KTemplate\Internal\Compile\Lexer;
 use KTemplate\Env;
 use KTemplate\Renderer;
 use KTemplate\Template;

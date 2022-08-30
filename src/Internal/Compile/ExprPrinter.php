@@ -1,6 +1,6 @@
 <?php
 
-namespace KTemplate\Compile;
+namespace KTemplate\Internal\Compile;
 
 class ExprPrinter {
     public static function formatExpr(ExprParser $p, Expr $e): string {

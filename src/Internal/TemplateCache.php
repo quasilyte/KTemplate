@@ -2,7 +2,7 @@
 
 namespace KTemplate\Internal;
 
-use KTemplate\Compile\Compiler;
+use KTemplate\Internal\Compile\Compiler;
 use KTemplate\LoaderInterface;
 use KTemplate\Template;
 use KTemplate\TemplateCacheKey;

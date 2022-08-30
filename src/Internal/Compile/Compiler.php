@@ -1,6 +1,6 @@
 <?php
 
-namespace KTemplate\Compile;
+namespace KTemplate\Internal\Compile;
 
 use KTemplate\Template; 
 use KTemplate\Internal\Env;

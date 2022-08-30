@@ -1,6 +1,6 @@
 <?php
 
-namespace KTemplate\Compile;
+namespace KTemplate\Internal\Compile;
 
 class Lexer {
     private $filename = '';

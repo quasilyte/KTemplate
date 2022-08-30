@@ -2,7 +2,7 @@
 
 namespace KTemplate;
 
-use KTemplate\Compile\Compiler;
+use KTemplate\Internal\Compile\Compiler;
 
 class ArrayLoader implements LoaderInterface {
     /**

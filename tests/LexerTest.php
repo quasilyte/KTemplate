@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use KTemplate\Compile\TokenKind;
-use KTemplate\Compile\Token;
-use KTemplate\Compile\Lexer;
+use KTemplate\Internal\Compile\TokenKind;
+use KTemplate\Internal\Compile\Token;
+use KTemplate\Internal\Compile\Lexer;
 
 class LexerTest extends TestCase {
     public function testScan() {

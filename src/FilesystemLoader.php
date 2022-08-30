@@ -3,7 +3,7 @@
 namespace KTemplate;
 
 use KTemplate\Internal\Strings;
-use KTemplate\Compile\Compiler;
+use KTemplate\Internal\Compile\Compiler;
 
 class FilesystemLoader implements LoaderInterface {
     /**

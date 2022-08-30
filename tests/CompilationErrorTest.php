@@ -1,8 +1,8 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use KTemplate\Compile\Compiler;
-use KTemplate\Compile\CompilationException;
+use KTemplate\Internal\Compile\Compiler;
+use KTemplate\Internal\Compile\CompilationException;
 use KTemplate\Engine;
 use KTemplate\ArrayLoader;
 use KTemplate\Internal\Strings;

@@ -1,10 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use KTemplate\Compile\Lexer;
-use KTemplate\Compile\ExprParser;
-use KTemplate\Compile\Expr;
-use KTemplate\Compile\ExprPrinter;
+use KTemplate\Internal\Compile\Lexer;
+use KTemplate\Internal\Compile\ExprParser;
+use KTemplate\Internal\Compile\Expr;
+use KTemplate\Internal\Compile\ExprPrinter;
 
 class ExprParserTest extends TestCase {
     public function testParseExpr() {
