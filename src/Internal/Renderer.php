@@ -92,13 +92,13 @@ class Renderer {
                 return;
 
             case Op::OUTPUT:
-                $state->buf .= self::escape($env, (string)$state->slots[$fp +(($opdata >> 8) & 0xff)]);
+                $state->buf .= self::escape($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)]);
                 break;
             case Op::OUTPUT_SLOT0:
                 $state->buf .= self::escape($env, (string)$slot0);
                 break;
             case Op::OUTPUT_SAFE:
-                $state->buf .= $state->slots[$fp +(($opdata >> 8) & 0xff)];
+                $state->buf .= $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 break;
             case Op::OUTPUT_SAFE_SLOT0:
                 $state->buf .= $slot0;
@@ -165,16 +165,16 @@ class Renderer {
                 break;
             
             case Op::MOVE:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::MOVE_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 break;
             case Op::MOVE_BOOL:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = (bool)$state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = (bool)$state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::MOVE_SLOT0_BOOL:
-                $slot0 = (bool)$state->slots[$fp +(($opdata >> 8) & 0xff)];
+                $slot0 = (bool)$state->slots[$fp + (($opdata >> 8) & 0xff)];
                 break;
 
             case Op::CONV_BOOL:
@@ -186,31 +186,31 @@ class Renderer {
                 break;
 
             case Op::LOAD_BOOL:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = (bool)(($opdata >> 16) & 0xff);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = (bool)(($opdata >> 16) & 0xff);
                 break;
             case Op::LOAD_SLOT0_BOOL:
                 $slot0 = (bool)(($opdata >> 8) & 0xff);
                 break;
             case Op::LOAD_INT_CONST:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $t->int_values[($opdata >> 16) & 0xff];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->int_values[($opdata >> 16) & 0xff];
                 break;
             case Op::LOAD_SLOT0_INT_CONST:
                 $slot0 = (int)$t->int_values[($opdata >> 8) & 0xff];
                 break;
             case Op::LOAD_FLOAT_CONST:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $t->float_values[($opdata >> 16) & 0xff];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->float_values[($opdata >> 16) & 0xff];
                 break;
             case Op::LOAD_SLOT0_FLOAT_CONST:
                 $slot0 = (float)$t->float_values[($opdata >> 8) & 0xff];
                 break;
             case Op::LOAD_STRING_CONST:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $t->string_values[($opdata >> 16) & 0xff];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->string_values[($opdata >> 16) & 0xff];
                 break;
             case Op::LOAD_SLOT0_STRING_CONST:
                 $slot0 = (string)$t->string_values[($opdata >> 8) & 0xff];
                 break;
             case Op::LOAD_NULL:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = null;
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = null;
                 break;
             case Op::LOAD_SLOT0_NULL:
                 $slot0 = null;
@@ -316,29 +316,29 @@ class Renderer {
                 break;
             
             case Op::INDEX_STRING_KEY:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)][$t->string_values[($opdata >> 24) & 0xff]];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$t->string_values[($opdata >> 24) & 0xff]];
                 break;
             case Op::INDEX_SLOT0_STRING_KEY:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)][$t->string_values[($opdata >> 16) & 0xff]];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)][$t->string_values[($opdata >> 16) & 0xff]];
                 break;
             case Op::INDEX_INT_KEY:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)][$t->int_values[($opdata >> 24) & 0xff]];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$t->int_values[($opdata >> 24) & 0xff]];
                 break;
             case Op::INDEX_SLOT0_INT_KEY:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)][$t->int_values[($opdata >> 16) & 0xff]];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)][$t->int_values[($opdata >> 16) & 0xff]];
                 break;
             case Op::INDEX:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)][$state->slots[$fp +(($opdata >> 24) & 0xff)]];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$state->slots[$fp + (($opdata >> 24) & 0xff)]];
                 break;
             case Op::INDEX_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)][$state->slots[$fp +(($opdata >> 16) & 0xff)]];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)][$state->slots[$fp + (($opdata >> 16) & 0xff)]];
                 break;
             
             case Op::JUMP:
                 $pc += ($opdata >> 8) & 0xffff;
                 break;
             case Op::JUMP_FALSY:
-                if (!$state->slots[$fp +(($opdata >> 24) & 0xff)]) {
+                if (!$state->slots[$fp + (($opdata >> 24) & 0xff)]) {
                     $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
@@ -348,7 +348,7 @@ class Renderer {
                 }
                 break;
             case Op::JUMP_TRUTHY:
-                if ($state->slots[$fp +(($opdata >> 24) & 0xff)]) {
+                if ($state->slots[$fp + (($opdata >> 24) & 0xff)]) {
                     $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
@@ -358,7 +358,7 @@ class Renderer {
                 }
                 break;
             case Op::JUMP_NOT_NULL:
-                if ($state->slots[$fp +(($opdata >> 24) & 0xff)] !== null) {
+                if ($state->slots[$fp + (($opdata >> 24) & 0xff)] !== null) {
                     $pc += ($opdata >> 8) & 0xffff;
                 }
                 break;
@@ -390,107 +390,107 @@ class Renderer {
                 break;
 
             case Op::NOT:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = !$state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = !$state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::NOT_SLOT0:
-                $slot0 = !$state->slots[$fp +(($opdata >> 8) & 0xff)];
+                $slot0 = !$state->slots[$fp + (($opdata >> 8) & 0xff)];
                 break;
 
             case Op::OR:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] || $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] || $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::OR_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] || $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] || $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::AND:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] && $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] && $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::AND_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] && $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] && $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::CONCAT:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] . $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] . $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::CONCAT_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] . $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] . $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::EQ:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] == $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] == $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::EQ_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] == $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] == $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::LT:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] < $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] < $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::LT_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] < $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] < $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::LT_EQ:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] <= $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] <= $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::LT_EQ_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] <= $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] <= $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::NOT_EQ:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] != $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] != $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::NOT_EQ_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] != $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] != $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::ADD:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] + $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] + $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::ADD_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] + $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] + $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::SUB:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] - $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] - $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::SUB_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] - $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] - $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::MUL:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] * $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] * $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::MUL_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] * $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] * $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::QUO:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] / $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] / $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::QUO_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] / $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] / $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
             case Op::MOD:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $state->slots[$fp +(($opdata >> 16) & 0xff)] % $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] % $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::MOD_SLOT0:
-                $slot0 = $state->slots[$fp +(($opdata >> 8) & 0xff)] % $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] % $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
 
             case Op::CALL_FILTER1:
-                $arg1 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $filter_id = ($opdata >> 24) & 0xffff;
                 $filter1 = $env->filters1[$filter_id];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $filter1($arg1);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $filter1($arg1);
                 break;
             case Op::CALL_SLOT0_FILTER1:
-                $arg1 = $state->slots[$fp +(($opdata >> 8) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 $filter_id = ($opdata >> 16) & 0xffff;
                 $filter1 = $env->filters1[$filter_id];
                 $slot0 = $filter1($arg1);
                 break;
             case Op::CALL_FILTER2:
-                $arg1 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 $filter_id = ($opdata >> 32) & 0xffff;
                 $filter2 = $env->filters2[$filter_id];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $filter2($arg1, $arg2);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $filter2($arg1, $arg2);
                 break;
             case Op::CALL_SLOT0_FILTER2:
-                $arg1 = $state->slots[$fp +(($opdata >> 8) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $filter_id = ($opdata >> 24) & 0xffff;
                 $filter2 = $env->filters2[$filter_id];
                 $slot0 = $filter2($arg1, $arg2);
@@ -498,7 +498,7 @@ class Renderer {
             case Op::CALL_FUNC0:
                 $func_id = ($opdata >> 16) & 0xffff;
                 $func0 = $env->funcs0[$func_id];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $func0();
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func0();
                 break;
             case Op::CALL_SLOT0_FUNC0:
                 $func_id = ($opdata >> 8) & 0xffff;
@@ -506,76 +506,76 @@ class Renderer {
                 $slot0 = $func0();
                 break;
             case Op::CALL_FUNC1:
-                $arg1 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $func_id = ($opdata >> 24) & 0xffff;
                 $func1 = $env->funcs1[$func_id];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $func1($arg1);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func1($arg1);
                 break;
             case Op::CALL_SLOT0_FUNC1:
-                $arg1 = $state->slots[$fp +(($opdata >> 8) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 $func_id = ($opdata >> 16) & 0xffff;
                 $func1 = $env->funcs1[$func_id];
                 $slot0 = $func1($arg1);
                 break;
             case Op::CALL_FUNC2:
-                $arg1 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 $func_id = ($opdata >> 32) & 0xffff;
                 $func2 = $env->funcs2[$func_id];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $func2($arg1, $arg2);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func2($arg1, $arg2);
                 break;
             case Op::CALL_SLOT0_FUNC2:
-                $arg1 = $state->slots[$fp +(($opdata >> 8) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $func_id = ($opdata >> 24) & 0xffff;
                 $func2 = $env->funcs2[$func_id];
                 $slot0 = $func2($arg1, $arg2);
                 break;
             case Op::CALL_FUNC3:
-                $arg1 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 24) & 0xff)];
-                $arg3 = $state->slots[$fp +(($opdata >> 32) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
+                $arg3 = $state->slots[$fp + (($opdata >> 32) & 0xff)];
                 $func_id = ($opdata >> 40) & 0xffff;
                 $func3 = $env->funcs3[$func_id];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = $func3($arg1, $arg2, $arg3);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func3($arg1, $arg2, $arg3);
                 break;
             case Op::CALL_SLOT0_FUNC3:
-                $arg1 = $state->slots[$fp +(($opdata >> 8) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
-                $arg3 = $state->slots[$fp +(($opdata >> 24) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                $arg3 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 $func_id = ($opdata >> 32) & 0xffff;
                 $func3 = $env->funcs3[$func_id];
                 $slot0 = $func3($arg1, $arg2, $arg3);
                 break;
             case Op::LENGTH_FILTER:
-                $arg = $state->slots[$fp +(($opdata >> 16) & 0xff)];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = self::lengthFilter($env, $arg);
+                $arg = $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::lengthFilter($env, $arg);
                 break;
             case Op::LENGTH_SLOT0_FILTER:
-                $arg = $state->slots[$fp +(($opdata >> 8) & 0xff)];
+                $arg = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 $slot0 = self::lengthFilter($env, $arg);
                 break;
             case Op::DEFAULT_FILTER:
-                $arg1 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 24) & 0xff)];
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = self::defaultFilter($arg1, $arg2);
+                $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::defaultFilter($arg1, $arg2);
                 break;
             case Op::DEFAULT_SLOT0_FILTER:
-                $arg1 = $state->slots[$fp +(($opdata >> 8) & 0xff)];
-                $arg2 = $state->slots[$fp +(($opdata >> 16) & 0xff)];
+                $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
+                $arg2 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $slot0 = self::defaultFilter($arg1, $arg2);
                 break;
             case Op::ESCAPE_FILTER1:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = self::escape($env, (string)$state->slots[$fp +(($opdata >> 16) & 0xff)]);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::escape($env, (string)$state->slots[$fp + (($opdata >> 16) & 0xff)]);
                 break;
             case Op::ESCAPE_SLOT0_FILTER1:
-                $slot0 = self::escape($env, (string)$state->slots[$fp +(($opdata >> 8) & 0xff)]);
+                $slot0 = self::escape($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)]);
                 break;
             case Op::ESCAPE_FILTER2:
-                $state->slots[$fp +(($opdata >> 8) & 0xff)] = self::escapeWithStrategy($env, (string)$state->slots[$fp +(($opdata >> 16) & 0xff)], $t->string_values[($opdata >> 24) & 0xff]);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 16) & 0xff)], $t->string_values[($opdata >> 24) & 0xff]);
                 break;
             case Op::ESCAPE_SLOT0_FILTER2:
-                $slot0 = self::escapeWithStrategy($env, (string)$state->slots[$fp +(($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xff]);
+                $slot0 = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xff]);
                 break;
             
             case Op::START_TMP_OUTPUT:
