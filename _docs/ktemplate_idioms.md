@@ -48,6 +48,8 @@ Let's take the Twig example and rewrite it accordingly.
 {% endblock %}
 ```
 
+Most of the time, the transformation is straightforward.
+
 `base.ktemplate`:
 
 ```html
