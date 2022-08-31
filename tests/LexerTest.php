@@ -27,6 +27,10 @@ class LexerTest extends TestCase {
                 '{%- $x -%}',
                 ['CONTROL_START_TRIM', 'DOLLAR_IDENT($x)', 'CONTROL_END_TRIM'],
             ],
+            [
+                '{{-$x}}',
+                ['ECHO_START_TRIM', 'DOLLAR_IDENT($x)', 'ECHO_END'],
+            ],
 
             // Comments.
             [

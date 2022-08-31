@@ -1540,6 +1540,9 @@ class Compiler {
             $label_id = ($opdata >> 8) & 0xffff;
             $jump_target = $this->addr_by_label_id[$label_id];
             $jump_offset = ($jump_target - $pc) - 1;
+            if ($jump_offset < -32768 || $jump_offset > 32767) {
+                $this->fail(-1, "can't compile: jump offset $jump_offset doesn't fit into int16");
+            }
             $this->result->code[$pc] = ($opdata & (~$mask)) | ($jump_offset << 8);
         }
     }
@@ -1549,6 +1552,9 @@ class Compiler {
      */
     private function newLabel() {
         $id = $this->label_seq;
+        if ($id > 0xffff) {
+            $this->fail(-1, "can't compile: too many jump targets");
+        }
         $this->label_seq++;
         return $id;
     }

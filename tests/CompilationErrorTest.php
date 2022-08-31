@@ -110,4 +110,67 @@ class CompilationErrorTest extends TestCase {
             $this->assertTrue(Strings::contains($have, $want), "input=$input have=$have\n");
         }
     }
+
+    public function testLimitErrors() {
+        $tests = [
+            [
+                '{% if cond %}' . str_repeat('{{ x }}', 35000) . '{% end %}',
+                "jump offset 35000 doesn't fit into int16",
+            ],
+            [
+                $this->createTemplateSource(0xffff+10, function ($i) {
+                    return "{% if $i %}1{% end %}";
+                }),
+                'too many jump targets',
+            ],
+            [
+                $this->createTemplateSource(0xffff+10, function ($i) {
+                    return "{{ $i }}";
+                }),
+                'too many int const values',
+            ],
+            [
+                $this->createTemplateSource(0xffff+10, function ($i) {
+                    return "{{ $i.0 }}";
+                }),
+                'too many float const values',
+            ],
+            [
+                $this->createTemplateSource(0xffff+10, function ($i) {
+                    return "{{ 'str$i' }}";
+                }),
+                'too many string const values',
+            ],
+        ];
+        
+        foreach ($tests as $test) {
+            [$input, $want] = $test;
+            self::$loader->setSources([
+                'example' => '
+                    {% param $title = "Example" %}
+                    {{ $title }}
+                ',
+                'test' => (string)$input,
+            ]);
+            $have = '';
+            try {
+                $t = self::$engine->getTemplate('test');
+            } catch (CompilationException $e) {
+                $have = $e->getFullMessage();
+            }
+            $this->assertTrue(Strings::contains($have, $want), "want=$want have=$have\n");
+        }
+    }
+
+    /**
+     * @param int $n
+     * @param callable(int):string $fn
+     */
+    private function createTemplateSource($n, $fn) {
+        $result = '';
+        for ($i = 0; $i < $n; $i++) {
+            $result .= $fn($i);
+        }
+        return $result;
+    }
 }

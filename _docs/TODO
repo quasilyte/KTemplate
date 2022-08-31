@@ -1,6 +1,5 @@
 * docs: add examples
 * more end2end tests
 * builtin functions
-* compile errors for long jumps/too many consts and vars, etc
 * reconsider default autoescape strategy
 * use codegen for Expr class and expr kind predicates
