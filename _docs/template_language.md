@@ -104,7 +104,7 @@ These control tags create a block scope:
 ### Operators
 
 | Example | PHP Equivalent | Result Type |
-|---|---|
+|---|---|---|
 | `x or y` | `x || y` | `bool` |
 | `x and y` | `x && y` | `bool` |
 | `x == y` | `x == y` | `bool` |
