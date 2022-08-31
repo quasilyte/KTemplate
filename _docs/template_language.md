@@ -114,11 +114,11 @@ These control tags create a block scope:
 | `x > y` | `x > y` | `bool` |
 | `x >= y` | `x >= y` | `bool` |
 | `x ~ y` | `x . y` | `string` |
-| `x + y` | `x + y` | `int|float` |
-| `x - y` | `x - y` | `int|float` |
-| `x * y` | `x * y` | `int|float` |
-| `x / y` | `x / y` | `int|float` |
-| `x % y` | `x % y` | `int|float` |
+| `x + y` | `x + y` | `int\|float` |
+| `x - y` | `x - y` | `int\|float` |
+| `x * y` | `x * y` | `int\|float` |
+| `x / y` | `x / y` | `int\|float` |
+| `x % y` | `x % y` | `int\|float` |
 
 Binary operator precedence groups:
 
