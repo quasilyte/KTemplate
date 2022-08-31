@@ -1,5 +1,7 @@
 # Template language overview
 
+> This document gives the high-level template language overview. For some practical tips, see [ktemplate_idioms](ktemplate_idioms.md).
+
 A template is a text that may contain special tags that are processed by the engine.
 
 Rendering a template results in a string with all special tags being expanded. All text outside of the special tags is emitted as is.
