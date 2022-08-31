@@ -382,88 +382,88 @@ class Lexer {
         }
         switch ((int)($dst->pos_to - $dst->pos_from)) {
         case 2:
-            if (substr_compare($this->src, 'or', $dst->pos_from, strlen('or')) === 0) {
+            if (substr_compare($this->src, 'or', $dst->pos_from, 2) === 0) {
                 $dst->kind = TokenKind::KEYWORD_OR;
                 return;
             }
-            if (substr_compare($this->src, 'if', $dst->pos_from, strlen('if')) === 0) {
+            if (substr_compare($this->src, 'if', $dst->pos_from, 2) === 0) {
                 $dst->kind = TokenKind::KEYWORD_IF;
                 return;
             }
-            if (substr_compare($this->src, 'do', $dst->pos_from, strlen('do')) === 0) {
+            if (substr_compare($this->src, 'do', $dst->pos_from, 2) === 0) {
                 $dst->kind = TokenKind::KEYWORD_DO;
                 return;
             }
-            if (substr_compare($this->src, 'in', $dst->pos_from, strlen('in')) === 0) {
+            if (substr_compare($this->src, 'in', $dst->pos_from, 2) === 0) {
                 $dst->kind = TokenKind::KEYWORD_IN;
                 return;
             }
         case 3:
-            if (substr_compare($this->src, 'end', $dst->pos_from, strlen('end')) === 0) {
+            if (substr_compare($this->src, 'end', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_END;
                 return;
             }
-            if (substr_compare($this->src, 'not', $dst->pos_from, strlen('not')) === 0) {
+            if (substr_compare($this->src, 'not', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_NOT;
                 return;
             }
-            if (substr_compare($this->src, 'and', $dst->pos_from, strlen('and')) === 0) {
+            if (substr_compare($this->src, 'and', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_AND;
                 return;
             }
-            if (substr_compare($this->src, 'for', $dst->pos_from, strlen('for')) === 0) {
+            if (substr_compare($this->src, 'for', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_FOR;
                 return;
             }
-            if (substr_compare($this->src, 'use', $dst->pos_from, strlen('use')) === 0) {
+            if (substr_compare($this->src, 'use', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_USE;
                 return;
             }
-            if (substr_compare($this->src, 'set', $dst->pos_from, strlen('set')) === 0) {
+            if (substr_compare($this->src, 'set', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_SET;
                 return;
             }
-            if (substr_compare($this->src, 'let', $dst->pos_from, strlen('let')) === 0) {
+            if (substr_compare($this->src, 'let', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_LET;
                 return;
             }
-            if (substr_compare($this->src, 'arg', $dst->pos_from, strlen('arg')) === 0) {
+            if (substr_compare($this->src, 'arg', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_ARG;
                 return;
             }
         case 4:
-            if (substr_compare($this->src, 'true', $dst->pos_from, strlen('true')) === 0) {
+            if (substr_compare($this->src, 'true', $dst->pos_from, 4) === 0) {
                 $dst->kind = TokenKind::KEYWORD_TRUE;
                 return;
             }
-            if (substr_compare($this->src, 'null', $dst->pos_from, strlen('null')) === 0) {
+            if (substr_compare($this->src, 'null', $dst->pos_from, 4) === 0) {
                 $dst->kind = TokenKind::KEYWORD_NULL;
                 return;
             }
-            if (substr_compare($this->src, 'else', $dst->pos_from, strlen('else')) === 0) {
+            if (substr_compare($this->src, 'else', $dst->pos_from, 4) === 0) {
                 $dst->kind = TokenKind::KEYWORD_ELSE;
                 return;
             }
         case 5:
-            if (substr_compare($this->src, 'false', $dst->pos_from, strlen('false')) === 0) {
+            if (substr_compare($this->src, 'false', $dst->pos_from, 5) === 0) {
                 $dst->kind = TokenKind::KEYWORD_FALSE;
                 return;
             }
-            if (substr_compare($this->src, 'param', $dst->pos_from, strlen('param')) === 0) {
+            if (substr_compare($this->src, 'param', $dst->pos_from, 5) === 0) {
                 $dst->kind = TokenKind::KEYWORD_PARAM;
                 return;
             }
         case 6:
-            if (substr_compare($this->src, 'elseif', $dst->pos_from, strlen('elseif')) === 0) {
+            if (substr_compare($this->src, 'elseif', $dst->pos_from, 6) === 0) {
                 $dst->kind = TokenKind::KEYWORD_ELSEIF;
                 return;
             }
         case 7:
-            if (substr_compare($this->src, 'include', $dst->pos_from, strlen('include')) === 0) {
+            if (substr_compare($this->src, 'include', $dst->pos_from, 7) === 0) {
                 $dst->kind = TokenKind::KEYWORD_INCLUDE;
                 return;
             }
-            if (substr_compare($this->src, 'matches', $dst->pos_from, strlen('matches')) === 0) {
+            if (substr_compare($this->src, 'matches', $dst->pos_from, 7) === 0) {
                 $dst->kind = TokenKind::KEYWORD_MATCHES;
                 return;
             }
