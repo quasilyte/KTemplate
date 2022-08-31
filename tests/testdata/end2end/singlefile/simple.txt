@@ -187,3 +187,13 @@ foo
 {{ '?!abc?!'|trim('?!') }}
 {{ '?!abc?!'|ltrim('?!') }}
 {{ '?!abc?!'|rtrim('?!') }}
+-
+{{ min(1, 0) }}
+{{ min(0, 1, 2) }}
+{{ max(1, 0) }}
+{{ max(0, 1, 2) }}
+-
+{{ assert_true(contains(arr1, 1)) }}
+{{ assert_true(contains(arr1, 0)) }}
+{{ assert_true(contains('aaa', 'a')) }}
+{{ assert_true(contains('aaa', 'b')) }}

@@ -1,6 +1,8 @@
 # Template language overview
 
-> This document gives the high-level template language overview. For some practical tips, see [ktemplate idioms](ktemplate_idioms.md).
+This document gives the high-level template language overview.
+
+* For some practical tips, see [ktemplate idioms](ktemplate_idioms.md)
 
 A template is a text that may contain special tags that are processed by the engine.
 

@@ -2,3 +2,4 @@
 * builtin functions (like in_array)
 * reconsider default autoescape strategy
 * use codegen for Expr class and expr kind predicates
+* add `matches` operator

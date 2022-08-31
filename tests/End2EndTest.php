@@ -7,6 +7,7 @@ use KTemplate\Renderer;
 use KTemplate\ArrayLoader;
 use KTemplate\Context;
 use KTemplate\FilterLib;
+use KTemplate\FunctionLib;
 use KTemplate\DataKey;
 use KTemplate\DataProviderInterface;
 use KTemplate\Internal\Strings;
@@ -29,6 +30,7 @@ class End2EndTest extends TestCase {
         $ctx = new Context();
         $engine = new Engine($ctx, $loader);
         FilterLib::registerAllFilters($ctx, $engine);
+        FunctionLib::registerAllFunctions($ctx, $engine);
         
         $engine->registerFilter1('strlen', function ($s) { return strlen($s); });
         $engine->registerFilter1('add1', function ($x) { return $x + 1; });
