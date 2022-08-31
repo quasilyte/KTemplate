@@ -10,56 +10,60 @@ class TokenKind {
     public const EOF = 1;
     public const ERROR = 2;
     public const ECHO_START = 3; // {{
-    public const ECHO_END = 4; // }}
-    public const CONTROL_START = 5; // {%
-    public const CONTROL_END = 6; // %}
-    public const COMMENT = 7; // {# ... #}
-    public const PLUS = 8; // +
-    public const MINUS = 9; // -
-    public const STAR = 10; // *
-    public const SLASH = 11; // /
-    public const LPAREN = 12; // (
-    public const RPAREN = 13; // )
-    public const TILDE = 14; // ~
-    public const DOT = 15; // .
-    public const EQ = 16; // ==
-    public const NOT_EQ = 17; // !=
-    public const LT = 18; // <
-    public const GT = 19; // >
-    public const LT_EQ = 20; // <=
-    public const GT_EQ = 21; // >=
-    public const ASSIGN = 22; // =
-    public const PIPE = 23; // |
-    public const COMMA = 24; // ,
-    public const LBRACKET = 25; // [
-    public const RBRACKET = 26; // ]
-    public const PERCENT = 27; // %
-    public const KEYWORD_OR = 28;
-    public const KEYWORD_IF = 29;
-    public const KEYWORD_DO = 30;
-    public const KEYWORD_AND = 31;
-    public const KEYWORD_FOR = 32;
-    public const KEYWORD_USE = 33;
-    public const KEYWORD_SET = 34;
-    public const KEYWORD_NOT = 35;
-    public const KEYWORD_TRUE = 36;
-    public const KEYWORD_FALSE = 37;
-    public const KEYWORD_END = 38;
-    public const KEYWORD_ELSE = 39;
-    public const KEYWORD_ELSEIF = 40;
-    public const KEYWORD_LET = 41;
-    public const KEYWORD_IN = 42;
-    public const KEYWORD_NULL = 43;
-    public const KEYWORD_INCLUDE = 44;
-    public const KEYWORD_PARAM = 45;
-    public const KEYWORD_ARG = 46;
-    public const DOLLAR_IDENT = 47;
-    public const IDENT = 48;
-    public const TEXT = 49;
-    public const INT_LIT = 50;
-    public const FLOAT_LIT = 51;
-    public const STRING_LIT_Q1 = 52;
-    public const STRING_LIT_Q2 = 53;
+    public const ECHO_START_TRIM = 4; // {{-
+    public const ECHO_END = 5; // }}
+    public const ECHO_END_TRIM = 6; // -}}
+    public const CONTROL_START = 7; // {%
+    public const CONTROL_START_TRIM = 8; // {%-
+    public const CONTROL_END = 9; // %}
+    public const CONTROL_END_TRIM = 10; // -%}
+    public const COMMENT = 11; // {# ... #}
+    public const PLUS = 12; // +
+    public const MINUS = 13; // -
+    public const STAR = 14; // *
+    public const SLASH = 15; // /
+    public const LPAREN = 16; // (
+    public const RPAREN = 17; // )
+    public const TILDE = 18; // ~
+    public const DOT = 19; // .
+    public const EQ = 20; // ==
+    public const NOT_EQ = 21; // !=
+    public const LT = 22; // <
+    public const GT = 23; // >
+    public const LT_EQ = 24; // <=
+    public const GT_EQ = 25; // >=
+    public const ASSIGN = 26; // =
+    public const PIPE = 27; // |
+    public const COMMA = 28; // ,
+    public const LBRACKET = 29; // [
+    public const RBRACKET = 30; // ]
+    public const PERCENT = 31; // %
+    public const KEYWORD_OR = 32;
+    public const KEYWORD_IF = 33;
+    public const KEYWORD_DO = 34;
+    public const KEYWORD_AND = 35;
+    public const KEYWORD_FOR = 36;
+    public const KEYWORD_USE = 37;
+    public const KEYWORD_SET = 38;
+    public const KEYWORD_NOT = 39;
+    public const KEYWORD_TRUE = 40;
+    public const KEYWORD_FALSE = 41;
+    public const KEYWORD_END = 42;
+    public const KEYWORD_ELSE = 43;
+    public const KEYWORD_ELSEIF = 44;
+    public const KEYWORD_LET = 45;
+    public const KEYWORD_IN = 46;
+    public const KEYWORD_NULL = 47;
+    public const KEYWORD_INCLUDE = 48;
+    public const KEYWORD_PARAM = 49;
+    public const KEYWORD_ARG = 50;
+    public const DOLLAR_IDENT = 51;
+    public const IDENT = 52;
+    public const TEXT = 53;
+    public const INT_LIT = 54;
+    public const FLOAT_LIT = 55;
+    public const STRING_LIT_Q1 = 56;
+    public const STRING_LIT_Q2 = 57;
 
     /**
      * @param int $kind
@@ -89,12 +93,20 @@ class TokenKind {
         switch ($kind) {
         case self::ECHO_START:
             return '{{';
+        case self::ECHO_START_TRIM:
+            return '{{-';
         case self::ECHO_END:
             return '}}';
+        case self::ECHO_END_TRIM:
+            return '-}}';
         case self::CONTROL_START:
             return '{%';
+        case self::CONTROL_START_TRIM:
+            return '{%-';
         case self::CONTROL_END:
             return '%}';
+        case self::CONTROL_END_TRIM:
+            return '-%}';
         case self::COMMENT:
             return '{# ... #}';
         case self::PLUS:
@@ -154,12 +166,20 @@ class TokenKind {
             return 'ERROR';
         case self::ECHO_START:
             return 'ECHO_START';
+        case self::ECHO_START_TRIM:
+            return 'ECHO_START_TRIM';
         case self::ECHO_END:
             return 'ECHO_END';
+        case self::ECHO_END_TRIM:
+            return 'ECHO_END_TRIM';
         case self::CONTROL_START:
             return 'CONTROL_START';
+        case self::CONTROL_START_TRIM:
+            return 'CONTROL_START_TRIM';
         case self::CONTROL_END:
             return 'CONTROL_END';
+        case self::CONTROL_END_TRIM:
+            return 'CONTROL_END_TRIM';
         case self::COMMENT:
             return 'COMMENT';
         case self::PLUS:

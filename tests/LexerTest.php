@@ -18,6 +18,16 @@ class LexerTest extends TestCase {
                 ['TEXT(hello, world)'],
             ],
 
+            // Trim tags.
+            [
+                '{{- $x -}}',
+                ['ECHO_START_TRIM', 'DOLLAR_IDENT($x)', 'ECHO_END_TRIM'],
+            ],
+            [
+                '{%- $x -%}',
+                ['CONTROL_START_TRIM', 'DOLLAR_IDENT($x)', 'CONTROL_END_TRIM'],
+            ],
+
             // Comments.
             [
                 '{#comment#}',

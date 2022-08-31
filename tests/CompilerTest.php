@@ -307,6 +307,29 @@ class CompilerTest extends TestCase {
 
     public function testCompileNoEscape() {
         $tests = [
+            // Trimming tags.
+            ' {{- 1 }}' => [
+                '  OUTPUT_SAFE_INT_CONST 1',
+                '  RETURN',
+            ],
+            "foo\n\t {{- 1 }}" => [
+                '  OUTPUT_SAFE_STRING_CONST `foo`',
+                '  OUTPUT_SAFE_INT_CONST 1',
+                '  RETURN',
+            ],
+            '{{ 1 -}} ' => [
+                '  OUTPUT_SAFE_INT_CONST 1',
+                '  RETURN',
+            ],
+            ' {{- 1 -}} ' => [
+                '  OUTPUT_SAFE_INT_CONST 1',
+                '  RETURN',
+            ],
+            ' {%- let $x = 10 -%} ' => [
+                '  LOAD_INT_CONST slot1 10',
+                '  RETURN',
+            ],
+
             // Numeric constants.
             '{{ -1 }}' => [
                 '  OUTPUT_SAFE_INT_CONST -1',

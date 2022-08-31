@@ -26,9 +26,13 @@ var rawTokens = []tokenInfo{
 	{name: "ERROR"},
 
 	{name: "ECHO_START", pretty: "{{"},
+	{name: "ECHO_START_TRIM", pretty: "{{-"},
 	{name: "ECHO_END", pretty: "}}"},
+	{name: "ECHO_END_TRIM", pretty: "-}}"},
 	{name: "CONTROL_START", pretty: "{%"},
+	{name: "CONTROL_START_TRIM", pretty: "{%-"},
 	{name: "CONTROL_END", pretty: "%}"},
+	{name: "CONTROL_END_TRIM", pretty: "-%}"},
 	{name: "COMMENT", pretty: "{# ... #}", hasValue: true},
 	{name: "PLUS", pretty: "+"},
 	{name: "MINUS", pretty: "-"},

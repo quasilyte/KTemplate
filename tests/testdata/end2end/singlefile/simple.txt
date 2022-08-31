@@ -148,3 +148,8 @@ $i2 < $i1->{{ $i2 < $i1 }}
   consectetuer adipiscing elit.
 {% end %}
 ---{{ $example }}---
+
+
+{{- 123 -}}
+
+foo

@@ -44,6 +44,9 @@ class Compiler {
     /** @var bool */
     private $parsing_header = true;
 
+    /** @var bool */
+    private $trim_left = false;
+
     /**
      * [$pc] => tuple($template_load_path, $arg_name)
      * @var tuple(string, string)[]
@@ -106,12 +109,14 @@ class Compiler {
         case TokenKind::COMMENT:
             return; // Just skip the comment
         case TokenKind::TEXT:
-            $this->compileOutputStringConst($this->lexer->tokenText($tok), !$this->env->escape_config->auto_escape_text);
+            $this->compileText($tok);
             return;
         case TokenKind::ECHO_START:
+        case TokenKind::ECHO_START_TRIM:
             $this->compileEcho();
             return;
         case TokenKind::CONTROL_START:
+        case TokenKind::CONTROL_START_TRIM:
             $this->compileControl();
             return;
         case TokenKind::ERROR:
@@ -120,6 +125,33 @@ class Compiler {
         }
 
         $this->failToken($tok, 'unexpected top-level token: ' . $tok->prettyKindName());
+    }
+
+    /**
+     * @param Token $tok
+     */
+    private function compileText($tok) {
+        $text = $this->lexer->tokenText($tok);
+
+        $next_tok = $this->lexer->peek();
+        $trim_right = false;
+        switch ($next_tok->kind) {
+        case TokenKind::CONTROL_START_TRIM:
+        case TokenKind::ECHO_START_TRIM:
+            $trim_right = true;
+        }
+
+        if ($this->trim_left && $trim_right) {
+            $text = trim($text);
+        } else if ($this->trim_left) {
+            $text = ltrim($text);
+        } else if ($trim_right) {
+            $text = rtrim($text);
+        }
+
+        $this->compileOutputStringConst($text, !$this->env->escape_config->auto_escape_text);
+
+        $this->trim_left = false; // Not strictly needed, but anyway
     }
 
     private function compileControl() {
@@ -173,7 +205,7 @@ class Compiler {
         }
         $this->current_template_path = (string)$path_value;
         $this->frame->enterTemplateCall();
-        $this->expectToken(TokenKind::CONTROL_END);
+        $this->expectEndToken(TokenKind::CONTROL_END);
         $this->emit1(Op::PREPARE_TEMPLATE, $this->internString($this->current_template_path));
         while (true) {
             $tok = $this->lexer->scan();
@@ -189,7 +221,7 @@ class Compiler {
                     continue;
                 }
                 if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
-                    $this->expectToken(TokenKind::CONTROL_END);
+                    $this->expectEndToken(TokenKind::CONTROL_END);
                     $this->emit(Op::INCLUDE_TEMPLATE);
                     break;
                 }
@@ -219,7 +251,7 @@ class Compiler {
         }
         $this->expectToken(TokenKind::KEYWORD_IN);
         $seq_expr = $this->parser->parseRootExpr($this->lexer);
-        $this->expectToken(TokenKind::CONTROL_END);
+        $this->expectEndToken(TokenKind::CONTROL_END);
 
         $this->frame->enterScope();
         $this->compileRootExpr(0, $seq_expr);
@@ -250,7 +282,7 @@ class Compiler {
             $tok = $this->lexer->scan();
             if ($tok->kind === TokenKind::CONTROL_START) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
-                    $this->expectToken(TokenKind::CONTROL_END);
+                    $this->expectEndToken(TokenKind::CONTROL_END);
                     if (!$has_else) {
                         $this->emit(Op::RETURN);
                     }
@@ -260,7 +292,7 @@ class Compiler {
                 }
                 if (!$has_else && $this->lexer->consume(TokenKind::KEYWORD_ELSE)) {
                     $has_else = true;
-                    $this->expectToken(TokenKind::CONTROL_END);
+                    $this->expectEndToken(TokenKind::CONTROL_END);
                     $this->emit(Op::RETURN);
                     $this->bindLabel($label_else);
                     $this->emitCondJump(Op::JUMP_TRUTHY, 0, $label_end);
@@ -277,8 +309,12 @@ class Compiler {
      */
     private function compileBlockAssign($dst, $tag) {
         $tok = $this->lexer->scan();
-        if ($tok->kind !== TokenKind::CONTROL_END) {
-            $this->failToken($tok, "expected = or %}, found " . $tok->prettyKindName());
+        if ($tok->kind === TokenKind::CONTROL_END_TRIM) {
+            $this->trim_left = true;
+        } else if ($tok->kind === TokenKind::CONTROL_END) {
+            $this->trim_left = false;
+        } else {
+            $this->failToken($tok, "expected = or %} or -%}, found " . $tok->prettyKindName());
         }
         if ($this->tmp_output_tag) {
             $this->failToken($tok, "unsupported block-assign $tag inside $this->tmp_output_tag");
@@ -288,7 +324,7 @@ class Compiler {
         while (true) {
             $tok = $this->lexer->scan();
             if ($tok->kind === TokenKind::CONTROL_START && $this->lexer->consume(TokenKind::KEYWORD_END)) {
-                $this->expectToken(TokenKind::CONTROL_END);
+                $this->expectEndToken(TokenKind::CONTROL_END);
                 break;
             }
             $this->compileToken($tok);
@@ -310,7 +346,7 @@ class Compiler {
         if ($this->lexer->consume(TokenKind::ASSIGN)) {
             $e = $this->parser->parseRootExpr($this->lexer);
             $this->compileRootExpr($var_slot, $e);
-            $this->expectToken(TokenKind::CONTROL_END);
+            $this->expectEndToken(TokenKind::CONTROL_END);
             return;
         }
         $this->compileBlockAssign($var_slot, 'set');
@@ -329,7 +365,7 @@ class Compiler {
         if ($this->lexer->consume(TokenKind::ASSIGN)) {
             $e = $this->parser->parseRootExpr($this->lexer);
             $this->compileRootExpr($var_slot, $e);
-            $this->expectToken(TokenKind::CONTROL_END);
+            $this->expectEndToken(TokenKind::CONTROL_END);
             return;
         }
         $this->compileBlockAssign($var_slot, 'let');
@@ -360,7 +396,7 @@ class Compiler {
             $this->compileRootExpr($var_slot, $e);
             $this->bindLabel($label_end);
         }
-        $this->expectToken(TokenKind::CONTROL_END);
+        $this->expectEndToken(TokenKind::CONTROL_END);
     }
 
     private function compileTemplateArg() {
@@ -382,7 +418,7 @@ class Compiler {
                 $this->failExpr($e, "passing null will cause the param to be default-initialized");
             }
             $this->compileRootExpr(Frame::ARG_SLOT_PLACEHOLDER, $e);
-            $this->expectToken(TokenKind::CONTROL_END);
+            $this->expectEndToken(TokenKind::CONTROL_END);
         } else {
             $this->compileBlockAssign(Frame::ARG_SLOT_PLACEHOLDER, 'arg');
         }
@@ -407,7 +443,7 @@ class Compiler {
         if ($cond_slot === 0) {
             [$cond_slot, $_] = $this->compileRootTempExpr(0, $e);
         }
-        $this->expectToken(TokenKind::CONTROL_END);
+        $this->expectEndToken(TokenKind::CONTROL_END);
 
         $this->frame->enterScope();
         $this->compileIfBody($jump_op, $cond_slot);
@@ -426,14 +462,14 @@ class Compiler {
             $tok = $this->lexer->scan();
             if ($tok->kind === TokenKind::CONTROL_START) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
-                    $this->expectToken(TokenKind::CONTROL_END);
+                    $this->expectEndToken(TokenKind::CONTROL_END);
                     $this->tryBindLabel($label_next);
                     $this->bindLabel($label_end);
                     break;
                 }
                 if ($this->lexer->consume(TokenKind::KEYWORD_ELSE)) {
                     $this->emitJump($label_end);
-                    $this->expectToken(TokenKind::CONTROL_END);
+                    $this->expectEndToken(TokenKind::CONTROL_END);
                     $this->bindLabel($label_next);
                     continue;
                 }
@@ -456,7 +492,22 @@ class Compiler {
             $op = $this->needsEscaping($type) ? Op::OUTPUT_SLOT0 : Op::OUTPUT_SAFE_SLOT0;
             $this->emit($op);
         }
-        $this->expectToken(TokenKind::ECHO_END);
+        $this->expectEndToken(TokenKind::ECHO_END);
+    }
+
+    /**
+     * @param int $kind
+     */
+    private function expectEndToken($kind) {
+        $tok = $this->lexer->scan();
+        $trim_kind = $kind + 1;
+        if ($tok->kind === $trim_kind) {
+            $this->trim_left = true;
+        } else if ($tok->kind === $kind) {
+            $this->trim_left = false;
+        } else {
+            $this->failToken($tok, "expected " . TokenKind::prettyName($kind) . ' or ' . TokenKind::prettyName($trim_kind) . ', found ' . $tok->prettyKindName());
+        }
     }
 
     /**
@@ -464,6 +515,9 @@ class Compiler {
      * @param bool $safe
      */
     private function compileOutputStringConst($v, $safe) {
+        if ($v === '') {
+            return;
+        }
         $string_id = $this->internString($v);
         if ($this->env->escape_config->escape_func && !$safe) {
             $this->emit1(Op::OUTPUT_STRING_CONST, $string_id);
@@ -1123,6 +1177,7 @@ class Compiler {
         $this->addr_by_label_id = [];
         $this->label_seq = 0;
         $this->parsing_header = true;
+        $this->trim_left = false;
 
         $this->template_arg_deps = [];
         $this->current_template_path = '';

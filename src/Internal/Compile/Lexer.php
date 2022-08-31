@@ -174,6 +174,16 @@ class Lexer {
                 $this->acceptSimpleToken($dst, TokenKind::PLUS, 1);
                 return;
             case ord('-'):
+                if ($this->peekChar(1) === ord('}') && $this->peekChar(2) === ord('}')) {
+                    $this->acceptSimpleToken($dst, TokenKind::ECHO_END_TRIM, 3);
+                    $this->inside_expr = false;
+                    return;
+                }
+                if ($this->peekChar(1) === ord('%') && $this->peekChar(2) === ord('}')) {
+                    $this->acceptSimpleToken($dst, TokenKind::CONTROL_END_TRIM, 3);
+                    $this->inside_expr = false;
+                    return;
+                }
                 $this->acceptSimpleToken($dst, TokenKind::MINUS, 1);
                 return;
             case ord('*'):
@@ -248,6 +258,18 @@ class Lexer {
         }
         switch ($this->src[$this->pos]) {
         case '{':
+            if ($this->peekChar(1) === ord('{') && $this->peekChar(2) === ord('-')) {
+                $dst->kind = TokenKind::ECHO_START_TRIM;
+                $this->pos += 3;
+                $this->inside_expr = true;
+                return;
+            }
+            if ($this->peekChar(1) === ord('%') && $this->peekChar(2) === ord('-')) {
+                $dst->kind = TokenKind::CONTROL_START_TRIM;
+                $this->pos += 3;
+                $this->inside_expr = true;
+                return;
+            }
             if ($this->pos < $this->src_len - 1) {
                 switch ($this->src[$this->pos + 1]) {
                 case '{':
