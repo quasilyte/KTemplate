@@ -13,31 +13,15 @@ class Engine {
     /** @var Renderer */
     private $renderer;
 
+    /** @var Context */
+    private $ctx;
+
     /**
+     * @param Context $ctx
      * @param LoaderInterface $loader
-     * @param string $cache_dir
      */
-    public function __construct($loader, $cache_dir = '') {
-        $this->env = new Env($loader, $cache_dir);
-    }
-
-    /**
-     * @param EscapeConfig $config
-     */
-    public function setEscapeConfig($config) {
-        $this->env->escape_config = $config;
-    }
-
-    /**
-     * Set the implied text encoding.
-     * Used as an argument to mb_* functions.
-     * 
-     * "UTF-8" is used by default.
-     * 
-     * @param string $encoding
-     */
-    public function setEncoding($encoding) {
-        $this->env->encoding = $encoding;
+    public function __construct($ctx, $loader) {
+        $this->env = new Env($ctx, $loader);
     }
 
     /**
@@ -65,9 +49,9 @@ class Engine {
      */
     public function renderTemplate($t, $data_provider = null) {
         if ($this->renderer === null) {
-            $this->renderer = new Renderer();
+            $this->renderer = new Renderer($this->env);
         }
-        return $this->renderer->render($this->env, $t, $data_provider);
+        return $this->renderer->render($t, $data_provider);
     }
 
     /**

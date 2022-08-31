@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use KTemplate\Internal\Compile\Compiler;
 use KTemplate\Internal\Compile\CompilationException;
+use KTemplate\Context;
 use KTemplate\Engine;
 use KTemplate\ArrayLoader;
 use KTemplate\Internal\Strings;
@@ -16,7 +17,7 @@ class CompilationErrorTest extends TestCase {
 
     public static function setUpBeforeClass(): void {
         self::$loader = new ArrayLoader();
-        self::$engine = new Engine(self::$loader);
+        self::$engine = new Engine(new Context(), self::$loader);
 
         self::$engine->registerFunction1('strlen', function ($x) { return strlen($x); });
     }
@@ -130,8 +131,8 @@ class CompilationErrorTest extends TestCase {
                 'too many int const values',
             ],
             [
-                $this->createTemplateSource(0xffff+10, function ($i) {
-                    return "{{ $i.0 }}";
+                $this->createTemplateSource(0xff+10, function ($i) {
+                    return "{{ $i.1 }}";
                 }),
                 'too many float const values',
             ],

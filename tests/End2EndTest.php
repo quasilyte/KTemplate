@@ -5,6 +5,8 @@ use KTemplate\Internal\Compile\Compiler;
 use KTemplate\Engine;
 use KTemplate\Renderer;
 use KTemplate\ArrayLoader;
+use KTemplate\Context;
+use KTemplate\FilterLib;
 use KTemplate\DataKey;
 use KTemplate\DataProviderInterface;
 use KTemplate\Internal\Strings;
@@ -24,7 +26,9 @@ class End2EndTest extends TestCase {
         }
 
         $loader = new ArrayLoader();
-        $engine = new Engine($loader);
+        $ctx = new Context();
+        $engine = new Engine($ctx, $loader);
+        FilterLib::registerAllFilters($ctx, $engine);
         
         $engine->registerFilter1('strlen', function ($s) { return strlen($s); });
         $engine->registerFilter1('add1', function ($x) { return $x + 1; });
@@ -108,6 +112,8 @@ class SimpleTestDataProvider implements DataProviderInterface {
             return [];
         case 'arr1':
             return [1];
+        case 'string_arr':
+            return ['a', 'b', 'c'];
         default:
             switch ($key->num_parts) {
             case 1:

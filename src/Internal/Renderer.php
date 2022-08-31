@@ -3,6 +3,7 @@
 namespace KTemplate\Internal;
 
 use KTemplate\DataKey;
+use KTemplate\Context;
 use KTemplate\Template;
 use KTemplate\DataProviderInterface;
 
@@ -15,24 +16,34 @@ class Renderer {
     /** @var RendererState */
     private $state;
 
-    public function __construct() {
+    /** @var Env */
+    private $env;
+
+    /** @var Context */
+    private $ctx;
+
+    /**
+     * @param Env $env
+     */
+    public function __construct($env) {
         if (self::$empty_template === null) {
             self::$empty_template = new Template();
             self::$empty_template->setExtraInfo(0, 0, 0);
         }
         $this->state = new RendererState();
+        $this->env = $env;
+        $this->ctx = $env->ctx;
     }
 
     /**
-     * @param Env $env
      * @param Template $t
      * @param DataProviderInterface $data_provider
      * @return string
      */
-    public function render($env, $t, $data_provider) {
+    public function render($t, $data_provider) {
         $this->state->reset($data_provider);
         $this->prepareTemplateFrame($t, 0);
-        $this->execTemplate($env, self::$empty_template, $t);
+        $this->execTemplate(self::$empty_template, $t);
         $this->state->clearSlots();
         return $this->state->buf;
     }
@@ -56,24 +67,22 @@ class Renderer {
     }
 
     /**
-     * @param Env $env
      * @param Template $current_template
      * @param Template $t
      */
-    private function execTemplate($env, $current_template, $t) {
+    private function execTemplate($current_template, $t) {
         $cache_bitset = $this->state->cache_bitset;
         $this->state->slot_offset += $current_template->frameSize();
-        $this->eval($env, $t);
+        $this->eval($t);
         $this->state->slot_offset -= $current_template->frameSize();
         $this->state->cache_bitset = $cache_bitset;
     }
 
     /**
-     * @param Env $env
      * @param Template $t
      * @param int $pc
      */
-    private function eval($env, $t, $pc = 0) {
+    private function eval($t, $pc = 0) {
         $state = $this->state;
         $key = $this->state->data_key;
         $fp = $state->slot_offset; // fp stands for "frame pointer"
@@ -92,10 +101,10 @@ class Renderer {
                 return;
 
             case Op::OUTPUT:
-                $state->buf .= self::escape($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)]);
+                $state->buf .= $this->escape((string)$state->slots[$fp + (($opdata >> 8) & 0xff)]);
                 break;
             case Op::OUTPUT_SLOT0:
-                $state->buf .= self::escape($env, (string)$slot0);
+                $state->buf .= $this->escape((string)$slot0);
                 break;
             case Op::OUTPUT_SAFE:
                 $state->buf .= $state->slots[$fp + (($opdata >> 8) & 0xff)];
@@ -107,7 +116,7 @@ class Renderer {
                 $state->buf .= $t->string_values[($opdata >> 8) & 0xffff];
                 break;
             case Op::OUTPUT_STRING_CONST:
-                $state->buf .= self::escape($env, $t->string_values[($opdata >> 8) & 0xffff]);
+                $state->buf .= $this->escape($t->string_values[($opdata >> 8) & 0xffff]);
                 break;
             case Op::OUTPUT_SAFE_INT_CONST:
                 $state->buf .= $t->int_values[($opdata >> 8) & 0xffff];
@@ -117,7 +126,7 @@ class Renderer {
                 $cache_mask = 1 << ($cache_slot - 1);
                 $escape_bit = ($opdata >> 24) & 0xff;
                 if (($state->cache_bitset & $cache_mask) !== 0) {
-                    $state->buf .= $escape_bit ? self::escape($env, (string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
+                    $state->buf .= $escape_bit ? $this->escape((string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
                     break;
                 }
                 $key_offset = ($opdata >> 16) & 0xff;
@@ -126,14 +135,14 @@ class Renderer {
                 $v = $state->data_provider->getData($key);
                 $state->cache_bitset |= $cache_mask;
                 $state->slots[$cache_slot] = $v;
-                $state->buf .= $escape_bit ? self::escape($env, (string)$v) : $v;
+                $state->buf .= $escape_bit ? $this->escape((string)$v) : $v;
                 break;
             case Op::OUTPUT_EXTDATA_2:
                 $cache_slot = ($opdata >> 8) & 0xff;
                 $cache_mask = 1 << ($cache_slot - 1);
                 $escape_bit = ($opdata >> 24) & 0xff;
                 if (($state->cache_bitset & $cache_mask) !== 0) {
-                    $state->buf .= $escape_bit ? self::escape($env, (string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
+                    $state->buf .= $escape_bit ? $this->escape((string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
                     break;
                 }
                 $key_offset = ($opdata >> 16) & 0xff;
@@ -143,14 +152,14 @@ class Renderer {
                 $v = $state->data_provider->getData($key);
                 $state->cache_bitset |= $cache_mask;
                 $state->slots[$cache_slot] = $v;
-                $state->buf .= $escape_bit ? self::escape($env, (string)$v) : $v;
+                $state->buf .= $escape_bit ? $this->escape((string)$v) : $v;
                 break;
             case Op::OUTPUT_EXTDATA_3:
                 $cache_slot = ($opdata >> 8) & 0xff;
                 $cache_mask = 1 << ($cache_slot - 1);
                 $escape_bit = ($opdata >> 24) & 0xff;
                 if (($state->cache_bitset & $cache_mask) !== 0) {
-                    $state->buf .= $escape_bit ? self::escape($env, (string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
+                    $state->buf .= $escape_bit ? $this->escape((string)$state->slots[$cache_slot]) : $state->slots[$cache_slot];
                     break;
                 }
                 $key_offset = ($opdata >> 16) & 0xff;
@@ -161,7 +170,7 @@ class Renderer {
                 $v = $state->data_provider->getData($key);
                 $state->cache_bitset |= $cache_mask;
                 $state->slots[$cache_slot] = $v;
-                $state->buf .= $escape_bit ? self::escape($env, (string)$v) : $v;
+                $state->buf .= $escape_bit ? $this->escape((string)$v) : $v;
                 break;
             
             case Op::MOVE:
@@ -198,10 +207,10 @@ class Renderer {
                 $slot0 = (int)$t->int_values[($opdata >> 8) & 0xffff];
                 break;
             case Op::LOAD_FLOAT_CONST:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->float_values[($opdata >> 16) & 0xffff];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->float_values[($opdata >> 16) & 0xff];
                 break;
             case Op::LOAD_SLOT0_FLOAT_CONST:
-                $slot0 = (float)$t->float_values[($opdata >> 8) & 0xffff];
+                $slot0 = (float)$t->float_values[($opdata >> 8) & 0xff];
                 break;
             case Op::LOAD_STRING_CONST:
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->string_values[($opdata >> 16) & 0xffff];
@@ -372,7 +381,7 @@ class Renderer {
                 $val_slot = ($opdata >> 24) & 0xff;
                 foreach ($slot0 as $v) {
                     $state->slots[$val_slot] = $v;
-                    $this->eval($env, $t, $pc);
+                    $this->eval($t, $pc);
                 }
                 $slot0 = count($slot0) !== 0;
                 $pc += ($opdata >> 8) & 0xffff;
@@ -383,7 +392,7 @@ class Renderer {
                 foreach ($slot0 as $k => $v) {
                     $state->slots[$key_slot] = $k;
                     $state->slots[$val_slot] = $v;
-                    $this->eval($env, $t, $pc);
+                    $this->eval($t, $pc);
                 }
                 $slot0 = count($slot0) !== 0;
                 $pc += ($opdata >> 8) & 0xffff;
@@ -472,63 +481,63 @@ class Renderer {
             case Op::CALL_FILTER1:
                 $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $filter_id = ($opdata >> 24) & 0xffff;
-                $filter1 = $env->filters1[$filter_id];
+                $filter1 = $this->env->filters1[$filter_id];
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $filter1($arg1);
                 break;
             case Op::CALL_SLOT0_FILTER1:
                 $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 $filter_id = ($opdata >> 16) & 0xffff;
-                $filter1 = $env->filters1[$filter_id];
+                $filter1 = $this->env->filters1[$filter_id];
                 $slot0 = $filter1($arg1);
                 break;
             case Op::CALL_FILTER2:
                 $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $arg2 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 $filter_id = ($opdata >> 32) & 0xffff;
-                $filter2 = $env->filters2[$filter_id];
+                $filter2 = $this->env->filters2[$filter_id];
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $filter2($arg1, $arg2);
                 break;
             case Op::CALL_SLOT0_FILTER2:
                 $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 $arg2 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $filter_id = ($opdata >> 24) & 0xffff;
-                $filter2 = $env->filters2[$filter_id];
+                $filter2 = $this->env->filters2[$filter_id];
                 $slot0 = $filter2($arg1, $arg2);
                 break;
             case Op::CALL_FUNC0:
                 $func_id = ($opdata >> 16) & 0xffff;
-                $func0 = $env->funcs0[$func_id];
+                $func0 = $this->env->funcs0[$func_id];
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func0();
                 break;
             case Op::CALL_SLOT0_FUNC0:
                 $func_id = ($opdata >> 8) & 0xffff;
-                $func0 = $env->funcs0[$func_id];
+                $func0 = $this->env->funcs0[$func_id];
                 $slot0 = $func0();
                 break;
             case Op::CALL_FUNC1:
                 $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $func_id = ($opdata >> 24) & 0xffff;
-                $func1 = $env->funcs1[$func_id];
+                $func1 = $this->env->funcs1[$func_id];
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func1($arg1);
                 break;
             case Op::CALL_SLOT0_FUNC1:
                 $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 $func_id = ($opdata >> 16) & 0xffff;
-                $func1 = $env->funcs1[$func_id];
+                $func1 = $this->env->funcs1[$func_id];
                 $slot0 = $func1($arg1);
                 break;
             case Op::CALL_FUNC2:
                 $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $arg2 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 $func_id = ($opdata >> 32) & 0xffff;
-                $func2 = $env->funcs2[$func_id];
+                $func2 = $this->env->funcs2[$func_id];
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func2($arg1, $arg2);
                 break;
             case Op::CALL_SLOT0_FUNC2:
                 $arg1 = $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 $arg2 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $func_id = ($opdata >> 24) & 0xffff;
-                $func2 = $env->funcs2[$func_id];
+                $func2 = $this->env->funcs2[$func_id];
                 $slot0 = $func2($arg1, $arg2);
                 break;
             case Op::CALL_FUNC3:
@@ -536,7 +545,7 @@ class Renderer {
                 $arg2 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 $arg3 = $state->slots[$fp + (($opdata >> 32) & 0xff)];
                 $func_id = ($opdata >> 40) & 0xffff;
-                $func3 = $env->funcs3[$func_id];
+                $func3 = $this->env->funcs3[$func_id];
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $func3($arg1, $arg2, $arg3);
                 break;
             case Op::CALL_SLOT0_FUNC3:
@@ -544,16 +553,16 @@ class Renderer {
                 $arg2 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 $arg3 = $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 $func_id = ($opdata >> 32) & 0xffff;
-                $func3 = $env->funcs3[$func_id];
+                $func3 = $this->env->funcs3[$func_id];
                 $slot0 = $func3($arg1, $arg2, $arg3);
                 break;
             case Op::LENGTH_FILTER:
                 $arg = $state->slots[$fp + (($opdata >> 16) & 0xff)];
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::lengthFilter($env, $arg);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $this->lengthFilter($arg);
                 break;
             case Op::LENGTH_SLOT0_FILTER:
                 $arg = $state->slots[$fp + (($opdata >> 8) & 0xff)];
-                $slot0 = self::lengthFilter($env, $arg);
+                $slot0 = $this->lengthFilter($arg);
                 break;
             case Op::DEFAULT_FILTER:
                 $arg1 = $state->slots[$fp + (($opdata >> 16) & 0xff)];
@@ -566,16 +575,16 @@ class Renderer {
                 $slot0 = self::defaultFilter($arg1, $arg2);
                 break;
             case Op::ESCAPE_FILTER1:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::escape($env, (string)$state->slots[$fp + (($opdata >> 16) & 0xff)]);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $this->escape((string)$state->slots[$fp + (($opdata >> 16) & 0xff)]);
                 break;
             case Op::ESCAPE_SLOT0_FILTER1:
-                $slot0 = self::escape($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)]);
+                $slot0 = $this->escape((string)$state->slots[$fp + (($opdata >> 8) & 0xff)]);
                 break;
             case Op::ESCAPE_FILTER2:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 16) & 0xff)], $t->string_values[($opdata >> 24) & 0xffff]);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $this->escapeWithStrategy((string)$state->slots[$fp + (($opdata >> 16) & 0xff)], $t->string_values[($opdata >> 24) & 0xffff]);
                 break;
             case Op::ESCAPE_SLOT0_FILTER2:
-                $slot0 = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xffff]);
+                $slot0 = $this->escapeWithStrategy((string)$state->slots[$fp + (($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xffff]);
                 break;
             
             case Op::START_TMP_OUTPUT:
@@ -588,11 +597,11 @@ class Renderer {
                 break;
 
             case Op::PREPARE_TEMPLATE:
-                $state->template = $env->getTemplate($t->string_values[($opdata >> 8) & 0xffff]);
+                $state->template = $this->env->getTemplate($t->string_values[($opdata >> 8) & 0xffff]);
                 $this->prepareTemplateFrame($state->template, $fp +$t->frameSize());
                 break;
             case Op::INCLUDE_TEMPLATE:
-                $this->execTemplate($env, $t, $state->template);
+                $this->execTemplate($t, $state->template);
                 break;
 
             default:
@@ -602,23 +611,21 @@ class Renderer {
     }
 
     /**
-     * @param Env $env
      * @param string $x
      * @return string
      */
-    private static function escape($env, $x) {
-        $escape_filter = $env->escape_config->escape_func;
-        return $escape_filter($x, $env->escape_config->default_strategy);
+    private function escape($x) {
+        $escape_filter = $this->ctx->escape_func;
+        return $escape_filter($x, $this->ctx->default_escape_strategy);
     }
 
     /**
-     * @param Env $env
      * @param string $x
      * @param string $strategy
      * @return string
      */
-    private static function escapeWithStrategy($env, $x, $strategy) {
-        $escape_filter = $env->escape_config->escape_func;
+    private function escapeWithStrategy($x, $strategy) {
+        $escape_filter = $this->ctx->escape_func;
         return $escape_filter($x, $strategy);
     }
 
@@ -643,13 +650,12 @@ class Renderer {
     }
 
     /**
-     * @param Env $env
      * @param mixed $x
      * @return int
      */
-    private static function lengthFilter($env, $x) {
+    private function lengthFilter($x) {
         if (is_string($x)) {
-            return mb_strlen($x, $env->encoding);
+            return mb_strlen($x, $this->ctx->encoding);
         }
         if (is_array($x)) {
             return count($x);

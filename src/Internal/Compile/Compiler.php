@@ -38,8 +38,6 @@ class Compiler {
     private $string_values;
     /** @var int[] */
     private $int_values;
-    /** @var int[] */
-    private $float_values;
 
     /** @var bool */
     private $parsing_header = true;
@@ -149,7 +147,7 @@ class Compiler {
             $text = rtrim($text);
         }
 
-        $this->compileOutputStringConst($text, !$this->env->escape_config->auto_escape_text);
+        $this->compileOutputStringConst($text, !$this->env->ctx->auto_escape_text);
 
         $this->trim_left = false; // Not strictly needed, but anyway
     }
@@ -528,7 +526,7 @@ class Compiler {
             return;
         }
         $string_id = $this->internString($v);
-        if ($this->env->escape_config->escape_func && !$safe) {
+        if ($this->env->ctx->escape_func && !$safe) {
             $this->emit1(Op::OUTPUT_STRING_CONST, $string_id);
         } else {
             $this->emit1(Op::OUTPUT_SAFE_STRING_CONST, $string_id);
@@ -614,7 +612,7 @@ class Compiler {
             if (is_int($const_value)) {
                 $this->compileOutputIntConst((int)$const_value);
             } else if (is_string($const_value)) {
-                $this->compileOutputStringConst((string)$const_value, !$this->env->escape_config->auto_escape_const_expr);
+                $this->compileOutputStringConst((string)$const_value, !$this->env->ctx->auto_escape_const_expr);
             } else {
                 $this->failExpr($e, 'unexpected value type: ' . gettype($const_value));
             }
@@ -690,11 +688,11 @@ class Compiler {
      * @return bool
      */
     private function needsEscaping($type, $is_const = false) {
-        if ($this->env->escape_config->escape_func === null) {
+        if ($this->env->ctx->escape_func === null) {
             return false;
         }
         if ($is_const) {
-            return $this->env->escape_config->auto_escape_const_expr;
+            return $this->env->ctx->auto_escape_const_expr;
         }
         switch ($type) {
         case Types::BOOL:
@@ -705,7 +703,7 @@ class Compiler {
         case Types::NUMERIC:
             return false;
         default:
-            return $this->env->escape_config->auto_escape_expr;
+            return $this->env->ctx->auto_escape_expr;
         }
     }
 
@@ -1167,7 +1165,6 @@ class Compiler {
         $this->env = null;
         $this->string_values = [];
         $this->int_values = [];
-        $this->float_values = [];
     }
 
     /**
@@ -1182,7 +1179,6 @@ class Compiler {
         $this->frame->reset($this->result);
         $this->string_values = [];
         $this->int_values = [];
-        $this->float_values = [];
         $this->addr_by_label_id = [];
         $this->label_seq = 0;
         $this->parsing_header = true;
@@ -1396,15 +1392,19 @@ class Compiler {
      * @return int
      */
     private function internFloat($v) {
-        if (array_key_exists($v, $this->float_values)) {
-            return $this->float_values[$v];
+        // PHP arrays can't have float keys, so they will be converted to ints.
+        // This is not what we want, so we use a linear search to find the index.
+        // Note that float pools are limited to 255 entries, so this shouldn't
+        // be as much of a big deal.
+        $search_result = array_search($v, $this->result->float_values, true);
+        if (is_int($search_result)) {
+            return (int)$search_result;
         }
         $id = count($this->result->float_values);
-        if ($id > 0xffff) {
+        if ($id > 0xff) {
             $this->fail(-1, "can't compile: too many float const values");
         }
         $this->result->float_values[] = $v;
-        $this->float_values[$v] = $id;
         return $id;
     }
 

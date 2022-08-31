@@ -159,3 +159,31 @@ foo
   {{- $x*2 -}}
 {% end %}
 {{ $x }}
+
+{{ 'hello, world!'|capitalize }}
+{{ 'HELLO, WORLD!'|capitalize }}
+{{ 'ABC'|first }}
+{{ arr1|first }}
+{{ string_arr|join }}
+{{ string_arr|join(" - ") }}
+{{ arr1|keys|first }}
+{{ time|keys|join(', ') }}
+{{ arr1|last }}
+{{ string_arr|last }}
+{{ 'Foo'|lower }}
+{{ 'Foo'|upper }}
+{{ 4.6|round }}
+{{ 4.6|ceil }}
+{{ 4.6|floor }}
+-
+{{ 4.3|round }}
+{{ 4.3|ceil }}
+{{ 4.3|floor }}
+-
+{{ ' abc '|trim }}
+{{ ' abc '|ltrim }}
+{{ ' abc '|rtrim }}
+-
+{{ '?!abc?!'|trim('?!') }}
+{{ '?!abc?!'|ltrim('?!') }}
+{{ '?!abc?!'|rtrim('?!') }}

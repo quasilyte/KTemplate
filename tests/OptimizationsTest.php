@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use KTemplate\Internal\Compile\Compiler;
+use KTemplate\Context;
 use KTemplate\Internal\Env;
 use KTemplate\Internal\Disasm;
 
@@ -88,11 +89,13 @@ class OptimizationsTest extends TestCase {
             ],
         ];
 
-        $env = new Env(null);
+        $ctx = new Context();
+        $ctx->escape_func = null;
+        $env = new Env($ctx, null);
         $env->registerFunction0('testfunc0', function () { return 10; });
         $env->registerFunction1('testfunc1', function ($x) { return $x; });
         $env->registerFunction2('testfunc2', function ($x, $y) { return $x + $y; });
-        $env->escape_config->escape_func = null;
+        $env->registerFunction3('testfunc3', function ($x, $y, $z) { return $x + $y + $z; });
         foreach ($tests as $input => $want) {
             $t = self::$compiler->compile($env, 'test', (string)$input);
             $have = Disasm::getBytecode($env, $t);

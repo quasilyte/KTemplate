@@ -4,6 +4,7 @@ namespace KTemplate\Internal;
 
 use KTemplate\Internal\Compile\Compiler;
 use KTemplate\LoaderInterface;
+use KTemplate\Context;
 use KTemplate\Template;
 use KTemplate\TemplateCacheKey;
 
@@ -14,8 +15,8 @@ class TemplateCache {
     /** @var CachedTemplate[] */
     private $cache = [];
 
-    /** @var string */
-    private $cache_dir = '';
+    /** @var Context */
+    private $ctx;
 
     /** @var LoaderInterface */
     private $loader;
@@ -26,14 +27,14 @@ class TemplateCache {
     public $cache_recheck = false;
 
     /**
+     * @param Context $ctx
      * @param LoaderInterface $loader
-     * @param string $cache_dir
      */
-    public function __construct($loader, $cache_dir = '') {
+    public function __construct($ctx, $loader) {
         $this->compiler = new Compiler();
-        $this->cache_dir = $cache_dir;
+        $this->ctx = $ctx;
         $this->loader = $loader;
-        $this->cache_key = new TemplateCacheKey;
+        $this->cache_key = new TemplateCacheKey();
     }
     
     /**
@@ -75,10 +76,10 @@ class TemplateCache {
     private function loadTemplateInto($env, $dst) {
         $cache_filename = '';
         $cache_file_dir = '';
-        if ($this->cache_dir) {
+        if ($this->ctx->cache_dir) {
             $load_path_dir = dirname($dst->load_path);
             $load_path_basename = basename($dst->load_path);
-            $cache_file_dir = "$this->cache_dir/$load_path_dir";
+            $cache_file_dir = $this->ctx->cache_dir . '/' . $load_path_dir;
             if (KPHP_COMPILER_VERSION) {
                 $cache_filename = "$cache_file_dir/$load_path_basename.kphp.$dst->key_mtime.$dst->key_file_size.tdata";
             } else {

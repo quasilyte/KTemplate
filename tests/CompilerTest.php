@@ -4,6 +4,7 @@ use PHPUnit\Framework\TestCase;
 use KTemplate\Internal\Compile\Compiler;
 use KTemplate\LoaderInterface;
 use KTemplate\ArrayLoader;
+use KTemplate\Context;
 use KTemplate\Internal\Env;
 use KTemplate\Internal\Disasm;
 
@@ -139,7 +140,7 @@ class CompilerTest extends TestCase {
                 $sources[$path] = (string)$src;
             }
             $loader = new ArrayLoader($sources);
-            $env = $this->newTestEnv($loader);
+            $env = $this->newTestEnv(new Context(), $loader);
 
             self::$compiler->compile($env, 'main', (string)$test['sources']['main']);
             foreach ($test['disasm'] as $name => $want) {
@@ -293,7 +294,7 @@ class CompilerTest extends TestCase {
             ],
         ];
 
-        $env = $this->newTestEnv();
+        $env = $this->newTestEnv(new Context());
         foreach ($tests as $input => $want) {
             $t = self::$compiler->compile($env, 'test', (string)$input);
             $have = Disasm::getBytecode($env, $t);
@@ -615,6 +616,15 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
+            '{{ testfunc2(2.4, 2.7) + 6.005 }}' => [
+                '  LOAD_FLOAT_CONST slot2 2.4',
+                '  LOAD_FLOAT_CONST slot3 2.7',
+                '  CALL_FUNC2 slot1 slot2 slot3 testfunc2',
+                '  LOAD_FLOAT_CONST slot4 6.005',
+                '  ADD_SLOT0 *slot0 slot1 slot4',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  RETURN',
+            ],
             '{{ testfunc1(testfunc3(1, 2, 3)) }}' => [
                 '  LOAD_INT_CONST slot2 1',
                 '  LOAD_INT_CONST slot3 2',
@@ -871,8 +881,9 @@ class CompilerTest extends TestCase {
             ],
         ];
 
-        $env = $this->newTestEnv();
-        $env->escape_config->escape_func = null;
+        $ctx = new Context();
+        $ctx->escape_func = null;
+        $env = $this->newTestEnv($ctx);
         foreach ($tests as $input => $want) {
             $t = self::$compiler->compile($env, 'test', (string)$input);
             $have = Disasm::getBytecode($env, $t);
@@ -885,11 +896,12 @@ class CompilerTest extends TestCase {
     }
 
     /**
+     * @param Context $ctx
      * @param LoaderInterface $loader
      * @return Env
      */
-    private function newTestEnv($loader = null) {
-        $env = new Env($loader);
+    private function newTestEnv($ctx, $loader = null) {
+        $env = new Env($ctx, $loader);
         $env->registerFilter1('strlen', function ($s) { return strlen($s); });
         $env->registerFilter1('add1', function ($x) { return $x + 1; });
         $env->registerFilter1('sub1', function ($x) { return $x - 1; });

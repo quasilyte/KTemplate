@@ -2,24 +2,33 @@
 
 namespace KTemplate;
 
-/**
- * EscapeConfig describes what and how needs to be escaped.
- * 
- * When some value is about to be escaped, the associated
- * EscapeConfig::$escape_func will be called on it.
- * See EscapeConfig::$escape_func documentation for more info. 
- *
- * Note that auto escaping options only used during the template compilation.
- * If you change these settings after template is compiled,
- * you won't notice any differences.
- */
-class EscapeConfig {
+class Context {
+    /**
+     * @var mixed
+     */
+    public $user_data = [];
+
+    /**
+     * @var string
+     */
+    public $cache_dir = '';
+
+    /**
+     * Set the implied text encoding.
+     * Used as an argument to mb_* functions.
+     * 
+     * "UTF-8" is used by default.
+     * 
+     * @param string $encoding
+     */
+    public $encoding = 'UTF-8';
+
     /**
      * A function to be used for escape filter (both auto-escape and explicit).
      * This function signature is (string $s, string $strategy) => string.
      * The strategy could be 'html', 'url', etc.
      * 
-     * By default, FilterLibrary::escape function is used.
+     * By default, FilterLib::escape function is used.
      * 
      * If null, no escaping will be performed.
      * 
@@ -27,7 +36,10 @@ class EscapeConfig {
      */
     public $escape_func;
 
-    public $default_strategy = 'html';
+    /**
+     * @var string
+     */
+    public $default_escape_strategy = 'html';
 
     /**
      * Whether to escape the data outside of the {{ }} tags.
@@ -35,12 +47,14 @@ class EscapeConfig {
      * on the output format and application. For example, you may want to
      * make sure that even manually constructed values don't contain
      * some sensitive information.
+     *
      * @var bool
      */
     public $auto_escape_text = false;
 
     /**
      * Whether const values should be escaped.
+     *
      * @var bool
      */
     public $auto_escape_const_expr = false;
@@ -50,10 +64,12 @@ class EscapeConfig {
      * This option is a fallback if KTemplate was unable to infer
      * a proper type of the expression.
      * Bool, int, float and null typed expressions are never escaped.
+     * 
+     * @var bool
      */
     public $auto_escape_expr = true;
 
     public function __construct() {
-        $this->escape_func = [FilterLibrary::class, 'escape'];
+        $this->escape_func = [FilterLib::class, 'escape'];
     }
 }

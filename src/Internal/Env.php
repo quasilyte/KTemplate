@@ -4,8 +4,8 @@ namespace KTemplate\Internal;
 
 use KTemplate\Template;
 use KTemplate\LoaderInterface;
-use KTemplate\EscapeConfig;
-use KTemplate\FilterLibrary;
+use KTemplate\Context;
+use KTemplate\FilterLib;
 
 class Env {
     /** @var (callable(mixed):mixed)[] */
@@ -37,20 +37,18 @@ class Env {
     /** @var TemplateCache */
     private $template_cache;
 
-    public $encoding = 'UTF-8';
-
     /**
-     * @var EscapeConfig
+     * @var Context
      */
-    public $escape_config;
+    public $ctx;
 
     /**
+     * @param Context $ctx
      * @param LoaderInterface $loader
-     * @param string $cache_dir
      */
-    public function __construct($loader, $cache_dir = '') {
-        $this->template_cache = new TemplateCache($loader, $cache_dir);
-        $this->escape_config = new EscapeConfig();
+    public function __construct($ctx, $loader) {
+        $this->template_cache = new TemplateCache($ctx, $loader);
+        $this->ctx = $ctx;
     }
 
     /**
