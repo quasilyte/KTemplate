@@ -104,13 +104,13 @@ class Renderer {
                 $state->buf .= $slot0;
                 break;
             case Op::OUTPUT_SAFE_STRING_CONST:
-                $state->buf .= $t->string_values[($opdata >> 8) & 0xff];
+                $state->buf .= $t->string_values[($opdata >> 8) & 0xffff];
                 break;
             case Op::OUTPUT_STRING_CONST:
-                $state->buf .= self::escape($env, $t->string_values[($opdata >> 8) & 0xff]);
+                $state->buf .= self::escape($env, $t->string_values[($opdata >> 8) & 0xffff]);
                 break;
             case Op::OUTPUT_SAFE_INT_CONST:
-                $state->buf .= $t->int_values[($opdata >> 8) & 0xff];
+                $state->buf .= $t->int_values[($opdata >> 8) & 0xffff];
                 break;
             case Op::OUTPUT_EXTDATA_1:
                 $cache_slot = ($opdata >> 8) & 0xff;
@@ -192,22 +192,22 @@ class Renderer {
                 $slot0 = (bool)(($opdata >> 8) & 0xff);
                 break;
             case Op::LOAD_INT_CONST:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->int_values[($opdata >> 16) & 0xff];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->int_values[($opdata >> 16) & 0xffff];
                 break;
             case Op::LOAD_SLOT0_INT_CONST:
-                $slot0 = (int)$t->int_values[($opdata >> 8) & 0xff];
+                $slot0 = (int)$t->int_values[($opdata >> 8) & 0xffff];
                 break;
             case Op::LOAD_FLOAT_CONST:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->float_values[($opdata >> 16) & 0xff];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->float_values[($opdata >> 16) & 0xffff];
                 break;
             case Op::LOAD_SLOT0_FLOAT_CONST:
-                $slot0 = (float)$t->float_values[($opdata >> 8) & 0xff];
+                $slot0 = (float)$t->float_values[($opdata >> 8) & 0xffff];
                 break;
             case Op::LOAD_STRING_CONST:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->string_values[($opdata >> 16) & 0xff];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $t->string_values[($opdata >> 16) & 0xffff];
                 break;
             case Op::LOAD_SLOT0_STRING_CONST:
-                $slot0 = (string)$t->string_values[($opdata >> 8) & 0xff];
+                $slot0 = (string)$t->string_values[($opdata >> 8) & 0xffff];
                 break;
             case Op::LOAD_NULL:
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = null;
@@ -316,16 +316,16 @@ class Renderer {
                 break;
             
             case Op::INDEX_STRING_KEY:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$t->string_values[($opdata >> 24) & 0xff]];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$t->string_values[($opdata >> 24) & 0xffff]];
                 break;
             case Op::INDEX_SLOT0_STRING_KEY:
-                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)][$t->string_values[($opdata >> 16) & 0xff]];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)][$t->string_values[($opdata >> 16) & 0xffff]];
                 break;
             case Op::INDEX_INT_KEY:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$t->int_values[($opdata >> 24) & 0xff]];
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$t->int_values[($opdata >> 24) & 0xffff]];
                 break;
             case Op::INDEX_SLOT0_INT_KEY:
-                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)][$t->int_values[($opdata >> 16) & 0xff]];
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)][$t->int_values[($opdata >> 16) & 0xffff]];
                 break;
             case Op::INDEX:
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)][$state->slots[$fp + (($opdata >> 24) & 0xff)]];
@@ -572,10 +572,10 @@ class Renderer {
                 $slot0 = self::escape($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)]);
                 break;
             case Op::ESCAPE_FILTER2:
-                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 16) & 0xff)], $t->string_values[($opdata >> 24) & 0xff]);
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 16) & 0xff)], $t->string_values[($opdata >> 24) & 0xffff]);
                 break;
             case Op::ESCAPE_SLOT0_FILTER2:
-                $slot0 = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xff]);
+                $slot0 = self::escapeWithStrategy($env, (string)$state->slots[$fp + (($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xffff]);
                 break;
             
             case Op::START_TMP_OUTPUT:
@@ -588,7 +588,7 @@ class Renderer {
                 break;
 
             case Op::PREPARE_TEMPLATE:
-                $state->template = $env->getTemplate($t->string_values[($opdata >> 8) & 0xff]);
+                $state->template = $env->getTemplate($t->string_values[($opdata >> 8) & 0xffff]);
                 $this->prepareTemplateFrame($state->template, $fp +$t->frameSize());
                 break;
             case Op::INCLUDE_TEMPLATE:

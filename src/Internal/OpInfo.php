@@ -26,6 +26,9 @@ class OpInfo {
         case self::ARG_FILTER_ID:
         case self::ARG_FUNC_ID:
         case self::ARG_REL16:
+        case self::ARG_STRING_CONST:
+        case self::ARG_INT_CONST:
+        case self::ARG_FLOAT_CONST:
             return 2;
         default:
             return 1;

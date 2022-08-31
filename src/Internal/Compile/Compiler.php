@@ -1357,6 +1357,9 @@ class Compiler {
             return $this->string_values[$v];
         }
         $id = count($this->result->string_values);
+        if ($id > 0xffff) {
+            $this->fail(-1, "can't compile: too many string const values");
+        }
         $this->result->string_values[] = $v;
         $this->string_values[$v] = $id;
         return $id;
@@ -1371,6 +1374,9 @@ class Compiler {
             return $this->int_values[$v];
         }
         $id = count($this->result->int_values);
+        if ($id > 0xffff) {
+            $this->fail(-1, "can't compile: too many int const values");
+        }
         $this->result->int_values[] = $v;
         $this->int_values[$v] = $id;
         return $id;
@@ -1385,6 +1391,9 @@ class Compiler {
             return $this->float_values[$v];
         }
         $id = count($this->result->float_values);
+        if ($id > 0xffff) {
+            $this->fail(-1, "can't compile: too many float const values");
+        }
         $this->result->float_values[] = $v;
         $this->float_values[$v] = $id;
         return $id;
