@@ -150,7 +150,7 @@ Depending on the configuration, KTemplate may have auto-escaping enabled for som
 
 Auto-escaping is usually applied to everything except the literal text and constants, as well as some integer-typed expressions. For everything else we apply a **default escaping strategy**. That escaping strategy can be configured (`html` by default).
 
-When using an escape filter explicitely, it's possible to use two forms:
+When using an escape filter explicitly, it's possible to use two forms:
 
 ```html
 {{ $x|escape        }} {# -- uses a default escape strategy #}
@@ -159,7 +159,7 @@ When using an escape filter explicitely, it's possible to use two forms:
 
 For convenience, `escape` filter is aliased to `e`.
 
-KTemplate tries to track which values were escaped and what doesn't need to be auto-escaped at all. For instance, for explicitely escaped expressions there will be no extra auto-escaping call involved. Keep in mind that double escaping is possible in some complex situations.
+KTemplate tries to track which values were escaped and what doesn't need to be auto-escaped at all. For instance, for explicitly escaped expressions there will be no extra auto-escaping call involved. Keep in mind that double escaping is possible in some complex situations.
 
 ## Control tags
 

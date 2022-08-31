@@ -1,4 +1,3 @@
-* docs: add examples
 * more end2end tests
 * builtin functions (like in_array)
 * reconsider default autoescape strategy
