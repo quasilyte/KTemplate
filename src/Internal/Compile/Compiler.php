@@ -316,6 +316,7 @@ class Compiler {
         } else {
             $this->failToken($tok, "expected = or %} or -%}, found " . $tok->prettyKindName());
         }
+        $this->frame->enterScope();
         if ($this->tmp_output_tag) {
             $this->failToken($tok, "unsupported block-assign $tag inside $this->tmp_output_tag");
         }
@@ -331,6 +332,7 @@ class Compiler {
         }
         $this->emit1dst(Op::FINISH_TMP_OUTPUT, $dst);
         $this->tmp_output_tag = '';
+        $this->frame->leaveScope();
     }
 
     private function compileSet() {

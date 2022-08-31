@@ -21,14 +21,14 @@ The **control tags** effect varies from one tag to another, we'll discuss them s
 By default, the text around the tag is not modified and printed "as is". There are a few exceptions for this:
 
 1. The text inside `{% include %}` directive is ignored (only `arg` tags are processed)
-2. `{{-` and `{%-` open tags trim whitespace before the tag
-3. `-}}` and `-%}` close tags trim whitespace after the tag
+2. `{{-` and `{%-` open tags trim whitespace **before** the tag
+3. `-}}` and `-%}` close tags trim whitespace **after** the tag
 
 Given the template:
 
 ```html
 {% include "partial.html" %}
-  {% arg $title = "Example" %}
+    {% arg $title = "Example" %}
 {% end %}
 Trim left| {{- "OK" }}
 {{ "OK" -}} |Trim right
@@ -63,7 +63,7 @@ Supported kinds of expressions:
 | Array indexing | `$arr[0]`, `$arr['key']`, `$arr[$k]` |
 | Operators | `x ~ y`, `x and y`, `not x` |
 | Function calls | `f()`, `g($x, $y)` |
-| Filter pipelines | `$x|filter`, `$x|e("url")`, `$x|filter|raw` |
+| Filter pipelines | `$x\|filter`, `$x\|e("url")`, `$x\|filter\|raw` |
 
 It's possible to use parentheses to group the expressions and force some specific evaluation order in case the default precedence would not work for you.
 
@@ -178,7 +178,7 @@ Note that local variables are block-scoped. You can't access that variable outsi
 {% if cond %}
     {% let $x = 10 %}
     {{ $x }} {# OK, can use $x here #}
-{% end %}   {# This tag closes the block started by if #}
+{% end %}    {# This tag closes the block started by if #}
 {{ $x }}     {# Compile time error: can't use $x here }
 ```
 
@@ -186,10 +186,10 @@ The second form of `let` is block-assignment.
 
 ```html
 {% let $part %}
-  Everything inside this block will be rendered into the variable.
-  {% if $cond %}
-    It can contain any kinds of nested tags.
-  {% end %}
+    Everything inside this block will be rendered into the variable.
+    {% if $cond %}
+        It can contain any kinds of nested tags.
+    {% end %}
 {% end %}
 ```
 
@@ -205,7 +205,7 @@ It supports both `=` and block-style initializations, just like `let`.
 {% set $x = 10 %}
 
 {% set $x %}
-  {{ $x * 2 }}
+    {{ $x * 2 }}
 {% end %}
 ```
 
@@ -237,15 +237,15 @@ Loop over the values or keys and values of the array, rendering the loop body re
 
 ```html
 <ul>
-  {% for $title in page.titles %}
-    <li>{{ $title }}</li>
-  {% end %}
+    {% for $title in page.titles %}
+        <li>{{ $title }}</li>
+    {% end %}
 </ul>
 ```
 
 ```html
 {% for $i, $title in page.titles %}
-  {{ $i }}: {{ $title }}<br>
+    {{ $i }}: {{ $title }}<br>
 {% end %}
 ```
 
@@ -264,11 +264,11 @@ Given the `ui/button.template` defined like this:
 {% param $label = "" %}
 {% if $label %}
 <label>
-  {{$label}}:
-  <input id="ui-{{$name}}" type="button" value="{{$name}}">
+    {{$label}}:
+    <input id="ui-{{$name}}" type="button" value="{{$name}}">
 </label>
 {% else %}
-  <input id="ui-{{$name}}" type="button" value="{{$name}}">
+    <input id="ui-{{$name}}" type="button" value="{{$name}}">
 {% end %}
 ```
 
@@ -276,22 +276,23 @@ And the template that uses them defined as follow:
 
 ```html
 {% include "ui/button.template" %}
-  {% arg $name = "example1" %}
+    {% arg $name = "example1" %}
 {% end %}
+
 {% include "ui/button.template" %}
-  {% arg $name = "example2" %}
-  {% arg $label = "Example" %}
+    {% arg $name = "example2" %}
+    {% arg $label = "Example" %}
 {% end %}
 ```
 
 We can get these rendering results (some whitespace editted out):
 
 ```html
-  <input id="ui-example1" type="button" value="example1">
+    <input id="ui-example1" type="button" value="example1">
 
 <label>
-  Example:
-  <input id="ui-example2" type="button" value="example2">
+    Example:
+    <input id="ui-example2" type="button" value="example2">
 </label>
 ```
 
