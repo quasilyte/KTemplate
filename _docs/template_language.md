@@ -130,7 +130,7 @@ Binary operator precedence groups:
 | 5 | `~` `+` `-` |
 | 7 | `*`, `/`, `%` |
 | 9 | `[]` |
-| 13 | `|` |
+| 13 | `\|` |
 | 14 | `.` |
 
 Unary operator precedence groups:
