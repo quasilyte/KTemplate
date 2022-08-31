@@ -57,13 +57,14 @@ class TokenKind {
     public const KEYWORD_INCLUDE = 48;
     public const KEYWORD_PARAM = 49;
     public const KEYWORD_ARG = 50;
-    public const DOLLAR_IDENT = 51;
-    public const IDENT = 52;
-    public const TEXT = 53;
-    public const INT_LIT = 54;
-    public const FLOAT_LIT = 55;
-    public const STRING_LIT_Q1 = 56;
-    public const STRING_LIT_Q2 = 57;
+    public const KEYWORD_MATCHES = 51;
+    public const DOLLAR_IDENT = 52;
+    public const IDENT = 53;
+    public const TEXT = 54;
+    public const INT_LIT = 55;
+    public const FLOAT_LIT = 56;
+    public const STRING_LIT_Q1 = 57;
+    public const STRING_LIT_Q2 = 58;
 
     /**
      * @param int $kind
@@ -260,6 +261,8 @@ class TokenKind {
             return 'PARAM';
         case self::KEYWORD_ARG:
             return 'ARG';
+        case self::KEYWORD_MATCHES:
+            return 'MATCHES';
         case self::DOLLAR_IDENT:
             return 'DOLLAR_IDENT';
         case self::IDENT:

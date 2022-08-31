@@ -463,6 +463,10 @@ class Lexer {
                 $dst->kind = TokenKind::KEYWORD_INCLUDE;
                 return;
             }
+            if (substr_compare($this->src, 'matches', $dst->pos_from, strlen('matches')) === 0) {
+                $dst->kind = TokenKind::KEYWORD_MATCHES;
+                return;
+            }
         }
     }
 

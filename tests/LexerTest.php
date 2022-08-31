@@ -217,6 +217,10 @@ class LexerTest extends TestCase {
                 '{{ x|y }}',
                 ['ECHO_START', 'IDENT(x)', 'PIPE', 'IDENT(y)', 'ECHO_END'],
             ],
+            [
+                '{{ $x matches "/abc/" }}',
+                ['ECHO_START', 'DOLLAR_IDENT($x)', 'MATCHES', 'STRING_LIT_Q2("/abc/")', 'ECHO_END'],
+            ],
 
             // Mixing everything together.
             [

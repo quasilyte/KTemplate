@@ -74,6 +74,7 @@ var rawTokens = []tokenInfo{
 	{name: "KEYWORD_INCLUDE"},
 	{name: "KEYWORD_PARAM"},
 	{name: "KEYWORD_ARG"},
+	{name: "KEYWORD_MATCHES"},
 
 	{name: "DOLLAR_IDENT", hasValue: true},
 	{name: "IDENT", hasValue: true},
