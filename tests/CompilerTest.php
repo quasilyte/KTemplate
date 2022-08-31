@@ -777,50 +777,6 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
-
-            // Const folding.
-            '{{ -(-1) }}' => [
-                '  OUTPUT_SAFE_INT_CONST 1',
-                '  RETURN',
-            ],
-            '{{ "a" ~ "b" }}' => [
-                '  OUTPUT_SAFE_STRING_CONST `ab`',
-                '  RETURN',
-            ],
-            '{{ "a" ~ "b" ~ x }}' => [
-                '  LOAD_STRING_CONST slot2 `ab`',
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  CONCAT_SLOT0 *slot0 slot2 slot3',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
-                '  RETURN',
-            ],
-            '{{ testfunc1(1 + 2) }}' => [
-                '  LOAD_INT_CONST slot1 3',
-                '  CALL_SLOT0_FUNC1 *slot0 slot1 testfunc1',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
-                '  RETURN',
-            ],
-            '{{ x ~ "a" ~ "b" }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
-                '  LOAD_STRING_CONST slot3 `ab`',
-                '  CONCAT_SLOT0 *slot0 slot2 slot3',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
-                '  RETURN',
-            ],
-            '{{ x + 10 + 20 }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
-                '  LOAD_INT_CONST slot3 30',
-                '  ADD_SLOT0 *slot0 slot2 slot3',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
-                '  RETURN',
-            ],
-            '{{ x * 10 * 20 }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
-                '  LOAD_INT_CONST slot3 200',
-                '  MUL_SLOT0 *slot0 slot2 slot3',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
-                '  RETURN',
-            ],
             
             // Loops.
             '{% for $x in xs %}{{ $x }}{% end %}' => [

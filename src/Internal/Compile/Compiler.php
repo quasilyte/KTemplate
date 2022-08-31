@@ -391,18 +391,37 @@ class Compiler {
 
     private function compileIf() {
         $e = $this->parser->parseRootExpr($this->lexer);
-        $this->compileRootExpr(0, $e);
+        $jump_op = Op::JUMP_FALSY;
+        $cond_slot = 0;
+        switch ($e->kind) {
+        case Expr::NOT_EQ:
+            $lhs = $this->parser->getExprMember($e, 0);
+            $rhs = $this->parser->getExprMember($e, 1);
+            if ($lhs->kind === Expr::DOLLAR_IDENT && $rhs->kind === Expr::NULL_LIT) {
+                $jump_op = Op::JUMP_NOT_NULL;
+                $cond_slot = $this->lookupLocalVar($lhs);
+            }
+            break;
+        }
+
+        if ($cond_slot === 0) {
+            [$cond_slot, $_] = $this->compileRootTempExpr(0, $e);
+        }
         $this->expectToken(TokenKind::CONTROL_END);
 
         $this->frame->enterScope();
-        $this->compileIfBody();
+        $this->compileIfBody($jump_op, $cond_slot);
         $this->frame->leaveScope();
     }
 
-    private function compileIfBody() {
+    /**
+     * @param int $jump_op
+     * @param int $cond_slot
+     */
+    private function compileIfBody($jump_op, $cond_slot) {
         $label_next = $this->newLabel();
         $label_end = $this->newLabel();
-        $this->emitCondJump(Op::JUMP_FALSY, 0, $label_next);
+        $this->emitCondJump($jump_op, $cond_slot, $label_next);
         while (true) {
             $tok = $this->lexer->scan();
             if ($tok->kind === TokenKind::CONTROL_START) {
@@ -544,7 +563,7 @@ class Compiler {
     /**
      * @param int $dst
      * @param Expr $e
-     * @return int
+     * @return int -- result type
      */
     private function compileRootExpr($dst, $e) {
         $this->frame->enterTempBlock();
@@ -554,8 +573,20 @@ class Compiler {
     }
 
     /**
+     * @param int $dst
      * @param Expr $e
-     * @return int
+     * @return tuple(int, int) -- a slot and result type
+     */
+    private function compileRootTempExpr($dst, $e) {
+        if ($e->kind === Expr::DOLLAR_IDENT) {
+            return tuple($this->lookupLocalVar($e), Types::MIXED);
+        }
+        return tuple($dst, $this->compileRootExpr($dst, $e));
+    }
+
+    /**
+     * @param Expr $e
+     * @return int -- a slot that holds result
      */
     private function compileTempExpr($e) {
         if ($e->kind === Expr::DOLLAR_IDENT) {
