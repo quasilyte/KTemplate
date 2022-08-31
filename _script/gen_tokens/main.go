@@ -83,6 +83,7 @@ var rawTokens = []tokenInfo{
 	{name: "FLOAT_LIT", hasValue: true},
 	{name: "STRING_LIT_Q1", hasValue: true},
 	{name: "STRING_LIT_Q2", hasValue: true},
+	{name: "STRING_LIT_RAW", hasValue: true},
 }
 
 func main() {

@@ -197,3 +197,13 @@ foo
 {{ assert_true(contains(arr1, 0)) }}
 {{ assert_true(contains('aaa', 'a')) }}
 {{ assert_true(contains('aaa', 'b')) }}
+-
+{{ assert_true('5452' matches `/\d+/`) }}
+{{ assert_true('adsa' matches `/\d+/`) }}
+{{ assert_true('5452' matches '/\\d+/') }}
+{{ assert_true('adsa' matches '/\\d+/') }}
+-
+{{ assert_true(starts_with('hello', 'hell')) }}
+{{ assert_true(starts_with('hello', 'ello')) }}
+{{ assert_true(ends_with('hello', 'hell')) }}
+{{ assert_true(ends_with('hello', 'ello')) }}

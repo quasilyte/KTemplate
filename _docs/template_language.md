@@ -61,7 +61,7 @@ Supported kinds of expressions:
 | Null literals | `null` |
 | Bool literals | `true`, `false` |
 | Int/float literals | `10`, `10.5` |
-| String literals | `"hello"`, `'world'` |
+| String literals | `"hello"`, `'world'`, `\`raw_string\`` |
 | Local variables | `$x`, `$foo` |
 | External variables | `x`, `x.y.z` |
 | Array indexing | `$arr[0]`, `$arr['key']`, `$arr[$k]` |
@@ -71,7 +71,15 @@ Supported kinds of expressions:
 
 It's possible to use parentheses to group the expressions and force some specific evaluation order in case the default precedence would not work for you.
 
-Single-quoted and double-quoted string literals are functionally identical. They can have escape sequences recognized by [stripcslashes](https://www.php.net/manual/en/function.stripcslashes.php).
+Single-quoted `'` and double-quoted `"` string literals are functionally identical. They can have escape sequences recognized by [stripcslashes](https://www.php.net/manual/en/function.stripcslashes.php).
+
+Raw string literals that use backticks `\`` are mostly useful in regexp contexts to avoid excessive escaping:
+
+```
+{{ $x matches '/\\d+/' }}
+{# vs #}
+{{ $x matches `/\d+/` }}
+```
 
 ### Variables and data providers
 
@@ -117,6 +125,7 @@ These control tags create a block scope:
 | `x <= y` | `x <= y` | `bool` |
 | `x > y` | `x > y` | `bool` |
 | `x >= y` | `x >= y` | `bool` |
+| `s matches pattern` | `preg_match(pattern, s)` | `bool` |
 | `x ~ y` | `x . y` | `string` |
 | `x + y` | `x + y` | `int\|float` |
 | `x - y` | `x - y` | `int\|float` |
@@ -130,7 +139,7 @@ Binary operator precedence groups:
 |---|---|
 | 1 | `or` |
 | 3 | `and` |
-| 4 | `==`, `!=`, `<`, `<=`, `>`, `>=` |
+| 4 | `==`, `!=`, `<`, `<=`, `>`, `>=`, `matches` |
 | 5 | `~` `+` `-` |
 | 7 | `*`, `/`, `%` |
 | 9 | `[]` |

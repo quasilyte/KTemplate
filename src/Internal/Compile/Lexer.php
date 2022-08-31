@@ -159,10 +159,13 @@ class Lexer {
             }
             switch ($ch) {
             case ord('\''):
-                $this->scanStringInto($dst, ord('\''));
+                $this->scanStringInto($dst, TokenKind::STRING_LIT_Q1);
                 return;
             case ord('"'):
-                $this->scanStringInto($dst, ord('"'));
+                $this->scanStringInto($dst, TokenKind::STRING_LIT_Q2);
+                return;
+            case ord('`'):
+                $this->scanStringInto($dst, TokenKind::STRING_LIT_RAW);
                 return;
             case ord('['):
                 $this->acceptSimpleToken($dst, TokenKind::LBRACKET, 1);
@@ -321,18 +324,28 @@ class Lexer {
 
     /**
      * @param Token $dst
-     * @param int $quote
+     * @param int $kind
      */
-    private function scanStringInto($dst, $quote) {
-        $dst->kind = $quote === ord('"') ? TokenKind::STRING_LIT_Q2 : TokenKind::STRING_LIT_Q1;
+    private function scanStringInto($dst, $kind) {
+        $dst->kind = $kind;
         $dst->pos_from = $this->pos;
         $this->pos++;
-        while ($this->pos < $this->src_len) {
-            $ch = ord($this->src[$this->pos]);
-            if ($ch === $quote && ord($this->src[$this->pos-1]) !== ord('\\')) {
-                break;
+        if ($kind === TokenKind::STRING_LIT_RAW) {
+                $strpos_result = strpos($this->src, '`', $this->pos);
+                if ($strpos_result === false) {
+                    $this->pos = $this->src_len;
+                } else {
+                    $this->pos = (int)$strpos_result;
+                }
+        } else {
+            $quote = $kind === TokenKind::STRING_LIT_Q1 ? ord('\'') : ord('"');
+            while ($this->pos < $this->src_len) {
+                $ch = ord($this->src[$this->pos]);
+                if ($ch === $quote && ord($this->src[$this->pos-1]) !== ord('\\')) {
+                    break;
+                }
+                $this->pos++;
             }
-            $this->pos++;
         }
         if ($this->pos >= $this->src_len) {
             $this->setError($dst, 'unterminated string literal');

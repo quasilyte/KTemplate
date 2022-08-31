@@ -148,6 +148,9 @@ var rawOpcodes = []opcodeTemplate{
 	{"MOD", "op dst:wslot arg1:rslot arg2:rslot", numericType},
 	{"MOD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
 
+	{"MATCHES", "op dst:wslot s:rslot regexp:strindex", boolType},
+	{"MATCHES_SLOT0", "op *slot0 s:rslot regexp:strindex", boolType},
+
 	{"START_TMP_OUTPUT", "op", unknownType},
 	{"FINISH_TMP_OUTPUT", "op dst:wslot", unknownType},
 

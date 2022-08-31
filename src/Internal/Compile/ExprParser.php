@@ -104,6 +104,10 @@ class ExprParser {
             $left->kind = Expr::FLOAT_LIT;
             $left->value = (float)$lexer->tokenText($tok);
             break;
+        case TokenKind::STRING_LIT_RAW:
+            $left->kind = Expr::STRING_LIT;
+            $left->value = $lexer->stringText($tok);
+            break;
         case TokenKind::STRING_LIT_Q1:
         case TokenKind::STRING_LIT_Q2:
             // We may enable string interpolation inside DQ strings later.
@@ -148,6 +152,9 @@ class ExprParser {
             switch ($tok->kind) {
             case TokenKind::LBRACKET:
                 $this->parseIndexExpr($left);
+                break;
+            case TokenKind::KEYWORD_MATCHES:
+                $this->parseBinaryExpr($left, Expr::MATCHES, $right_prec);
                 break;
             case TokenKind::PIPE:
                 $this->parseBinaryExpr($left, Expr::FILTER, $right_prec);
@@ -313,6 +320,7 @@ class ExprParser {
         case TokenKind::LT_EQ:
         case TokenKind::GT:
         case TokenKind::GT_EQ:
+        case TokenKind::KEYWORD_MATCHES:
             return 4;
         case TokenKind::PLUS:
         case TokenKind::MINUS:

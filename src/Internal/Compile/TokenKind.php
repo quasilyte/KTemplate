@@ -65,6 +65,7 @@ class TokenKind {
     public const FLOAT_LIT = 56;
     public const STRING_LIT_Q1 = 57;
     public const STRING_LIT_Q2 = 58;
+    public const STRING_LIT_RAW = 59;
 
     /**
      * @param int $kind
@@ -80,6 +81,7 @@ class TokenKind {
         case self::FLOAT_LIT:
         case self::STRING_LIT_Q1:
         case self::STRING_LIT_Q2:
+        case self::STRING_LIT_RAW:
             return true;
         default:
             return false;
@@ -277,6 +279,8 @@ class TokenKind {
             return 'STRING_LIT_Q1';
         case self::STRING_LIT_Q2:
             return 'STRING_LIT_Q2';
+        case self::STRING_LIT_RAW:
+            return 'STRING_LIT_RAW';
         default:
             return '?';
         }

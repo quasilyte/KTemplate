@@ -65,6 +65,8 @@ class ExprPrinter {
             return self::formatBinaryExpr($p, $e, '>');
         case Expr::GT_EQ:
             return self::formatBinaryExpr($p, $e, '>=');
+        case Expr::MATCHES:
+            return self::formatBinaryExpr($p, $e, 'matches');
 
         case Expr::NOT:
             return self::formatUnaryExpr($p, $e, 'not');

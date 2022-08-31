@@ -14,6 +14,8 @@ class FunctionLib {
         self::registerMax($ctx, $engine);
         self::registerDate($ctx, $engine);
         self::registerContains($ctx, $engine);
+        self::registerStartsWith($ctx, $engine);
+        self::registerEndsWith($ctx, $engine);
     }
 
     /**
@@ -68,6 +70,26 @@ class FunctionLib {
                 return in_array($x, $seq);
             }
             return false;
+        });
+    }
+
+    /**
+     * @param Context $ctx
+     * @param Engine $engine
+     */
+    public static function registerStartsWith($ctx, $engine) {
+        $engine->registerFunction2('starts_with', function ($s, $prefix) {
+            return Strings::hasPrefix((string)$s, (string)$prefix);
+        });
+    }
+
+    /**
+     * @param Context $ctx
+     * @param Engine $engine
+     */
+    public static function registerEndsWith($ctx, $engine) {
+        $engine->registerFunction2('ends_with', function ($s, $suffix) {
+            return Strings::hasSuffix((string)$s, (string)$suffix);
         });
     }
 }

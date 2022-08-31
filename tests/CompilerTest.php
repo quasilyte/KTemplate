@@ -192,6 +192,21 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
 
+            // Matches operator. Never escaped.
+            '{{ x matches "/abc/" }}' => [
+                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  MATCHES_SLOT0 *slot0 slot2 `/abc/`',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  RETURN',
+            ],
+            '{{ not (y matches "/a/") }}' => [
+                '  LOAD_EXTDATA_1 slot3 slot1 y',
+                '  MATCHES slot2 slot3 `/a/`',
+                '  NOT_SLOT0 *slot0 slot2',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
             // Safe strings are not escaped.
             '{{ x|escape }}' => [
                 '  LOAD_EXTDATA_1 slot2 slot1 x',

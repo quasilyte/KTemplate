@@ -586,6 +586,13 @@ class Renderer {
             case Op::ESCAPE_SLOT0_FILTER2:
                 $slot0 = $this->escapeWithStrategy((string)$state->slots[$fp + (($opdata >> 8) & 0xff)], $t->string_values[($opdata >> 16) & 0xffff]);
                 break;
+
+            case Op::MATCHES:
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = 1 === preg_match($t->string_values[($opdata >> 24) & 0xffff], $state->slots[$fp + (($opdata >> 16) & 0xff)]);
+                break;
+            case Op::MATCHES_SLOT0:
+                $slot0 = 1 === preg_match($t->string_values[($opdata >> 16) & 0xffff], $state->slots[$fp + (($opdata >> 8) & 0xff)]);
+                break;
             
             case Op::START_TMP_OUTPUT:
                 $state->swapBuf();

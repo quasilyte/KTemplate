@@ -96,6 +96,18 @@ class LexerTest extends TestCase {
 
             // String literals.
             [
+                '{{ `` }}',
+                ['ECHO_START', 'STRING_LIT_RAW(``)', 'ECHO_END'],
+            ],
+            [
+                '{{ `\d` }}',
+                ['ECHO_START', 'STRING_LIT_RAW(`\d`)', 'ECHO_END'],
+            ],
+            [
+                '{{ `\` }}',
+                ['ECHO_START', 'STRING_LIT_RAW(`\`)', 'ECHO_END'],
+            ],
+            [
                 '{{ "" }}',
                 ['ECHO_START', 'STRING_LIT_Q2("")', 'ECHO_END'],
             ],
