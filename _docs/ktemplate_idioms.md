@@ -1,8 +1,8 @@
 # KTemplate idioms
 
-## Twig-like inheritance
+## Twig-like template inheritance
 
-There is no distincs `extends`/`block` in KTemplate, but this functionallity can be achieved by `include` alone.
+There are no distincs `extends`/`block` tags in KTemplate, but this functionallity can be achieved by `include` alone.
 
 Let's take the Twig example and rewrite it accordingly.
 
