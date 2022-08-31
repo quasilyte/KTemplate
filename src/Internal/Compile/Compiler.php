@@ -213,7 +213,7 @@ class Compiler {
                 }
                 continue;
             }
-            if ($tok->kind === TokenKind::CONTROL_START) {
+            if ($tok->kind === TokenKind::CONTROL_START || $tok->kind === TokenKind::CONTROL_START_TRIM) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_ARG)) {
                     $this->compileTemplateArg();
                     continue;
@@ -278,7 +278,7 @@ class Compiler {
         $has_else = false;
         while (true) {
             $tok = $this->lexer->scan();
-            if ($tok->kind === TokenKind::CONTROL_START) {
+            if ($tok->kind === TokenKind::CONTROL_START || $tok->kind === TokenKind::CONTROL_START_TRIM) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
                     $this->expectEndToken(TokenKind::CONTROL_END);
                     if (!$has_else) {
@@ -467,7 +467,7 @@ class Compiler {
         $this->emitCondJump($jump_op, $cond_slot, $label_next);
         while (true) {
             $tok = $this->lexer->scan();
-            if ($tok->kind === TokenKind::CONTROL_START) {
+            if ($tok->kind === TokenKind::CONTROL_START || $tok->kind === TokenKind::CONTROL_START_TRIM) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
                     $this->expectEndToken(TokenKind::CONTROL_END);
                     $this->tryBindLabel($label_next);

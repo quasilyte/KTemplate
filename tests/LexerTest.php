@@ -239,6 +239,10 @@ class LexerTest extends TestCase {
                 'a{{x_2}}b',
                 ['TEXT(a)', 'ECHO_START', 'IDENT(x_2)', 'ECHO_END', 'TEXT(b)'],
             ],
+            [
+                '{%- if $v > 100000 -%}',
+                ['CONTROL_START_TRIM', 'IF', 'DOLLAR_IDENT($v)', 'GT', 'INT_LIT(100000)', 'CONTROL_END_TRIM'],
+            ],
         ];
         $lexer = new Lexer();
         foreach ($tests as $test) {
