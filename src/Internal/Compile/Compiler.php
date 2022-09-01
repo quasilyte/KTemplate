@@ -901,8 +901,10 @@ class Compiler {
             $this->failExpr($pattern, 'matches operator rhs pattern should be a const expr string');
         }
         $pattern_string = (string)$pattern_value;
-        if ((@preg_match($pattern_string, '')) === false) {
-            $this->failExpr($pattern, 'matches operator rhs contains invalid pattern');
+        if ($this->env->ctx->validate_regexp) {
+            if ((@preg_match($pattern_string, '')) === false) {
+                $this->failExpr($pattern, 'matches operator rhs contains invalid pattern');
+            }
         }
         $lhs_slot = $this->compileTempExpr($lhs);
         $this->emit3dst(Op::MATCHES, $dst, $lhs_slot, $this->internString($pattern_string));
