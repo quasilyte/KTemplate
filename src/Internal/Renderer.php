@@ -72,6 +72,7 @@ class Renderer {
      */
     private function execTemplate($current_template, $t) {
         $cache_bitset = $this->state->cache_bitset;
+        $this->state->cache_bitset = 0;
         $this->state->slot_offset += $current_template->frameSize();
         $this->eval($t);
         $this->state->slot_offset -= $current_template->frameSize();
