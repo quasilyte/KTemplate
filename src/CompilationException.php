@@ -1,6 +1,6 @@
 <?php
 
-namespace KTemplate\Internal\Compile;
+namespace KTemplate;
 
 class CompilationException extends \Exception {
     /** @var int */

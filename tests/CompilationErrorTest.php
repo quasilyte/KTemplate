@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use KTemplate\Internal\Compile\Compiler;
-use KTemplate\Internal\Compile\CompilationException;
+use KTemplate\CompilationException;
 use KTemplate\Context;
 use KTemplate\Engine;
 use KTemplate\ArrayLoader;

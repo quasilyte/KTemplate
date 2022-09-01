@@ -2,7 +2,8 @@
 
 namespace KTemplate\Internal\Compile;
 
-use KTemplate\Template; 
+use KTemplate\Template;
+use KTemplate\CompilationException;
 use KTemplate\Internal\Env;
 use KTemplate\Internal\Op;
 use KTemplate\Internal\OpInfo;
