@@ -2,7 +2,7 @@
 
 ## Overview
 
-KTemplate is a simple text template engine for PHP and [KPHP](https://github.com/VKCOM/kphp).
+[KTemplate](https://github.com/quasilyte/KTemplate) is a simple text template engine for PHP and [KPHP](https://github.com/VKCOM/kphp).
 
 KTemplate uses a syntax similar to the Twig, Django and Jinja template languages.
 
