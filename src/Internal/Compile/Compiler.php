@@ -1517,6 +1517,10 @@ class Compiler {
         $frame_args_size = $this->frame->max_num_args;
         $this->result->setExtraInfo($frame_size, $frame_args_size, $num_cache_slots);
 
+        if ($frame_size > 255) {
+            $this->fail(-1, "template frame size is too big (too many local variables?)");
+        }
+
         return $this->resolveTemplateDeps();
     }
 

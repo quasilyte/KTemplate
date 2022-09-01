@@ -148,6 +148,12 @@ class CompilationErrorTest extends TestCase {
                 "jump offset 35000 doesn't fit into int16",
             ],
             [
+                $this->createTemplateSource(260, function ($i) {
+                    return "{% let \$x$i = 0 %}";
+                }),
+                'template frame size is too big (too many local variables?)',
+            ],
+            [
                 $this->createTemplateSource(70, function ($i) {
                     return "{{ x$i }}\n";
                 }),
