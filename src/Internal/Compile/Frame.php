@@ -127,6 +127,8 @@ class Frame {
     }
 
     /**
+     * TODO: just return a tuple(int,int)?
+     *
      * @param string $p1
      * @param string $p2
      * @param string $p3

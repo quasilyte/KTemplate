@@ -560,6 +560,7 @@ class Compiler {
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
+            $this->validateCacheSlot($e, $cache_slot);
             $escape_bit = $this->needsEscaping(Types::MIXED) ? 1 : 0;
             $this->emit3(Op::OUTPUT_EXTDATA_1, $cache_slot, $key_offset, $escape_bit);
             return true;
@@ -571,6 +572,7 @@ class Compiler {
             $cache_slot_info = $this->frame->getCacheSlotInfo($p1, $p2, $p3);
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
+            $this->validateCacheSlot($e, $cache_slot);
             $escape_bit = $this->needsEscaping(Types::MIXED) ? 1 : 0;
             $op = $p3 === '' ? Op::OUTPUT_EXTDATA_2 : Op::OUTPUT_EXTDATA_3;
             $this->emit3($op, $cache_slot, $key_offset, $escape_bit);
@@ -795,6 +797,7 @@ class Compiler {
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
+            $this->validateCacheSlot($e, $cache_slot);
             $this->emit3dst(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
             return Types::MIXED;
 
@@ -806,6 +809,7 @@ class Compiler {
             $slot_info = $this->frame->getCacheSlotInfo($p1, $p2, $p3);
             $cache_slot = $slot_info & 0xff;
             $key_offset = ($slot_info >> 8) & 0xff;
+            $this->validateCacheSlot($e, $cache_slot);
             $op = $p3 === '' ? Op::LOAD_EXTDATA_2 : Op::LOAD_EXTDATA_3;
             $this->emit3dst($op, $dst, $cache_slot, $key_offset);
             return Types::MIXED;
@@ -1484,15 +1488,33 @@ class Compiler {
     }
 
     /**
+     * @param Expr $e
+     * @param int $cache_slot
+     */
+    private function validateCacheSlot($e, $cache_slot) {
+        if ($cache_slot <= 64) {
+            return;
+        }
+        // We're storing a cache bitset inside 64-bit integer.
+        // Since every slot require exactly 1 bit, we can't
+        // have more than 64 slots reserved for cache.
+        //
+        // TODO: have a second bitset to lift this restriction to 128?
+        // Or maybe have a separate, non-caching opcode for ids>64?
+        // Anyway, we need to fail the compilation here for now.
+        $this->failExpr($e, "too many external variable references");
+    }
+
+    /**
      * @return Template
      */
     private function finalizeTemplate() {
         $this->linkJumps();
         $this->reallocateSlots();
 
-        $frame_size = count($this->frame->cache_slots) + $this->frame->num_locals;
-        $frame_args_size = $this->frame->max_num_args;
         $num_cache_slots = count($this->frame->cache_slots);
+        $frame_size = $num_cache_slots + $this->frame->num_locals;
+        $frame_args_size = $this->frame->max_num_args;
         $this->result->setExtraInfo($frame_size, $frame_args_size, $num_cache_slots);
 
         return $this->resolveTemplateDeps();

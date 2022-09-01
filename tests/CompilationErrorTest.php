@@ -148,6 +148,12 @@ class CompilationErrorTest extends TestCase {
                 "jump offset 35000 doesn't fit into int16",
             ],
             [
+                $this->createTemplateSource(70, function ($i) {
+                    return "{{ x$i }}\n";
+                }),
+                'too many external variable references',
+            ],
+            [
                 $this->createTemplateSource(0xffff+10, function ($i) {
                     return "{% if $i %}1{% end %}";
                 }),
