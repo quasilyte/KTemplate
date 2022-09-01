@@ -343,3 +343,27 @@ It's possible to look inside that template by disassembling it:
 ```php
 $disasm = $engine->disassembleTemplate($t);
 ```
+
+## Handling compilation errors
+
+When template is being compiled, `CompilationException` can be thrown.
+
+KTemplate may compile a template during `$engine->load()` or `$engine->render()`. If you want to make sure that all compilation is finished before starting rendering, use `$engine->load()` + `$engine->renderTemplate()`.
+
+```php
+/** @var Template $t */
+$t = null;
+try {
+    $t = $engine->load($template_path);
+} catch (CompilationException $e) {
+    // getFullMessage() includes the error location information.
+    // Use $e->source_line and $e->source_filename if you want to
+    // format the error differently.
+    die('error: ' . $e->getFullMessage());
+}
+
+// No compilation errors can happen during this call.
+$result = $engine->renderTemplate($e, $data_provider);
+```
+
+The `$engine->load()` compiles the specified template as well as all its dependencies. If no errors occured during that process, it's safe to assume that `$engine->renderTemplate()` will not cause any template compilations.
