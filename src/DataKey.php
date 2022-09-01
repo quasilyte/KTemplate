@@ -45,4 +45,22 @@ class DataKey {
      * @var string
      */
     public $part3;
+
+    /**
+     * Return all parts of the key combined.
+     *
+     * This method is mostly useful for debugging and pretty-printing.
+     *
+     * @return string
+     */
+    public function combined() {
+        switch ($this->num_parts) {
+        case 1:
+            return $this->part1;
+        case 2:
+            return $this->part1 . '.' . $this->part2;
+        default:
+            return $this->part1 . '.' . $this->part2 . '.' . $this->part3;
+        }
+    }
 }
