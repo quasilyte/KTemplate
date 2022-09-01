@@ -1,2 +1,3 @@
 * more end2end tests
 * use codegen for Expr class and expr kind predicates
+* associate a pos with Expr, so Compiler::failExpr gives a precise error loc
