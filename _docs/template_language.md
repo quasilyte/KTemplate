@@ -262,7 +262,7 @@ Loop over the values or keys and values of the array, rendering the loop body re
 {% end %}
 ```
 
-A `for` can contain an `else` clause that will be executed if loop body was executed zero times:
+A `for` can have an `else` clause that will be executed if loop body was executed zero times:
 
 ```html
 {% for $x in $xs %}
