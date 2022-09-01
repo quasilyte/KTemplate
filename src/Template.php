@@ -4,6 +4,9 @@ namespace KTemplate;
 
 use KTemplate\Internal\TemplateSerializer;
 
+/**
+ * Template represents a compiled unit that can be rendered.
+ */
 class Template {
     /** @var string[] */
     public $string_values = [];

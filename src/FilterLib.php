@@ -2,6 +2,10 @@
 
 namespace KTemplate;
 
+/**
+ * FilterLib provides implementations for some basic filters.
+ * Use registerAllFilters() to add all available definitions.
+ */
 class FilterLib {
     /**
      * @param string $s

@@ -6,6 +6,19 @@ use KTemplate\Internal\Renderer;
 use KTemplate\Internal\Env;
 use KTemplate\Internal\Disasm;
 
+/**
+ * Engine provides the ways to compile, configure and render templates.
+ *
+ * It works as both the environment that holds things like user-defined functions
+ * and API entrypoint.
+ *
+ * If you need to compile a template, use load().
+ * If you need to render a template, use render() or renderTemplate().
+ * If you have a template, you can use disassembleTemplate() to get its bytecode.
+ *
+ * registerFunctionX() and registerFilterX() methods can be used to
+ * define symbols accessible from the compiled templates.
+ */
 class Engine {
     /** @var Env */
     private $env;
@@ -25,27 +38,30 @@ class Engine {
     }
 
     /**
-     * @param string $path
-     * @return Template
+     * load returns the template associated with a given path.
+     *
+     * This may involve LoaderInterface call to find the sources
+     * and template compilation (if it's not compiled yet).
+     *
+     * After the first load() call, the template is cached and
+     * will not involve any actual loading.
+     *
+     * If compilation will be triggered,
+     * a CompilationException can be thrown in case of an error.
+     *
+     * @param string $path - a template to be loaded
+     * @return Template - a compiled template
      */
     public function load($path) {
         return $this->env->getTemplate($path);
     }
 
     /**
-     * @param string $path
+     * renderTemplate executes a compiled template and returns the rendered result.
+     *
+     * @param Template $t - a template to be executed
      * @param DataProviderInterface $data_provider
-     * @return string
-     */
-    public function render($path, $data_provider = null) {
-        $t = $this->env->getTemplate($path);
-        return $this->renderTemplate($t, $data_provider);
-    }
-
-    /**
-     * @param Template $t
-     * @param DataProviderInterface $data_provider
-     * @return string
+     * @return string - rendering result
      */
     public function renderTemplate($t, $data_provider = null) {
         if ($this->renderer === null) {
@@ -55,9 +71,23 @@ class Engine {
     }
 
     /**
-     * @param Template $t
-     * @param int $max_str_len
-     * @return string[]
+     * render is a shorthand for load()+renderTemplate().
+     * 
+     * @param string $path - a template path, will be used as load() argument
+     * @param DataProviderInterface $data_provider
+     * @return string - rendering result
+     */
+    public function render($path, $data_provider = null) {
+        $t = $this->env->getTemplate($path);
+        return $this->renderTemplate($t, $data_provider);
+    }
+
+    /**
+     * disassembleTemplate returns a bytecode that is stored inside a template.
+     *
+     * @param Template $t - a template to be disassembled
+     * @param int $max_str_len - truncate string values longer than this threshold
+     * @return string[] - disassembled listing in form of string lines
      */
     public function disassembleTemplate($t, $max_str_len = 32) {
         return Disasm::getBytecode($this->env, $t, $max_str_len);

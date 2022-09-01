@@ -2,6 +2,12 @@
 
 namespace KTemplate;
 
+/**
+ * DataKey describes an external data lookup request during the
+ * template rendering process.
+ *
+ * It's up to the DataProviderInterface implementation to resolve this request.
+ */
 class DataKey {
     /**
      * How many parts are relevant.

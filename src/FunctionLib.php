@@ -4,6 +4,10 @@ namespace KTemplate;
 
 use KTemplate\Internal\Strings;
 
+/**
+ * FunctionLib provides implementations for some basic functions.
+ * Use registerAllFunctions() to add all available definitions.
+ */
 class FunctionLib {
     /**
      * @param Context $ctx

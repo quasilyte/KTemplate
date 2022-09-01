@@ -22,6 +22,8 @@ It's possible to use KTemplate engine with 0 predefined filters and functions. S
 * `FilterLib` - implementations for core filters
 * `FunctionLib` - implementations for core functions
 
+> All classes that have `Internal` part in their namespace are not supposed to be used outside of the KTemplate package.
+
 Here is a minimal example that uses the default config:
 
 ```php

@@ -2,14 +2,26 @@
 
 namespace KTemplate;
 
+/**
+ * ArrayDataProvider implements a simple data mapping for templates.
+ *
+ * It turns every part of the DataKey into the array access:
+ *
+ *   "x"     => $data["x"]
+ *   "x.y"   => $data["x"]["y"]
+ *   "x.y.z" => $data["x"]["y"]["z"]
+ */
 class ArrayDataProvider implements DataProviderInterface {
     /** @var mixed $data */
     private $data;
 
     /**
-     * @param mixed $data
+     * @param mixed $data - the array that will be mapped
      */
     public function __construct($data) {
+        if (!is_array($data)) {
+            throw new \Exception("data should be an array");
+        }
         $this->data = $data;
     }
 

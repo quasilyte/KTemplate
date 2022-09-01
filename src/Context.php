@@ -11,11 +11,27 @@ namespace KTemplate;
  */
 class Context {
     /**
+     * A folder where KTemplate can store the compiled templates.
+     * If empty, no filesystem cache is used.
+     *
+     * The benefit of this cache is that it persists between the requests.
+     *
      * @var string
      */
     public $cache_dir = '';
 
     /**
+     * Whether to re-check already cached templates during this request.
+     *
+     * For typical PHP application this is usually redundant.
+     *
+     * For applications that have long-running, background-like scripts,
+     * this option can be set to true.
+     *
+     * There is a slight performance penalty when having this option set to true.
+     * 
+     * When $cache_dir is unset, this option has no effect.
+     *
      * @var bool
      */
     public $cache_recheck = false;
@@ -44,6 +60,11 @@ class Context {
     public $escape_func;
 
     /**
+     * A default $strategy argument for $escape_func filter.
+     *
+     * Used for auto-escaping (if enabled) and explicit escape/e
+     * invocations without arguments.
+     *
      * @var string
      */
     public $default_escape_strategy = 'html';

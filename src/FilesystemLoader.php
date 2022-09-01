@@ -5,6 +5,11 @@ namespace KTemplate;
 use KTemplate\Internal\Strings;
 use KTemplate\Internal\Compile\Compiler;
 
+/**
+ * FilesystemLoader implements a template source loader that reads them from local files.
+ *
+ * It's possible to have several search paths.
+ */
 class FilesystemLoader implements LoaderInterface {
     /**
      * @var string[]
@@ -12,7 +17,7 @@ class FilesystemLoader implements LoaderInterface {
     private $paths = [];
 
     /**
-     * @param string[] $paths
+     * @param string[] $paths - search path roots
      */
     public function __construct($paths) {
         foreach ($paths as $p) {
