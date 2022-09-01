@@ -62,6 +62,7 @@ string(7) "Example"
 
 * [Template language overview](_docs/template_language.md)
 * [KTemplate idioms](_docs/ktemplate_idioms.md)
+* [Differences from Twig](_docs/differences_from_twig.md)
 * [KTemplate PHP API](_docs/ktemplate_php_api.md)
 
 ## Rationale
