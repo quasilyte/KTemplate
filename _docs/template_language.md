@@ -266,9 +266,9 @@ A `for` can contain an `else` clause that will be executed if loop body was exec
 
 ```html
 {% for $x in $xs %}
-  {{ $x }}
+    {{ $x }}
 {% else %}
-  $xs is empty!
+    $xs is empty!
 {% end %}
 ```
 
