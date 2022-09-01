@@ -24,6 +24,9 @@ class CompilationErrorTest extends TestCase {
 
     public function testSimpleErrors() {
         $tests = [
+            '{{ x matches "/" }}' => 'matches operator rhs contains invalid pattern',
+            '{{ x matches $x }}' => 'matches operator rhs pattern should be a const expr string',
+
             '}}' => 'unexpected top-level token: }}',
             '%}' => 'unexpected top-level token: %}',
 

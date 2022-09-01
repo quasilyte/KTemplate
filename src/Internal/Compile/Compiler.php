@@ -897,11 +897,11 @@ class Compiler {
         $pattern = $this->parser->getExprMember($e, 1);
         $pattern_value = $this->const_folder->fold($pattern);
         if (!is_string($pattern_value)) {
-            $this->failExpr($pattern, 'matches rhs pattern should be a const expr string');
+            $this->failExpr($pattern, 'matches operator rhs pattern should be a const expr string');
         }
         $pattern_string = (string)$pattern_value;
         if ((@preg_match($pattern_string, '')) === false) {
-            $this->failExpr($pattern, 'matches rhs contains invalid pattern');
+            $this->failExpr($pattern, 'matches operator rhs contains invalid pattern');
         }
         $lhs_slot = $this->compileTempExpr($lhs);
         $this->emit3dst(Op::MATCHES, $dst, $lhs_slot, $this->internString($pattern_string));
