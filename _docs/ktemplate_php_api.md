@@ -7,8 +7,9 @@ The core public API consists of these classes:
 * `Context` - the main configuration source
 * `Engine` - API main entry point (render/compile/etc)
 * `DataProviderInterface` and related `DataKey` - data binding
-* `LoaderInterface` - templates discovery
+* `LoaderInterface` and related `TemplateCacheKey` - templates discovery
 * `CompilationException` - an exception that contains error location info
+* `Template` - the compiled template object (can be renderer or disassembled)
 
 For convenience, KTemplate provides implementations:
 
@@ -121,6 +122,8 @@ class DataKey {
 | `x.y`      | `"x"`    | `"y"`    | `""`     | 2            |
 | `x.y.z`    | `"x"`    | `"y"`    | `"z"`    | 3            |
 
+> 3-part key is the current limit of KTemplate. You can use the dynamic lookup with `a.b.c[$key]` though if `a.b.c` evaluates to something that can be indexed (like array or string).
+
 The builtin `ArrayDataProvider` implements `getData` method like so:
 
 ```php
@@ -171,6 +174,14 @@ private function matchKey3(DataKey $key, string $p1, string $p2, string $p3): bo
 ```
 
 The data provider concept allows us to make data independent from the template. We take the application data, wrap it into a custom data provider and then render the template. Only the data provider needs to know about the both ends. The template source is data provider agnostic while the application data does not need to be copied just to render the template.
+
+```php
+// $users, $forms and $misc don't know that they're
+// about to be used inside a template, but IndexDataProvider
+// knows about index.template and those data sources.
+$data = new IndexDataProvider($users, $forms, $misc);
+$result = $engine->render('ui/index.template', $data);
+```
 
 Note that KTemplate has data access caching, so it may evaluate `getData` on some key only once and then use the cached value. Therefore, it's recommended that the data returned by the data provider does not change while the template is being rendered.
 
@@ -248,4 +259,87 @@ public static function registerFirst(Context $ctx, Engine $engine) {
 
 ## Template compilation cache
 
-TODO.
+Compiling a template from its sources is expensive operation. Sometimes it takes even more time to compile the template than actually executing it.
+
+To reduce the compilation overhead, there are two levels of caching:
+
+1. In-memory cache that exists inside one request (very fast, always enabled)
+2. Filesystem cache that persists between the requests (fast, not enabled by default)
+
+The first cache level is simple. We same the compiled templates in the PHP arrays.
+
+To enable the second level, you need to specify the **cache directory**:
+
+```php
+$ctx->cache_dir = $path_to_cache_dir;
+```
+
+KTemplate never clears the given `cache_dir`. If templates are not updated frequently, this is not a concern. If your system has limited resources and template sources updates happen often, consider clearing the `cache_dir` once in a while.
+
+Since cache can become outdated, KTemplate uses two-component keys over the template source:
+
+1. Last modification time
+2. Template source size
+
+```php
+class TemplateCacheKey {
+    public string $full_name = '';
+    public int $modification_time = 0;
+    public int $source_size = 0;
+}
+```
+
+> The `$full_name` is not used by the engine, but it can be used to re-use name resolution results peformed by your loader.
+
+For immutable/in-memory templates it doesn't matter that much, you can adjust the values as you like. For filesystem loaders, `filemtime` and `filesize` PHP functions can be used.
+
+This way, the cache knows when it can load the template from cache or it needs to re-compile it.
+
+This is why the `LoaderInterface` has `updateCacheKey` method.
+
+Here is how you can implement the filesystem loader:
+
+```php
+public function load(string $path, string $full_name) {
+    if (!$full_name) {
+        $full_name = $this->resolvePath($path);
+    }
+    return (string)file_get_contents($full_name);
+}
+
+public function updateCacheKey(string $path, TemplateCacheKey $key) {
+    $key->full_name = $this->resolvePath($path);
+    $filemtime_result = filemtime($key->full_name);
+    if ($filemtime_result === false) {
+        throw new \Exception("cached $key->full_name appears to be unavailable");
+    }
+    $key->modification_time = (int)$filemtime_result;
+    $key->source_size = (int)filesize($key->full_name);
+}
+```
+
+For long-running requests or applications like games (that never exit the request) it may be necessary to turn the `cache_recheck` option to `true`:
+
+```php
+$ctx->cache_recheck = true;
+```
+
+When this option is enabled, KTemplate will re-check whether the first level cache content is not stale. This is redundant for normal PHP applications, therefore it's turned off by default.
+
+## Template inspection
+
+We used `$engine->render` method with a specified **template path**. There is also another way to render a template.
+
+```php
+// load() may compile the template if it was not compiled yet.
+$t = $engine->load('main.html');
+$result = $engine->renderTemplate($t);
+```
+
+This approach leaves you with `Template` object that you can use.
+
+It's possible to look inside that template by disassembling it:
+
+```php
+$disasm = $engine->disassembleTemplate($t);
+```
