@@ -64,6 +64,7 @@ string(7) "Example"
 * [KTemplate idioms](_docs/ktemplate_idioms.md)
 * [Differences from Twig](_docs/differences_from_twig.md)
 * [KTemplate PHP API](_docs/ktemplate_php_api.md)
+* [KTemplate architecture](_docs/ktemplate_architecture.md)
 
 ## Rationale
 
