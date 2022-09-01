@@ -122,7 +122,7 @@ class DataKey {
 | `x.y`      | `"x"`    | `"y"`    | `""`     | 2            |
 | `x.y.z`    | `"x"`    | `"y"`    | `"z"`    | 3            |
 
-> 3-part key is the current limit of KTemplate. You can use the dynamic lookup with `a.b.c[$key]` though if `a.b.c` evaluates to something that can be indexed (like array or string).
+> 3-part key is the current limit of KTemplate. You can use the dynamic lookup with `a.b.c[$key]` if `a.b.c` evaluates to something that can be indexed (like array or string).
 
 The builtin `ArrayDataProvider` implements `getData` method like so:
 
@@ -318,7 +318,7 @@ public function updateCacheKey(string $path, TemplateCacheKey $key) {
 }
 ```
 
-For long-running requests or applications like games (that never exit the request) it may be necessary to turn the `cache_recheck` option to `true`:
+For long-running requests or applications like games and services/daemons (that never exit the request) it may be necessary to turn the `cache_recheck` option to `true`:
 
 ```php
 $ctx->cache_recheck = true;
