@@ -1058,6 +1058,9 @@ class Compiler {
             if (!is_string($arg2_const_value)) {
                 $this->failExpr($arg2_expr, 'escape filter expects a const expr string argument');
             }
+            if ($this->env->ctx->escape_func === null) {
+                $this->failExpr($e, $filter_name . ' is used, but $ctx->escape_func is null');
+            }
             $strategy = $this->internString((string)$arg2_const_value);
             $this->emit3dst(Op::ESCAPE_FILTER2, $dst, $arg1_slot, $strategy);
             return Types::SAFE_STRING;
@@ -1092,6 +1095,9 @@ class Compiler {
                 return Types::INT;
             }
             if ($rhs->value === 'escape' || $rhs->value === 'e') {
+                if ($this->env->ctx->escape_func === null) {
+                    $this->failExpr($e, $rhs->value . ' is used, but $ctx->escape_func is null');
+                }
                 $this->emit2dst(Op::ESCAPE_FILTER1, $dst, $arg1_slot);
                 return Types::SAFE_STRING;
             }

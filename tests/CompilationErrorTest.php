@@ -15,14 +15,25 @@ class CompilationErrorTest extends TestCase {
     /** @var ArrayLoader */
     private static $loader;
 
+    /** @var Context */
+    private static $context;
+
     public static function setUpBeforeClass(): void {
+        self::$context = new Context();
         self::$loader = new ArrayLoader();
-        self::$engine = new Engine(new Context(), self::$loader);
+        self::$engine = new Engine(self::$context, self::$loader);
 
         self::$engine->registerFunction1('strlen', function ($x) { return strlen($x); });
     }
 
     public function testSimpleErrors() {
+        $tests_no_escape_func = [
+            '{{ x|escape }}' => 'escape is used, but $ctx->escape_func is null',
+            '{{ x|e }}' => 'e is used, but $ctx->escape_func is null',
+            '{{ x|escape("a") }}' => 'escape is used, but $ctx->escape_func is null',
+            '{{ x|e("a") }}' => 'e is used, but $ctx->escape_func is null',
+        ];
+
         $tests = [
             '{{ x matches "/" }}' => 'matches operator rhs contains invalid pattern',
             '{{ x matches $x }}' => 'matches operator rhs pattern should be a const expr string',
@@ -98,14 +109,14 @@ class CompilationErrorTest extends TestCase {
             '{% let $x %}1{% let $y %}{% end %}{% end %}' => 'unsupported block-assign let inside let',
             '{% let $x %}1{% set $x %}{% end %}{% end %}' => 'unsupported block-assign set inside let',
         ];
-        
-        foreach ($tests as $input => $want) {
+
+        $run_test = function(string $input) {
             self::$loader->setSources([
                 'example' => '
                     {% param $title = "Example" %}
                     {{ $title }}
                 ',
-                'test' => (string)$input,
+                'test' => $input,
             ]);
             $have = '';
             try {
@@ -113,8 +124,21 @@ class CompilationErrorTest extends TestCase {
             } catch (CompilationException $e) {
                 $have = $e->getFullMessage();
             }
+            return $have;
+        };
+        
+        foreach ($tests as $input => $want) {
+            $have = $run_test($input);
             $this->assertTrue(Strings::contains($have, $want), "input=$input have=$have\n");
         }
+
+        $escape_func = self::$context->escape_func;
+        self::$context->escape_func = null;
+        foreach ($tests_no_escape_func as $input => $want) {
+            $have = $run_test($input);
+            $this->assertTrue(Strings::contains($have, $want), "input=$input have=$have\n");
+        }
+        self::$context->escape_func = $escape_func;
     }
 
     public function testLimitErrors() {

@@ -897,7 +897,7 @@ class CompilerTest extends TestCase {
         ];
 
         $ctx = new Context();
-        $ctx->escape_func = null;
+        $ctx->auto_escape_expr = false;
         $env = $this->newTestEnv($ctx);
         foreach ($tests as $input => $want) {
             $t = self::$compiler->compile($env, 'test', (string)$input);
