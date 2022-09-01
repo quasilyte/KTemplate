@@ -1,4 +1,4 @@
-# KTemplate idioms
+# KTemplate Idioms
 
 ## Twig-like template inheritance
 

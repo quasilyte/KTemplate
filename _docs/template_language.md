@@ -1,4 +1,4 @@
-# Template language overview
+# Template Language Overview
 
 This document gives the high-level template language overview.
 
