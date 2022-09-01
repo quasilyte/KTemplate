@@ -1043,6 +1043,9 @@ class Compiler {
      */
     private function compileFilter2($dst, $e) {
         $rhs = $this->parser->getExprMember($e, 1);
+        if ($rhs->value === 0) {
+            $this->failExpr($e, 'omit the () for 0-arguments filter call');
+        }
         if ($rhs->value > 1) {
             $this->failExpr($e, 'too many arguments for a filter');
         }

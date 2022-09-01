@@ -55,7 +55,7 @@ class End2EndTest extends TestCase {
             $full_name = "$dir/$test";
             $source = (string)file_get_contents($full_name);
             $loader->setSources([$full_name => $source]);
-            $t = $engine->getTemplate($full_name);
+            $t = $engine->load($full_name);
             $data_provider->setTestName($test);
             $have = $engine->renderTemplate($t, $data_provider);
             if (!file_exists("$dir/$test.golden")) {

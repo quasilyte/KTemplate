@@ -28,7 +28,7 @@ class Engine {
      * @param string $path
      * @return Template
      */
-    public function getTemplate($path) {
+    public function load($path) {
         return $this->env->getTemplate($path);
     }
 

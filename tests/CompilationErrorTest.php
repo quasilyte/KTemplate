@@ -86,6 +86,8 @@ class CompilationErrorTest extends TestCase {
 
             '{% include "example" %}{% arg $foo = 5 %}{% end %}' => "template example doesn't have foo param",
 
+            '{{ s|escape() }}' => 'omit the () for 0-arguments filter call',
+
             '{% let $x = 1 %}{% param $y = 2 %}' => 'param can only be used in the beginning of template',
             '{% let $x = 1 %}{% param $x = 2 %}' => "can't declare x param: name is already in use",
             '{% param $x = 1 %}{% param $x = 2 %}' => "can't declare x param: name is already in use",
@@ -107,7 +109,7 @@ class CompilationErrorTest extends TestCase {
             ]);
             $have = '';
             try {
-                $t = self::$engine->getTemplate('test');
+                $t = self::$engine->load('test');
             } catch (CompilationException $e) {
                 $have = $e->getFullMessage();
             }
@@ -158,7 +160,7 @@ class CompilationErrorTest extends TestCase {
             ]);
             $have = '';
             try {
-                $t = self::$engine->getTemplate('test');
+                $t = self::$engine->load('test');
             } catch (CompilationException $e) {
                 $have = $e->getFullMessage();
             }
