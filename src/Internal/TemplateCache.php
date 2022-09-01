@@ -24,8 +24,6 @@ class TemplateCache {
     /** @var TemplateCacheKey */
     private $cache_key;
 
-    public $cache_recheck = false;
-
     /**
      * @param Context $ctx
      * @param LoaderInterface $loader
@@ -45,7 +43,7 @@ class TemplateCache {
     public function get($env, $path) {
         if (isset($this->cache[$path])) {
             $cache_item = $this->cache[$path];
-            if ($this->cache_recheck) {
+            if ($this->ctx->cache_recheck) {
                 $this->cache_key->full_name = $cache_item->full_name;
                 $this->loader->updateCacheKey($path, $this->cache_key);
                 if ($cache_item->key_mtime < $this->cache_key->modification_time || $cache_item->key_file_size !== $this->cache_key->source_size) {

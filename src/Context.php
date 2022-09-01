@@ -14,6 +14,11 @@ class Context {
     public $cache_dir = '';
 
     /**
+     * @var bool
+     */
+    public $cache_recheck = false;
+
+    /**
      * Set the implied text encoding.
      * Used as an argument to mb_* functions.
      * 
