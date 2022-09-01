@@ -55,7 +55,12 @@ To make templates more powerfull, there are `{% param %}` and `{% arg %}` tags t
 
 Twig has a lot of operators: normal binary operators, **tests** (via `is`), `in` operator and others.
 
-KTemplate set of operators is more restricted. For most **tests**, you use normal functions. Which means you write `is_empty($x)` instead of `$x is empty`.
+KTemplate set of operators is more restricted. For most **tests**, you use normal functions:
+
+```html
+Twig style:      {{ $x is empty }}
+KTemplate style: {{ is_empty($x) }}
+```
 
 There is no **ranges** `..` operator support too. Use functions for that.
 
