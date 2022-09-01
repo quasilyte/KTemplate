@@ -110,13 +110,13 @@ class CompilationErrorTest extends TestCase {
             '{% let $x %}1{% set $x %}{% end %}{% end %}' => 'unsupported block-assign set inside let',
         ];
 
-        $run_test = function(string $input) {
+        $run_test = function($input) {
             self::$loader->setSources([
                 'example' => '
                     {% param $title = "Example" %}
                     {{ $title }}
                 ',
-                'test' => $input,
+                'test' => (string)$input,
             ]);
             $have = '';
             try {
