@@ -317,9 +317,7 @@ class Lexer {
     }
 
     private function skipWhitespace() {
-        while ($this->pos < $this->src_len && $this->src[$this->pos] === ' ') {
-            $this->pos++;
-        }
+        $this->pos += strspn($this->src, " \t\n\r", $this->pos);
     }
 
     /**

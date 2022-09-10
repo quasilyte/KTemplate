@@ -20,11 +20,11 @@ class LexerTest extends TestCase {
 
             // Trim tags.
             [
-                '{{- $x -}}',
+                "{{-\t\$x\t-}}",
                 ['ECHO_START_TRIM', 'DOLLAR_IDENT($x)', 'ECHO_END_TRIM'],
             ],
             [
-                '{%- $x -%}',
+                "{%-\r\n\$x\t\t -%}",
                 ['CONTROL_START_TRIM', 'DOLLAR_IDENT($x)', 'CONTROL_END_TRIM'],
             ],
             [
