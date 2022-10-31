@@ -15,5 +15,5 @@ interface DataProviderInterface {
      * @param DataKey $key
      * @return mixed
      */
-    function getData($key);
+    public function getData($key);
 }

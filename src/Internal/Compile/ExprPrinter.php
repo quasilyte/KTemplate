@@ -6,6 +6,7 @@ class ExprPrinter {
     public static function formatExpr(ExprParser $p, Expr $e): string {
         switch ($e->kind) {
         case Expr::IDENT:
+        case Expr::INT_LIT:
             return (string)$e->value;
         case Expr::DOLLAR_IDENT:
             return '$' . (string)$e->value;
@@ -15,8 +16,6 @@ class ExprPrinter {
 
         case Expr::STRING_LIT:
             return '`' . (string)$e->value . '`';
-        case Expr::INT_LIT:
-            return (string)$e->value;
 
         case Expr::BAD:
             return '(bad `' . $e->value['msg'] . '`)';

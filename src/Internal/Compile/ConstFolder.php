@@ -9,7 +9,7 @@ class ConstFolder {
     /**
      * @param ExprParser $parser
      */
-    function __construct($parser) {
+    public function __construct($parser) {
         $this->parser = $parser;
     }
 
@@ -21,51 +21,51 @@ class ConstFolder {
     public function foldBinaryExpr($kind, $x, $y) {
         switch ($kind) {
         case Expr::CONCAT:
-            $lhs = self::fold($x);
+            $lhs = $this->fold($x);
             if (!is_string($lhs)) {
                 return null;
             }
-            $rhs = self::fold($y);
+            $rhs = $this->fold($y);
             if (!is_string($rhs)) {
                 return null;
             }
             return $lhs . $rhs;
         case Expr::MUL:
-            $lhs = self::fold($x);
+            $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
             }
-            $rhs = self::fold($y);
+            $rhs = $this->fold($y);
             if (!is_numeric($rhs)) {
                 return null;
             }
             return $lhs * $rhs;
         case Expr::QUO:
-            $lhs = self::fold($x);
+            $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
             }
-            $rhs = self::fold($y);
+            $rhs = $this->fold($y);
             if (!is_numeric($rhs)) {
                 return null;
             }
             return $lhs / $rhs;
         case Expr::ADD:
-            $lhs = self::fold($x);
+            $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
             }
-            $rhs = self::fold($y);
+            $rhs = $this->fold($y);
             if (!is_numeric($rhs)) {
                 return null;
             }
             return $lhs + $rhs;
         case Expr::SUB:
-            $lhs = self::fold($x);
+            $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
             }
-            $rhs = self::fold($y);
+            $rhs = $this->fold($y);
             if (!is_numeric($rhs)) {
                 return null;
             }
@@ -83,12 +83,11 @@ class ConstFolder {
     public function fold($e) {
         switch ($e->kind) {
         case Expr::INT_LIT:
-            return $e->value;
         case Expr::STRING_LIT:
             return $e->value;
         
         case Expr::NEG:
-            $arg = self::fold($this->getExprMember($e, 0));
+            $arg = $this->fold($this->getExprMember($e, 0));
             if (!is_numeric($arg)) {
                 return null;
             }

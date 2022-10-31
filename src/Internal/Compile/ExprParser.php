@@ -223,7 +223,6 @@ class ExprParser {
             // A small optimization: we can allocate exactly 1 member
             // for empty argument list.
             $this->allocateExprMembers($left, 1);
-            $this->getExprMember($left, 0);
             $this->getExprMember($left, 0)->assign($this->tmp);
             return;
         }

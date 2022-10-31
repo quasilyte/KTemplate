@@ -290,6 +290,7 @@ class Lexer {
                     return;
                 }
             }
+            break;
         case '%': {
             if ($this->pos < $this->src_len - 1) {
                 switch ($this->src[$this->pos + 1]) {
@@ -300,6 +301,7 @@ class Lexer {
                     return;
                 }
             }
+            break;
         }
         case '}':
             if ($this->pos < $this->src_len - 1) {
@@ -311,6 +313,7 @@ class Lexer {
                     return;
                 }
             }
+            break;
         }
 
         $this->scanTextInto($dst);
@@ -409,6 +412,7 @@ class Lexer {
                 $dst->kind = TokenKind::KEYWORD_IN;
                 return;
             }
+            break;
         case 3:
             if (substr_compare($this->src, 'end', $dst->pos_from, 3) === 0) {
                 $dst->kind = TokenKind::KEYWORD_END;
@@ -442,6 +446,7 @@ class Lexer {
                 $dst->kind = TokenKind::KEYWORD_ARG;
                 return;
             }
+            break;
         case 4:
             if (substr_compare($this->src, 'true', $dst->pos_from, 4) === 0) {
                 $dst->kind = TokenKind::KEYWORD_TRUE;
@@ -455,6 +460,7 @@ class Lexer {
                 $dst->kind = TokenKind::KEYWORD_ELSE;
                 return;
             }
+            break;
         case 5:
             if (substr_compare($this->src, 'false', $dst->pos_from, 5) === 0) {
                 $dst->kind = TokenKind::KEYWORD_FALSE;
@@ -464,11 +470,13 @@ class Lexer {
                 $dst->kind = TokenKind::KEYWORD_PARAM;
                 return;
             }
+            break;
         case 6:
             if (substr_compare($this->src, 'elseif', $dst->pos_from, 6) === 0) {
                 $dst->kind = TokenKind::KEYWORD_ELSEIF;
                 return;
             }
+            break;
         case 7:
             if (substr_compare($this->src, 'include', $dst->pos_from, 7) === 0) {
                 $dst->kind = TokenKind::KEYWORD_INCLUDE;
@@ -478,6 +486,7 @@ class Lexer {
                 $dst->kind = TokenKind::KEYWORD_MATCHES;
                 return;
             }
+            break;
         }
     }
 

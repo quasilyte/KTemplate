@@ -61,7 +61,6 @@ class FilesystemLoader implements LoaderInterface {
             }
         }
         throw new \Exception("can't resolve $path path");
-        return '';
     }
 
     /**
