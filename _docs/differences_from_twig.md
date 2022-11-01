@@ -77,6 +77,7 @@ In KTemplate, `x.y.z` is not necessarily identical to `x["y"]["z"]`, because it'
 KTemplate doesn't implement these features:
 
 * Named arguments for function calls
+* Functions are always called with `()`
 * Some tags like `spaceless` and other (consult the API reference)
 * Macros system
 * Array literals
