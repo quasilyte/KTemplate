@@ -1,4 +1,4 @@
-![](docs/logo.png)
+![](_docs/logo.png)
 
 ## Overview
 
