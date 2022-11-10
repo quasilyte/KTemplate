@@ -1,4 +1,4 @@
-# KTemplate
+![](docs/logo.png)
 
 ## Overview
 
