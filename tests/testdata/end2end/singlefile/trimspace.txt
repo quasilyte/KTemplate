@@ -1,0 +1,67 @@
+{% let $ten = "10" %}
+
+{% let $blockvar1 %}
+  {{ $ten }}
+{% end %}
+>{{ $blockvar1 }}<
+
+{% let $blockvar2 -%}
+  {{ $ten }}
+{% end %}
+>{{ $blockvar2 }}<
+
+{% let $blockvar3 %}
+  {{ $ten }}
+{%- end %}
+>{{ $blockvar3 }}<
+
+{% let $blockvar4 -%}
+  {{ $ten }}
+{%- end %}
+>{{ $blockvar4 }}<
+
+{% let $blockvar5 %}
+  {{- $ten -}}
+{% end %}
+>{{ $blockvar5 }}<
+
+{% let $blockvar6 -%}
+  {{- $ten -}}
+{%- end %}
+>{{ $blockvar6 }}<
+
+{% set $blockvar1 %}
+  {{ $ten }}
+  {{ $ten }}
+{% end %}
+>{{ $blockvar1 }}<
+
+{% set $blockvar1 %}
+  {{ $ten -}}
+  {{ $ten }}
+{% end %}
+>{{ $blockvar1 }}<
+
+{% set $blockvar1 %}
+  {{ $ten }}
+  {{- $ten }}
+{% end %}
+>{{ $blockvar1 }}<
+
+{% set $blockvar1 %}
+  {{ $ten -}}
+  {{- $ten }}
+{% end %}
+>{{ $blockvar1 }}<
+
+{% set $blockvar1 -%}
+  {{ $ten -}}
+  {{ $ten -}}
+{% end %}
+>{{- $blockvar1 }}<
+
+{% set $blockvar1 -%}
+  {{- $ten -}}
+  {{- $ten -}}
+{%- end %}
+>{{- $blockvar1 }}<

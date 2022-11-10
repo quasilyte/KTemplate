@@ -214,7 +214,7 @@ class Compiler {
                 }
                 continue;
             }
-            if ($tok->kind === TokenKind::CONTROL_START || $tok->kind === TokenKind::CONTROL_START_TRIM) {
+            if (self::isControlStartTok($tok->kind)) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_ARG)) {
                     $this->compileTemplateArg();
                     continue;
@@ -279,7 +279,7 @@ class Compiler {
         $has_else = false;
         while (true) {
             $tok = $this->lexer->scan();
-            if ($tok->kind === TokenKind::CONTROL_START || $tok->kind === TokenKind::CONTROL_START_TRIM) {
+            if (self::isControlStartTok($tok->kind)) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
                     $this->expectEndToken(TokenKind::CONTROL_END);
                     if (!$has_else) {
@@ -323,7 +323,7 @@ class Compiler {
         $this->emit(Op::START_TMP_OUTPUT);
         while (true) {
             $tok = $this->lexer->scan();
-            if ($tok->kind === TokenKind::CONTROL_START && $this->lexer->consume(TokenKind::KEYWORD_END)) {
+            if (self::isControlStartTok($tok->kind) && $this->lexer->consume(TokenKind::KEYWORD_END)) {
                 $this->expectEndToken(TokenKind::CONTROL_END);
                 break;
             }
@@ -468,7 +468,7 @@ class Compiler {
         $this->emitCondJump($jump_op, $cond_slot, $label_next);
         while (true) {
             $tok = $this->lexer->scan();
-            if ($tok->kind === TokenKind::CONTROL_START || $tok->kind === TokenKind::CONTROL_START_TRIM) {
+            if (self::isControlStartTok($tok->kind)) {
                 if ($this->lexer->consume(TokenKind::KEYWORD_END)) {
                     $this->expectEndToken(TokenKind::CONTROL_END);
                     $this->tryBindLabel($label_next);
@@ -516,6 +516,13 @@ class Compiler {
         } else {
             $this->failToken($tok, "expected " . TokenKind::prettyName($kind) . ' or ' . TokenKind::prettyName($trim_kind) . ', found ' . $tok->prettyKindName());
         }
+    }
+
+    /**
+     * @param int $tok
+     */
+    private static function isControlStartTok($tok) {
+        return $tok === TokenKind::CONTROL_START || $tok === TokenKind::CONTROL_START_TRIM;
     }
 
     /**
