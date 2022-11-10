@@ -17,6 +17,9 @@ class RendererState {
     public $slots = [];
 
     /** @var int */
+    public $slots_used = 0;
+
+    /** @var int */
     public $slot_offset = 0;
 
     /** @var int */
@@ -45,6 +48,7 @@ class RendererState {
         $this->buf = '';
         $this->buf2 = '';
         $this->slot_offset = 0;
+        $this->slots_used = 0;
         $this->template = null;
     }
 
@@ -55,7 +59,8 @@ class RendererState {
     }
 
     public function clearSlots() {
-        foreach ($this->slots as $i => $_) {
+        $slots_used = $this->slots_used;
+        for ($i = 0; $i < $slots_used; $i++) {
             $this->slots[$i] = null;
         }
     }

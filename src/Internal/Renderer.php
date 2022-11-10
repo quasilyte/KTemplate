@@ -54,7 +54,10 @@ class Renderer {
     private function prepareTemplateFrame($t, $slot_offset) {
         $state = $this->state;
 
-        $need_slots = $t->frameSize() + $t->frameArgsSize();
+        $need_slots = $t->frameSize() + $t->frameArgsSize() + $slot_offset;
+        if ($need_slots > $state->slots_used) {
+            $state->slots_used = $need_slots;
+        }
         $state->reserve($need_slots);
 
         // Now bind the default template param values.
@@ -606,7 +609,7 @@ class Renderer {
 
             case Op::PREPARE_TEMPLATE:
                 $state->template = $this->env->getTemplate($t->string_values[($opdata >> 8) & 0xffff]);
-                $this->prepareTemplateFrame($state->template, $fp +$t->frameSize());
+                $this->prepareTemplateFrame($state->template, $fp + $t->frameSize());
                 break;
             case Op::INCLUDE_TEMPLATE:
                 $this->execTemplate($t, $state->template);
