@@ -390,122 +390,142 @@ class Op {
     // Result type: Types::STRING
     public const CONCAT_SLOT0 = 78;
     
-    // Encoding: 0x4f dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x4f dst:wslot arg1:rslot arg2:rslot arg3:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const EQ = 79;
+    // Result type: Types::STRING
+    public const CONCAT3 = 79;
     
-    // Encoding: 0x50 arg1:rslot arg2:rslot
+    // Encoding: 0x50 arg1:rslot arg2:rslot arg3:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const EQ_SLOT0 = 80;
+    // Result type: Types::STRING
+    public const CONCAT3_SLOT0 = 80;
     
-    // Encoding: 0x51 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x51 dst:wslot arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const LT = 81;
+    // Result type: Types::STRING
+    public const APPEND = 81;
     
-    // Encoding: 0x52 arg1:rslot arg2:rslot
+    // Encoding: 0x52 arg:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::BOOL
-    public const LT_SLOT0 = 82;
+    // Result type: Types::STRING
+    public const APPEND_SLOT0 = 82;
     
     // Encoding: 0x53 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_EQ = 83;
+    public const EQ = 83;
     
     // Encoding: 0x54 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_EQ_SLOT0 = 84;
+    public const EQ_SLOT0 = 84;
     
     // Encoding: 0x55 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT_EQ = 85;
+    public const LT = 85;
     
     // Encoding: 0x56 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT_EQ_SLOT0 = 86;
+    public const LT_SLOT0 = 86;
     
     // Encoding: 0x57 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const ADD = 87;
+    // Result type: Types::BOOL
+    public const LT_EQ = 87;
     
     // Encoding: 0x58 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const ADD_SLOT0 = 88;
+    // Result type: Types::BOOL
+    public const LT_EQ_SLOT0 = 88;
     
     // Encoding: 0x59 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const SUB = 89;
+    // Result type: Types::BOOL
+    public const NOT_EQ = 89;
     
     // Encoding: 0x5a arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
-    // Result type: Types::NUMERIC
-    public const SUB_SLOT0 = 90;
+    // Result type: Types::BOOL
+    public const NOT_EQ_SLOT0 = 90;
     
     // Encoding: 0x5b dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MUL = 91;
+    public const ADD = 91;
     
     // Encoding: 0x5c arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MUL_SLOT0 = 92;
+    public const ADD_SLOT0 = 92;
     
     // Encoding: 0x5d dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const QUO = 93;
+    public const SUB = 93;
     
     // Encoding: 0x5e arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const QUO_SLOT0 = 94;
+    public const SUB_SLOT0 = 94;
     
     // Encoding: 0x5f dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MOD = 95;
+    public const MUL = 95;
     
     // Encoding: 0x60 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MOD_SLOT0 = 96;
+    public const MUL_SLOT0 = 96;
     
-    // Encoding: 0x61 dst:wslot s:rslot regexp:strindex
+    // Encoding: 0x61 dst:wslot arg1:rslot arg2:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    // Result type: Types::NUMERIC
+    public const QUO = 97;
+    
+    // Encoding: 0x62 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    // Result type: Types::NUMERIC
+    public const QUO_SLOT0 = 98;
+    
+    // Encoding: 0x63 dst:wslot arg1:rslot arg2:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    // Result type: Types::NUMERIC
+    public const MOD = 99;
+    
+    // Encoding: 0x64 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    // Result type: Types::NUMERIC
+    public const MOD_SLOT0 = 100;
+    
+    // Encoding: 0x65 dst:wslot s:rslot regexp:strindex
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const MATCHES = 97;
+    public const MATCHES = 101;
     
-    // Encoding: 0x62 s:rslot regexp:strindex
+    // Encoding: 0x66 s:rslot regexp:strindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const MATCHES_SLOT0 = 98;
+    public const MATCHES_SLOT0 = 102;
     
-    // Encoding: 0x63
+    // Encoding: 0x67
     // Result type: unknown/varying
-    public const START_TMP_OUTPUT = 99;
+    public const START_TMP_OUTPUT = 103;
     
-    // Encoding: 0x64 dst:wslot
+    // Encoding: 0x68 dst:wslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const FINISH_TMP_OUTPUT = 100;
+    public const FINISH_TMP_OUTPUT = 104;
     
-    // Encoding: 0x65 path:strindex
+    // Encoding: 0x69 path:strindex
     // Result type: unknown/varying
-    public const PREPARE_TEMPLATE = 101;
+    public const PREPARE_TEMPLATE = 105;
     
-    // Encoding: 0x66
+    // Encoding: 0x6a
     // Result type: unknown/varying
-    public const INCLUDE_TEMPLATE = 102;
+    public const INCLUDE_TEMPLATE = 106;
     
 
     /**
@@ -671,52 +691,60 @@ class Op {
         case 78:
             return 'CONCAT_SLOT0';
         case 79:
-            return 'EQ';
+            return 'CONCAT3';
         case 80:
-            return 'EQ_SLOT0';
+            return 'CONCAT3_SLOT0';
         case 81:
-            return 'LT';
+            return 'APPEND';
         case 82:
-            return 'LT_SLOT0';
+            return 'APPEND_SLOT0';
         case 83:
-            return 'LT_EQ';
+            return 'EQ';
         case 84:
-            return 'LT_EQ_SLOT0';
+            return 'EQ_SLOT0';
         case 85:
-            return 'NOT_EQ';
+            return 'LT';
         case 86:
-            return 'NOT_EQ_SLOT0';
+            return 'LT_SLOT0';
         case 87:
-            return 'ADD';
+            return 'LT_EQ';
         case 88:
-            return 'ADD_SLOT0';
+            return 'LT_EQ_SLOT0';
         case 89:
-            return 'SUB';
+            return 'NOT_EQ';
         case 90:
-            return 'SUB_SLOT0';
+            return 'NOT_EQ_SLOT0';
         case 91:
-            return 'MUL';
+            return 'ADD';
         case 92:
-            return 'MUL_SLOT0';
+            return 'ADD_SLOT0';
         case 93:
-            return 'QUO';
+            return 'SUB';
         case 94:
-            return 'QUO_SLOT0';
+            return 'SUB_SLOT0';
         case 95:
-            return 'MOD';
+            return 'MUL';
         case 96:
-            return 'MOD_SLOT0';
+            return 'MUL_SLOT0';
         case 97:
-            return 'MATCHES';
+            return 'QUO';
         case 98:
-            return 'MATCHES_SLOT0';
+            return 'QUO_SLOT0';
         case 99:
-            return 'START_TMP_OUTPUT';
+            return 'MOD';
         case 100:
-            return 'FINISH_TMP_OUTPUT';
+            return 'MOD_SLOT0';
         case 101:
-            return 'PREPARE_TEMPLATE';
+            return 'MATCHES';
         case 102:
+            return 'MATCHES_SLOT0';
+        case 103:
+            return 'START_TMP_OUTPUT';
+        case 104:
+            return 'FINISH_TMP_OUTPUT';
+        case 105:
+            return 'PREPARE_TEMPLATE';
+        case 106:
             return 'INCLUDE_TEMPLATE';
         default:
             return '?';
@@ -844,6 +872,14 @@ class Op {
         case self::CONCAT:
             return Types::STRING;
         case self::CONCAT_SLOT0:
+            return Types::STRING;
+        case self::CONCAT3:
+            return Types::STRING;
+        case self::CONCAT3_SLOT0:
+            return Types::STRING;
+        case self::APPEND:
+            return Types::STRING;
+        case self::APPEND_SLOT0:
             return Types::STRING;
         case self::EQ:
             return Types::BOOL;
@@ -1052,53 +1088,61 @@ class Op {
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case 78: // CONCAT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 79: // EQ
+        case 79: // CONCAT3
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 80: // EQ_SLOT0
+        case 80: // CONCAT3_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 81: // LT
+        case 81: // APPEND
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 82: // LT_SLOT0
+        case 82: // APPEND_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 83: // LT_EQ
+        case 83: // EQ
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 84: // LT_EQ_SLOT0
+        case 84: // EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 85: // NOT_EQ
+        case 85: // LT
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 86: // NOT_EQ_SLOT0
+        case 86: // LT_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 87: // ADD
+        case 87: // LT_EQ
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 88: // ADD_SLOT0
+        case 88: // LT_EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 89: // SUB
+        case 89: // NOT_EQ
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 90: // SUB_SLOT0
+        case 90: // NOT_EQ_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 91: // MUL
+        case 91: // ADD
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 92: // MUL_SLOT0
+        case 92: // ADD_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 93: // QUO
+        case 93: // SUB
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 94: // QUO_SLOT0
+        case 94: // SUB_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 95: // MOD
+        case 95: // MUL
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 96: // MOD_SLOT0
+        case 96: // MUL_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 97: // MATCHES
+        case 97: // QUO
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 98: // MATCHES_SLOT0
+        case 98: // QUO_SLOT0
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 99: // START_TMP_OUTPUT
+        case 99: // MOD
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 100: // MOD_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 101: // MATCHES
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case 102: // MATCHES_SLOT0
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case 103: // START_TMP_OUTPUT
             return 0;
-        case 100: // FINISH_TMP_OUTPUT
+        case 104: // FINISH_TMP_OUTPUT
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 101: // PREPARE_TEMPLATE
+        case 105: // PREPARE_TEMPLATE
             return 0;
-        case 102: // INCLUDE_TEMPLATE
+        case 106: // INCLUDE_TEMPLATE
             return 0;
         default:
             return 0;
@@ -1184,6 +1228,10 @@ class Op {
         self::AND_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::CONCAT => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::CONCAT_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::CONCAT3 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::CONCAT3_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::APPEND => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::APPEND_SLOT0 => [OpInfo::ARG_SLOT],
         self::EQ => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::EQ_SLOT0 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::LT => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],

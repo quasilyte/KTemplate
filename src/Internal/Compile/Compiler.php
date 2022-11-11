@@ -59,6 +59,10 @@ class Compiler {
     /** @var string */
     private $tmp_output_tag = '';
 
+    /** @var Expr[] */
+    private $tmp_expr_array = [null, null, null, null, null, null, null, null, null, null];
+    private $tmp_expr_array_size = 0;
+
     public function __construct() {
         $this->lexer = new Lexer();
         $this->parser = new ExprParser();
@@ -731,7 +735,6 @@ class Compiler {
      */
     private function isAdditiveBinaryExpr($e) {
         switch ($e->kind) {
-        case ExprKind::CONCAT:
         case ExprKind::ADD:
         case ExprKind::MUL:
             return true;
@@ -850,6 +853,8 @@ class Compiler {
             return $this->compileMatches($dst, $e);
 
         case ExprKind::CONCAT:
+            return $this->compileConcat($dst, $e);
+
         case ExprKind::EQ:
         case ExprKind::LT:
         case ExprKind::LT_EQ:
@@ -1178,6 +1183,62 @@ class Compiler {
         $op = $this->opByBinaryExprKind($e->kind);
         $this->compileBinaryExpr($dst, $op, $lhs_slot, $rhs_slot);
         return Op::opcodeResultType($op);
+    }
+
+    /**
+     * @param int $dst
+     * @param Expr $e
+     * @return int
+     */
+    private function compileConcat($dst, $e) {
+        $this->tmp_expr_array_size = 0;
+        Expr::walk($this->parser, $e, function ($x) {
+            if ($x->kind === ExprKind::CONCAT) {
+                return true;
+            }
+            if ($this->tmp_expr_array_size >= count($this->tmp_expr_array)) {
+                $this->failExpr($x, "too many concat operands ($this->tmp_expr_array_size)");
+            }
+            $this->tmp_expr_array[$this->tmp_expr_array_size] = $x;
+            $this->tmp_expr_array_size++;
+            return false;
+        });
+
+        $num_args = 1;
+        for ($i = 1; $i < $this->tmp_expr_array_size; $i++) {
+            $prev_arg = $this->tmp_expr_array[$num_args-1];
+            $current_arg = $this->tmp_expr_array[$i];
+            $const_val = $this->const_folder->foldBinaryExpr(ExprKind::CONCAT, $prev_arg, $current_arg);
+            if ($const_val !== null) {
+                $prev_arg->kind = ExprKind::STRING_LIT;
+                $prev_arg->value = (string)$const_val;
+            } else {
+                $this->tmp_expr_array[$num_args] = $current_arg;
+                $num_args++;
+            }
+        }
+
+        $i = 0;
+        if ($num_args >= 3) {
+            $i = 3;
+            $arg1 = $this->compileTempExpr($this->tmp_expr_array[0]);
+            $arg2 = $this->compileTempExpr($this->tmp_expr_array[1]);
+            $arg3 = $this->compileTempExpr($this->tmp_expr_array[2]);
+            $this->emit4dst(Op::CONCAT3, $dst, $arg1, $arg2, $arg3);
+        } else {
+            $i = 2;
+            $arg1 = $this->compileTempExpr($this->tmp_expr_array[0]);
+            $arg2 = $this->compileTempExpr($this->tmp_expr_array[1]);
+            $this->emit3dst(Op::CONCAT, $dst, $arg1, $arg2);
+        }
+        $num_args -= $i;
+        while ($num_args > 0) {
+            $arg_slot = $this->compileTempExpr($this->tmp_expr_array[$i]);
+            $this->emit2dst(Op::APPEND, $dst, $arg_slot);
+            $i++;
+            $num_args--;
+        }
+        return Types::STRING;
     }
 
     /**

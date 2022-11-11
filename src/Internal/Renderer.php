@@ -421,11 +421,23 @@ class Renderer {
             case Op::AND_SLOT0:
                 $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] && $state->slots[$fp + (($opdata >> 16) & 0xff)];
                 break;
+            case Op::CONCAT3:
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] . $state->slots[$fp + (($opdata >> 24) & 0xff)] . $state->slots[$fp + (($opdata >> 32) & 0xff)];
+                break;
+            case Op::CONCAT3_SLOT0:
+                $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] . $state->slots[$fp + (($opdata >> 16) & 0xff)] . $state->slots[$fp + (($opdata >> 24) & 0xff)];
+                break;
             case Op::CONCAT:
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] . $state->slots[$fp + (($opdata >> 24) & 0xff)];
                 break;
             case Op::CONCAT_SLOT0:
                 $slot0 = $state->slots[$fp + (($opdata >> 8) & 0xff)] . $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                break;
+            case Op::APPEND:
+                $state->slots[$fp + (($opdata >> 8) & 0xff)] .= $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                break;
+            case Op::APPEND_SLOT0:
+                $slot0 .= $state->slots[$fp + (($opdata >> 8) & 0xff)];
                 break;
             case Op::EQ:
                 $state->slots[$fp + (($opdata >> 8) & 0xff)] = $state->slots[$fp + (($opdata >> 16) & 0xff)] == $state->slots[$fp + (($opdata >> 24) & 0xff)];

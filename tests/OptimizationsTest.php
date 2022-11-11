@@ -66,10 +66,14 @@ class OptimizationsTest extends TestCase {
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
-            '{{ x ~ "a" ~ "b" }}' => [
+            // TODO: do not reload extdata inside one expression; re-use slot2 here
+            '{{ x ~ "a" ~ "b" ~ x ~ "c" ~ "d" }}' => [
                 '  LOAD_EXTDATA_1 slot2 slot1 x',
                 '  LOAD_STRING_CONST slot3 `ab`',
-                '  CONCAT_SLOT0 *slot0 slot2 slot3',
+                '  LOAD_EXTDATA_1 slot4 slot1 x',
+                '  CONCAT3_SLOT0 *slot0 slot2 slot3 slot4',
+                '  LOAD_STRING_CONST slot5 `cd`',
+                '  APPEND_SLOT0 *slot0 slot5',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
