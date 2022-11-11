@@ -68,7 +68,7 @@ class ExprParser {
     private function setError(Expr $e, string $msg) {
         $pos = $this->lexer->getPos();
         $line = $this->lexer->getLineByPos($pos);
-        $e->kind = Expr::BAD;
+        $e->kind = ExprKind::BAD;
         $e->value = ['line' => $line, 'msg' => $msg];
     }
 
@@ -78,45 +78,45 @@ class ExprParser {
         $tok = $lexer->scan();
         switch ($tok->kind) {
         case TokenKind::KEYWORD_TRUE:
-            $left->kind = Expr::BOOL_LIT;
+            $left->kind = ExprKind::BOOL_LIT;
             $left->value = true;
             break;
         case TokenKind::KEYWORD_FALSE:
-            $left->kind = Expr::BOOL_LIT;
+            $left->kind = ExprKind::BOOL_LIT;
             $left->value = false;
             break;
         case TokenKind::DOLLAR_IDENT:
-            $left->kind = Expr::DOLLAR_IDENT;
+            $left->kind = ExprKind::DOLLAR_IDENT;
             $left->value = $lexer->dollarVarName($tok);
             break;
         case TokenKind::IDENT:
-            $left->kind = Expr::IDENT;
+            $left->kind = ExprKind::IDENT;
             $left->value = $lexer->tokenText($tok);
             if ($lexer->consume(TokenKind::LPAREN)) {
                 $this->parseCallExpr($left);
             }
             break;
         case TokenKind::INT_LIT:
-            $left->kind = Expr::INT_LIT;
+            $left->kind = ExprKind::INT_LIT;
             $left->value = (int)$lexer->tokenText($tok);
             break;
         case TokenKind::FLOAT_LIT:
-            $left->kind = Expr::FLOAT_LIT;
+            $left->kind = ExprKind::FLOAT_LIT;
             $left->value = (float)$lexer->tokenText($tok);
             break;
         case TokenKind::STRING_LIT_RAW:
-            $left->kind = Expr::STRING_LIT;
+            $left->kind = ExprKind::STRING_LIT;
             $left->value = $lexer->stringText($tok);
             break;
         case TokenKind::STRING_LIT_Q1:
         case TokenKind::STRING_LIT_Q2:
             // We may enable string interpolation inside DQ strings later.
             // For now, they're behaving identically.
-            $left->kind = Expr::STRING_LIT;
+            $left->kind = ExprKind::STRING_LIT;
             $left->value = $this->interpretString($left, $lexer->stringText($tok));
             break;
         case TokenKind::KEYWORD_NULL:
-            $left->kind = Expr::NULL_LIT;
+            $left->kind = ExprKind::NULL_LIT;
             break;
         case TokenKind::LPAREN:
             $this->parseExpr($left, 0);
@@ -125,16 +125,16 @@ class ExprParser {
             }
             break;
         case TokenKind::KEYWORD_NOT:
-            $this->parseUnaryExpr($left, Expr::NOT, $this->unaryPrecedence(TokenKind::KEYWORD_NOT));
+            $this->parseUnaryExpr($left, ExprKind::NOT, $this->unaryPrecedence(TokenKind::KEYWORD_NOT));
             break;
         case TokenKind::MINUS:
             if ($lexer->peek()->kind === TokenKind::INT_LIT) {
                 $tok = $lexer->scan();
-                $left->kind = Expr::INT_LIT;
+                $left->kind = ExprKind::INT_LIT;
                 $left->value = -(int)$lexer->tokenText($tok);
                 break;
             }
-            $this->parseUnaryExpr($left, Expr::NEG, $this->unaryPrecedence(TokenKind::MINUS));
+            $this->parseUnaryExpr($left, ExprKind::NEG, $this->unaryPrecedence(TokenKind::MINUS));
             break;
         case TokenKind::ERROR:
             $this->setError($left, $this->lexer->getError());
@@ -154,57 +154,57 @@ class ExprParser {
                 $this->parseIndexExpr($left);
                 break;
             case TokenKind::KEYWORD_MATCHES:
-                $this->parseBinaryExpr($left, Expr::MATCHES, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::MATCHES, $right_prec);
                 break;
             case TokenKind::PIPE:
-                $this->parseBinaryExpr($left, Expr::FILTER, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::FILTER, $right_prec);
                 break;
             case TokenKind::DOT:
-                $this->parseBinaryExpr($left, Expr::DOT_ACCESS, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::DOT_ACCESS, $right_prec);
                 break;
             case TokenKind::PLUS:
-                $this->parseBinaryExpr($left, Expr::ADD, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::ADD, $right_prec);
                 break;
             case TokenKind::MINUS:
-                $this->parseBinaryExpr($left, Expr::SUB, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::SUB, $right_prec);
                 break;
             case TokenKind::STAR:
-                $this->parseBinaryExpr($left, Expr::MUL, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::MUL, $right_prec);
                 break;
             case TokenKind::SLASH:
-                $this->parseBinaryExpr($left, Expr::QUO, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::QUO, $right_prec);
                 break;
             case TokenKind::PERCENT:
-                $this->parseBinaryExpr($left, Expr::MOD, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::MOD, $right_prec);
                 break;
             case TokenKind::TILDE:
-                $this->parseBinaryExpr($left, Expr::CONCAT, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::CONCAT, $right_prec);
                 break;
             case TokenKind::KEYWORD_AND:
                 // Parse AND as right-associative to simplify the compilation.
-                $this->parseBinaryExpr($left, Expr::AND, $right_prec - 1);
+                $this->parseBinaryExpr($left, ExprKind::AND, $right_prec - 1);
                 break;
             case TokenKind::KEYWORD_OR:
                 // Parse OR as right-associative to simplify the compilation.
-                $this->parseBinaryExpr($left, Expr::OR, $right_prec - 1);
+                $this->parseBinaryExpr($left, ExprKind::OR, $right_prec - 1);
                 break;
             case TokenKind::EQ:
-                $this->parseBinaryExpr($left, Expr::EQ, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::EQ, $right_prec);
                 break;
             case TokenKind::NOT_EQ:
-                $this->parseBinaryExpr($left, Expr::NOT_EQ, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::NOT_EQ, $right_prec);
                 break;
             case TokenKind::LT:
-                $this->parseBinaryExpr($left, Expr::LT, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::LT, $right_prec);
                 break;
             case TokenKind::LT_EQ:
-                $this->parseBinaryExpr($left, Expr::LT_EQ, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::LT_EQ, $right_prec);
                 break;
             case TokenKind::GT:
-                $this->parseBinaryExpr($left, Expr::GT, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::GT, $right_prec);
                 break;
             case TokenKind::GT_EQ:
-                $this->parseBinaryExpr($left, Expr::GT_EQ, $right_prec);
+                $this->parseBinaryExpr($left, ExprKind::GT_EQ, $right_prec);
                 break;
             }
         }
@@ -217,7 +217,7 @@ class ExprParser {
      */
     private function parseCallExpr($left) {
         $this->tmp->assign($left);
-        $left->kind = Expr::CALL;
+        $left->kind = ExprKind::CALL;
         $left->value = 0; // Number of arguments
         if ($this->lexer->consume(TokenKind::RPAREN)) {
             // A small optimization: we can allocate exactly 1 member
@@ -270,7 +270,7 @@ class ExprParser {
      */
     private function parseIndexExpr($left) {
         $this->tmp->assign($left);
-        $left->kind = Expr::INDEX;
+        $left->kind = ExprKind::INDEX;
         $this->allocateExprMembers($left, 2);
         $this->getExprMember($left, 0)->assign($this->tmp);
         $this->parseExpr($this->getExprMember($left, 1), 0);

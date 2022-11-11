@@ -384,7 +384,7 @@ class Compiler {
         $var_slot = $this->frame->allocVarSlot($var_name);
         if ($this->lexer->consume(TokenKind::ASSIGN)) {
             $e = $this->parser->parseRootExpr($this->lexer);
-            if ($e->kind === Expr::NULL_LIT) {
+            if ($e->kind === ExprKind::NULL_LIT) {
                 $this->failExpr($e, "$var_name param default initializer can't have null value");
             }
             $const_value = $this->const_folder->fold($e);
@@ -422,7 +422,7 @@ class Compiler {
         $this->current_template_arg = $arg_name;
         if ($this->lexer->consume(TokenKind::ASSIGN)) {
             $e = $this->parser->parseRootExpr($this->lexer);
-            if ($e->kind === Expr::NULL_LIT) {
+            if ($e->kind === ExprKind::NULL_LIT) {
                 $this->failExpr($e, "passing null will cause the param to be default-initialized");
             }
             $this->compileRootExpr(Frame::ARG_SLOT_PLACEHOLDER, $e);
@@ -438,10 +438,10 @@ class Compiler {
         $jump_op = Op::JUMP_FALSY;
         $cond_slot = 0;
         switch ($e->kind) {
-        case Expr::NOT_EQ:
+        case ExprKind::NOT_EQ:
             $lhs = $this->parser->getExprMember($e, 0);
             $rhs = $this->parser->getExprMember($e, 1);
-            if ($lhs->kind === Expr::DOLLAR_IDENT && $rhs->kind === Expr::NULL_LIT) {
+            if ($lhs->kind === ExprKind::DOLLAR_IDENT && $rhs->kind === ExprKind::NULL_LIT) {
                 $jump_op = Op::JUMP_NOT_NULL;
                 $cond_slot = $this->lookupLocalVar($lhs);
             }
@@ -558,12 +558,12 @@ class Compiler {
             return true;
         }
         switch ($e->kind) {
-        case Expr::DOLLAR_IDENT:
+        case ExprKind::DOLLAR_IDENT:
             $var_slot = $this->lookupLocalVar($e);
             $op = $this->needsEscaping(Types::MIXED) ? Op::OUTPUT : Op::OUTPUT_SAFE;
             $this->emit1($op, $var_slot);
             return true;
-        case Expr::IDENT:
+        case ExprKind::IDENT:
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
@@ -571,7 +571,7 @@ class Compiler {
             $escape_bit = $this->needsEscaping(Types::MIXED) ? 1 : 0;
             $this->emit3(Op::OUTPUT_EXTDATA_1, $cache_slot, $key_offset, $escape_bit);
             return true;
-        case Expr::DOT_ACCESS:
+        case ExprKind::DOT_ACCESS:
             [$p1, $p2, $p3] = $this->decodeDotAccess($e);
             if ($p1 === '') {
                 $this->failExpr($e, 'dot access expression is too complex');
@@ -595,18 +595,18 @@ class Compiler {
     private function decodeDotAccess($e) {
         $lhs = $this->parser->getExprMember($e, 0);
         $rhs = $this->parser->getExprMember($e, 1);
-        if ($rhs->kind !== Expr::IDENT) {
+        if ($rhs->kind !== ExprKind::IDENT) {
             return tuple('', '', '');
         }
-        if ($lhs->kind === Expr::IDENT) {
+        if ($lhs->kind === ExprKind::IDENT) {
             return tuple((string)$lhs->value, (string)$rhs->value, '');
         }
-        if ($lhs->kind !== Expr::DOT_ACCESS) {
+        if ($lhs->kind !== ExprKind::DOT_ACCESS) {
             return tuple('', '', '');
         }
         $lhs0 = $this->parser->getExprMember($lhs, 0);
         $lhs1 = $this->parser->getExprMember($lhs, 1);
-        if ($lhs0->kind !== Expr::IDENT || $lhs1->kind !== Expr::IDENT) {
+        if ($lhs0->kind !== ExprKind::IDENT || $lhs1->kind !== ExprKind::IDENT) {
             return tuple('', '', '');
         }
         return tuple((string)$lhs0->value, (string)$lhs1->value, (string)$rhs->value);
@@ -649,7 +649,7 @@ class Compiler {
      * @return tuple(int, int) -- a slot and result type
      */
     private function compileRootTempExpr($dst, $e) {
-        if ($e->kind === Expr::DOLLAR_IDENT) {
+        if ($e->kind === ExprKind::DOLLAR_IDENT) {
             return tuple($this->lookupLocalVar($e), Types::MIXED);
         }
         return tuple($dst, $this->compileRootExpr($dst, $e));
@@ -660,7 +660,7 @@ class Compiler {
      * @return int -- a slot that holds result
      */
     private function compileTempExpr($e) {
-        if ($e->kind === Expr::DOLLAR_IDENT) {
+        if ($e->kind === ExprKind::DOLLAR_IDENT) {
             return $this->lookupLocalVar($e);
         }
         $temp = $this->frame->allocTempSlot();
@@ -731,9 +731,9 @@ class Compiler {
      */
     private function isAdditiveBinaryExpr($e) {
         switch ($e->kind) {
-        case Expr::CONCAT:
-        case Expr::ADD:
-        case Expr::MUL:
+        case ExprKind::CONCAT:
+        case ExprKind::ADD:
+        case ExprKind::MUL:
             return true;
         default:
             return false;
@@ -792,15 +792,15 @@ class Compiler {
         }
 
         switch ($e->kind) {
-        case Expr::BAD:
+        case ExprKind::BAD:
             $this->fail((int)$e->value['line'], (string)$e->value['msg']);
             return Types::UNKNOWN;
 
-        case Expr::DOLLAR_IDENT:
+        case ExprKind::DOLLAR_IDENT:
             $this->compileTypedMoveNode($dst, $e, $type);
             return $type;
 
-        case Expr::IDENT:
+        case ExprKind::IDENT:
             $cache_slot_info = $this->frame->getCacheSlotInfo((string)$e->value, '', '');
             $cache_slot = $cache_slot_info & 0xff;
             $key_offset = ($cache_slot_info >> 8) & 0xff;
@@ -808,7 +808,7 @@ class Compiler {
             $this->emit3dst(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
             return Types::MIXED;
 
-        case Expr::DOT_ACCESS:
+        case ExprKind::DOT_ACCESS:
             [$p1, $p2, $p3] = $this->decodeDotAccess($e);
             if ($p1 === '') {
                 $this->failExpr($e, 'dot access expression is too complex');
@@ -821,75 +821,75 @@ class Compiler {
             $this->emit3dst($op, $dst, $cache_slot, $key_offset);
             return Types::MIXED;
 
-        case Expr::INDEX:
+        case ExprKind::INDEX:
             $this->compileIndex($dst, $e);
             return Types::MIXED;
 
-        case Expr::OR:
+        case ExprKind::OR:
             $this->compileOr($dst, $e);
             return Types::BOOL;
-        case Expr::AND:
+        case ExprKind::AND:
             $this->compileAnd($dst, $e);
             return Types::BOOL;
 
-        case Expr::NOT:
+        case ExprKind::NOT:
             $this->compileUnaryExpr($dst, Op::NOT, $e);
             return Types::BOOL;
-        case Expr::NEG:
+        case ExprKind::NEG:
             $this->compileUnaryExpr($dst, Op::NEG, $e);
             return Types::NUMERIC;
 
-        case Expr::GT:
+        case ExprKind::GT:
             $this->compileReversedBinaryExprNode($dst, Op::LT, $e);
             return Types::BOOL;
-        case Expr::GT_EQ:
+        case ExprKind::GT_EQ:
             $this->compileReversedBinaryExprNode($dst, Op::LT_EQ, $e);
             return Types::BOOL;
         
-        case Expr::MATCHES:
+        case ExprKind::MATCHES:
             return $this->compileMatches($dst, $e);
 
-        case Expr::CONCAT:
-        case Expr::EQ:
-        case Expr::LT:
-        case Expr::LT_EQ:
-        case Expr::NOT_EQ:
-        case Expr::ADD:
-        case Expr::SUB:
-        case Expr::MUL:
-        case Expr::QUO:
-        case Expr::MOD:
+        case ExprKind::CONCAT:
+        case ExprKind::EQ:
+        case ExprKind::LT:
+        case ExprKind::LT_EQ:
+        case ExprKind::NOT_EQ:
+        case ExprKind::ADD:
+        case ExprKind::SUB:
+        case ExprKind::MUL:
+        case ExprKind::QUO:
+        case ExprKind::MOD:
             return $this->compileBinaryExprNode($dst, $e);
 
-        case Expr::NULL_LIT:
+        case ExprKind::NULL_LIT:
             $this->emit1dst(Op::LOAD_NULL, $dst);
             return Types::NULL;
 
-        case Expr::STRING_LIT:
+        case ExprKind::STRING_LIT:
             $this->compileStringConst($dst, (string)$e->value);
             return Types::STRING;
 
-        case Expr::BOOL_LIT:
+        case ExprKind::BOOL_LIT:
             $this->emit2dst(Op::LOAD_BOOL, $dst, (int)$e->value);
             return Types::BOOL;
 
-        case Expr::INT_LIT:
+        case ExprKind::INT_LIT:
             $this->compileIntConst($dst, (int)$e->value);
             return Types::INT;
 
-        case Expr::FLOAT_LIT:
+        case ExprKind::FLOAT_LIT:
             $this->compileFloatConst($dst, (float)$e->value);
             return Types::FLOAT;
 
-        case Expr::CALL:
+        case ExprKind::CALL:
             $this->compileCall($dst, $e);
             return Types::MIXED;
 
-        case Expr::FILTER:
-            if ($this->parser->getExprMember($e, 1)->kind === Expr::IDENT) {
+        case ExprKind::FILTER:
+            if ($this->parser->getExprMember($e, 1)->kind === ExprKind::IDENT) {
                 return $this->compileFilter1($dst, $e);
             }
-            if ($this->parser->getExprMember($e, 1)->kind === Expr::CALL) {
+            if ($this->parser->getExprMember($e, 1)->kind === ExprKind::CALL) {
                 return $this->compileFilter2($dst, $e);
             }
             $this->failExpr($e, 'compile expr: invalid filter, expected a call or ident');
@@ -930,12 +930,12 @@ class Compiler {
         $seq_expr = $this->parser->getExprMember($e, 0);
         $seq_slot = $this->compileTempExpr($seq_expr);
         $key_expr = $this->parser->getExprMember($e, 1);
-        if ($key_expr->kind === Expr::STRING_LIT) {
+        if ($key_expr->kind === ExprKind::STRING_LIT) {
             $key_id = $this->internString((string)$key_expr->value);
             $this->emit3dst(Op::INDEX_STRING_KEY, $dst, $seq_slot, $key_id);
             return;
         }
-        if ($key_expr->kind === Expr::INT_LIT) {
+        if ($key_expr->kind === ExprKind::INT_LIT) {
             $key_id = $this->internInt((int)$key_expr->value);
             $this->emit3dst(Op::INDEX_INT_KEY, $dst, $seq_slot, $key_id);
             return;
@@ -977,7 +977,7 @@ class Compiler {
         $lhs = $this->parser->getExprMember($e, 0);
         $rhs = $this->parser->getExprMember($e, 1);
 
-        if ($lhs->kind === Expr::DOLLAR_IDENT && $rhs->kind === Expr::DOLLAR_IDENT) {
+        if ($lhs->kind === ExprKind::DOLLAR_IDENT && $rhs->kind === ExprKind::DOLLAR_IDENT) {
             $this->compileBinaryExprNode($dst, $e);
             return;
         }
@@ -1136,29 +1136,29 @@ class Compiler {
      */
     private function opByBinaryExprKind($kind) {
         switch ($kind) {
-        case Expr::OR:
+        case ExprKind::OR:
             return Op::OR;
-        case Expr::AND:
+        case ExprKind::AND:
             return Op::AND;
-        case Expr::CONCAT:
+        case ExprKind::CONCAT:
             return Op::CONCAT;
-        case Expr::EQ:
+        case ExprKind::EQ:
             return Op::EQ;
-        case Expr::LT:
+        case ExprKind::LT:
             return Op::LT;
-        case Expr::LT_EQ:
+        case ExprKind::LT_EQ:
             return Op::LT_EQ;
-        case Expr::NOT_EQ:
+        case ExprKind::NOT_EQ:
             return Op::NOT_EQ;
-        case Expr::ADD:
+        case ExprKind::ADD:
             return Op::ADD;
-        case Expr::SUB:
+        case ExprKind::SUB:
             return Op::SUB;
-        case Expr::MUL:
+        case ExprKind::MUL:
             return Op::MUL;
-        case Expr::QUO:
+        case ExprKind::QUO:
             return Op::QUO;
-        case Expr::MOD:
+        case ExprKind::MOD:
             return Op::MOD;
 
         default:

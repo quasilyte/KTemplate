@@ -5,22 +5,22 @@ namespace KTemplate\Internal\Compile;
 class ExprPrinter {
     public static function formatExpr(ExprParser $p, Expr $e): string {
         switch ($e->kind) {
-        case Expr::IDENT:
-        case Expr::INT_LIT:
+        case ExprKind::IDENT:
+        case ExprKind::INT_LIT:
             return (string)$e->value;
-        case Expr::DOLLAR_IDENT:
+        case ExprKind::DOLLAR_IDENT:
             return '$' . (string)$e->value;
 
-        case Expr::BOOL_LIT:
+        case ExprKind::BOOL_LIT:
             return $e->value ? 'true' : 'false';
 
-        case Expr::STRING_LIT:
+        case ExprKind::STRING_LIT:
             return '`' . (string)$e->value . '`';
 
-        case Expr::BAD:
+        case ExprKind::BAD:
             return '(bad `' . $e->value['msg'] . '`)';
 
-        case Expr::CALL:
+        case ExprKind::CALL:
             $num_args = (int)$e->value;
             $fn = self::formatExpr($p, $p->getExprMember($e, 0));
             if ($num_args === 0) {
@@ -32,47 +32,47 @@ class ExprPrinter {
             }
             return '(call ' . $fn . ' ' . implode(' ', $args) . ')';
 
-        case Expr::FILTER:
+        case ExprKind::FILTER:
             return self::formatBinaryExpr($p, $e, '|');
-        case Expr::DOT_ACCESS:
+        case ExprKind::DOT_ACCESS:
             return self::formatBinaryExpr($p, $e, '.');
-        case Expr::ADD:
+        case ExprKind::ADD:
             return self::formatBinaryExpr($p, $e, '+');
-        case Expr::SUB:
+        case ExprKind::SUB:
             return self::formatBinaryExpr($p, $e, '-');
-        case Expr::MUL:
+        case ExprKind::MUL:
             return self::formatBinaryExpr($p, $e, '*');
-        case Expr::QUO:
+        case ExprKind::QUO:
             return self::formatBinaryExpr($p, $e, '/');
-        case Expr::MOD:
+        case ExprKind::MOD:
             return self::formatBinaryExpr($p, $e, '%');
-        case Expr::CONCAT:
+        case ExprKind::CONCAT:
             return self::formatBinaryExpr($p, $e, '~');
-        case Expr::AND:
+        case ExprKind::AND:
             return self::formatBinaryExpr($p, $e, 'and');
-        case Expr::OR:
+        case ExprKind::OR:
             return self::formatBinaryExpr($p, $e, 'or');
-        case Expr::EQ:
+        case ExprKind::EQ:
             return self::formatBinaryExpr($p, $e, '==');
-        case Expr::NOT_EQ:
+        case ExprKind::NOT_EQ:
             return self::formatBinaryExpr($p, $e, '!=');
-        case Expr::LT:
+        case ExprKind::LT:
             return self::formatBinaryExpr($p, $e, '<');
-        case Expr::LT_EQ:
+        case ExprKind::LT_EQ:
             return self::formatBinaryExpr($p, $e, '<=');
-        case Expr::GT:
+        case ExprKind::GT:
             return self::formatBinaryExpr($p, $e, '>');
-        case Expr::GT_EQ:
+        case ExprKind::GT_EQ:
             return self::formatBinaryExpr($p, $e, '>=');
-        case Expr::MATCHES:
+        case ExprKind::MATCHES:
             return self::formatBinaryExpr($p, $e, 'matches');
 
-        case Expr::NOT:
+        case ExprKind::NOT:
             return self::formatUnaryExpr($p, $e, 'not');
-        case Expr::NEG:
+        case ExprKind::NEG:
             return self::formatUnaryExpr($p, $e, 'neg');
 
-        case Expr::INDEX:
+        case ExprKind::INDEX:
             return self::formatBinaryExpr($p, $e, '[]');
 
         default:

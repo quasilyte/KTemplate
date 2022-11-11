@@ -20,7 +20,7 @@ class ConstFolder {
      */
     public function foldBinaryExpr($kind, $x, $y) {
         switch ($kind) {
-        case Expr::CONCAT:
+        case ExprKind::CONCAT:
             $lhs = $this->fold($x);
             if (!is_string($lhs)) {
                 return null;
@@ -30,7 +30,7 @@ class ConstFolder {
                 return null;
             }
             return $lhs . $rhs;
-        case Expr::MUL:
+        case ExprKind::MUL:
             $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
@@ -40,7 +40,7 @@ class ConstFolder {
                 return null;
             }
             return $lhs * $rhs;
-        case Expr::QUO:
+        case ExprKind::QUO:
             $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
@@ -50,7 +50,7 @@ class ConstFolder {
                 return null;
             }
             return $lhs / $rhs;
-        case Expr::ADD:
+        case ExprKind::ADD:
             $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
@@ -60,7 +60,7 @@ class ConstFolder {
                 return null;
             }
             return $lhs + $rhs;
-        case Expr::SUB:
+        case ExprKind::SUB:
             $lhs = $this->fold($x);
             if (!is_numeric($lhs)) {
                 return null;
@@ -82,22 +82,22 @@ class ConstFolder {
      */
     public function fold($e) {
         switch ($e->kind) {
-        case Expr::INT_LIT:
-        case Expr::STRING_LIT:
+        case ExprKind::INT_LIT:
+        case ExprKind::STRING_LIT:
             return $e->value;
         
-        case Expr::NEG:
+        case ExprKind::NEG:
             $arg = $this->fold($this->getExprMember($e, 0));
             if (!is_numeric($arg)) {
                 return null;
             }
             return -$arg;
 
-        case Expr::CONCAT:
-        case Expr::ADD:
-        case Expr::SUB:
-        case Expr::MUL:
-        case Expr::QUO:
+        case ExprKind::CONCAT:
+        case ExprKind::ADD:
+        case ExprKind::SUB:
+        case ExprKind::MUL:
+        case ExprKind::QUO:
             return $this->foldBinaryExprNode($e);
 
         default:
