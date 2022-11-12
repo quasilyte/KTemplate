@@ -10,6 +10,7 @@ use KTemplate\DataKey;
 use KTemplate\Context;
 
 class BenchmarkRenderer {
+    private $trivial_template;
     private $var_access1_template;
     private $var_access1_x2_template;
     private $var_access1_x10_template;
@@ -59,6 +60,8 @@ class BenchmarkRenderer {
 
         $c = new Compiler();
 
+        $this->trivial_template = $c->compile($env, 'test', 'hello');
+
         $this->var_access1_template = $c->compile($env, 'test', '{{ test_name }}');
 
         $var_access1_src = '';
@@ -89,6 +92,10 @@ class BenchmarkRenderer {
                 {% end %}
             {% end %}
         ');
+    }
+
+    public function benchmarkTrivial() {
+        return $this->renderer->render($this->trivial_template, $this->array_data_provider);
     }
 
     public function benchmarkConcat2() {
