@@ -3,6 +3,7 @@
 namespace KTemplate\Internal\Compile;
 
 use KTemplate\Template;
+use KTemplate\DataKey;
 use KTemplate\Internal\Assert;
 
 class Frame {
@@ -34,6 +35,19 @@ class Frame {
     private $var_ids = [];
     /** @var int[] */
     private $depths = [];
+    /** @var DataKey[] */
+    private $data_keys = [];
+    /** @var int */
+    private $num_data_keys_used = 0;
+
+    public function __construct() {
+        $this->data_keys = [
+            new DataKey(),
+            new DataKey(),
+            new DataKey(),
+            new DataKey(),
+        ];
+    }
 
     /**
      * @param Template $template
@@ -50,6 +64,7 @@ class Frame {
         $this->popVars(count($this->vars));
         $this->popVarIDs(count($this->var_ids));
         $this->popDepths(count($this->depths));
+        $this->num_data_keys_used = 0;
     }
 
     public function enterTemplateCall() {
@@ -84,6 +99,7 @@ class Frame {
         $this->in_temp_block = false;
         $this->id_seq -= $this->num_temps;
         $this->num_temps = 0;
+        $this->num_data_keys_used = 0;
     }
 
     public function enterScope() {
@@ -124,6 +140,40 @@ class Frame {
             }
         }
         return -1;
+    }
+
+    /**
+     * @param string $p1
+     * @param string $p2
+     * @param string $p3
+     * @return int
+     */
+    public function lookupExtdataSlot($p1, $p2, $p3) {
+        for ($i = 0; $i < $this->num_data_keys_used; $i++) {
+            $k = $this->data_keys[$i];
+            if ($p1 === $k->part1 && $p2 === $k->part2 && $p3 === $k->part3) {
+                return $k->num_parts; // Actually holds a cache slot ID
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * @param int $slot
+     * @param string $p1
+     * @param string $p2
+     * @param string $p3
+     */
+    public function saveExtdataSlot($slot, $p1, $p2, $p3) {
+        if ($this->num_data_keys_used >= count($this->data_keys)) {
+            return;
+        }
+        $k = $this->data_keys[$this->num_data_keys_used];
+        $this->num_data_keys_used++;
+        $k->num_parts = $slot;
+        $k->part1 = $p1;
+        $k->part2 = $p2;
+        $k->part3 = $p3;
     }
 
     /**

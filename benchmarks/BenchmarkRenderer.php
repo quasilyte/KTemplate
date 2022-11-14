@@ -88,7 +88,7 @@ class BenchmarkRenderer {
             {% let $v = y %}
             {% for $item in items %}
                 {# comment #}
-                {% let $s = $item ~ x ~ $v %}
+                {% let $s = $item ~ x ~ $v ~ x %}
                 {% if $item %}
                     > {{ $s }}
                 {% end %}

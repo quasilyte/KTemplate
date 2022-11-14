@@ -54,6 +54,7 @@ class Disasm {
             }
         }
 
+        $num_cache_slots = $t->numCacheSlots();
         foreach ($code as $pc => $opdata) {
             if (array_key_exists($pc, $label_by_addr)) {
                 $out[] = $label_by_addr[$pc] . ':';
@@ -80,7 +81,9 @@ class Disasm {
                     $parts[] = "[slot$v]";
                     break;
                 case OpInfo::ARG_SLOT:
-                    if ($v <= $t->frameSize()) {
+                    if ($v <= $num_cache_slots && $v !== 0) {
+                        $parts[] = "[slot$v]";
+                    } else if ($v <= $t->frameSize()) {
                         $parts[] = "slot$v";
                     } else {
                         $parts[] = "arg" . ($v - $t->frameSize());

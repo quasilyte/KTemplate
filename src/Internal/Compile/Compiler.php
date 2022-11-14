@@ -687,6 +687,19 @@ class Compiler {
         if ($e->kind === ExprKind::DOLLAR_IDENT) {
             return $this->lookupLocalVar($e);
         }
+        if ($e->kind === ExprKind::IDENT) {
+            $cache_slot = $this->frame->lookupExtdataSlot((string)$e->value, '', '');
+            if ($cache_slot !== -1) {
+                return (255 - $cache_slot) + 1;
+            }
+        }
+        if ($e->kind === ExprKind::DOT_ACCESS) {
+            [$p1, $p2, $p3] = $this->decodeDotAccess($e);
+            $cache_slot = $this->frame->lookupExtdataSlot($p1, $p2, $p3);
+            if ($cache_slot !== -1) {
+                return (255 - $cache_slot) + 1;
+            }
+        }
         $temp = $this->frame->allocTempSlot();
         $this->compileExpr($temp, $e);
         return $temp;
@@ -829,6 +842,7 @@ class Compiler {
             $key_offset = ($cache_slot_info >> 8) & 0xff;
             $this->validateCacheSlot($e, $cache_slot);
             $this->emit3dst(Op::LOAD_EXTDATA_1, $dst, $cache_slot, $key_offset);
+            $this->frame->saveExtdataSlot($cache_slot, (string)$e->value, '', '');
             return Types::MIXED;
 
         case ExprKind::DOT_ACCESS:
@@ -842,6 +856,7 @@ class Compiler {
             $this->validateCacheSlot($e, $cache_slot);
             $op = $p3 === '' ? Op::LOAD_EXTDATA_2 : Op::LOAD_EXTDATA_3;
             $this->emit3dst($op, $dst, $cache_slot, $key_offset);
+            $this->frame->saveExtdataSlot($cache_slot, $p1, $p2, $p3);
             return Types::MIXED;
 
         case ExprKind::INDEX:
@@ -1748,6 +1763,7 @@ class Compiler {
             // Nothing to do: all slots are OK as they are.
             return;
         }
+        $max_slot = 255 - $num_cache_slots;
         foreach ($this->result->code as $pc => $opdata) {
             $op = $opdata & 0xff;
             $op_flags = Op::opcodeFlags($op);
@@ -1762,6 +1778,10 @@ class Compiler {
                 if ($a == OpInfo::ARG_SLOT) {
                     $orig_slot = ($opdata >> $arg_shift) & 0xff;
                     $new_slot = $orig_slot + $num_cache_slots;
+                    if ($orig_slot > $max_slot) {
+                        // An inlined cache slot.
+                        $new_slot = (255 - $orig_slot) + 1;
+                    }
                     $new_opdata = self::patchOpdata1($new_opdata, $arg_shift, $new_slot);
                 }
                 $arg_shift += OpInfo::argSize($a) * 8;

@@ -295,7 +295,7 @@ class CompilerTest extends TestCase {
             ],
             '{{ x|length }}' => [
                 '  LOAD_EXTDATA_1 slot2 [slot1] x',
-                '  LENGTH_SLOT0_FILTER slot2 slot1',
+                '  LENGTH_SLOT0_FILTER *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
@@ -420,8 +420,7 @@ class CompilerTest extends TestCase {
             ],
             '{{ x + x }}' => [
                 '  LOAD_EXTDATA_1 slot2 [slot1] x',
-                '  LOAD_EXTDATA_1 slot3 [slot1] x',
-                '  ADD_SLOT0 *slot0 slot2 slot3',
+                '  ADD_SLOT0 *slot0 slot2 [slot1]',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
@@ -449,6 +448,27 @@ class CompilerTest extends TestCase {
                 '  LOAD_EXTDATA_2 slot3 [slot1] x.y',
                 '  LOAD_EXTDATA_3 slot4 [slot2] x.y.z',
                 '  ADD_SLOT0 *slot0 slot3 slot4',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  RETURN',
+            ],
+
+            // There is a limit on how many extdata keys we can optimize.
+            '{{ x1 + x2 + x3 + x4 + x5 + x1 + x2 + x3 + x4 + x5 }}' => [
+                '  LOAD_EXTDATA_1 slot14 [slot1] x1',
+                '  LOAD_EXTDATA_1 slot15 [slot2] x2',
+                '  ADD slot13 slot14 slot15',
+                '  LOAD_EXTDATA_1 slot16 [slot3] x3',
+                '  ADD slot12 slot13 slot16',
+                '  LOAD_EXTDATA_1 slot17 [slot4] x4',
+                '  ADD slot11 slot12 slot17',
+                '  LOAD_EXTDATA_1 slot18 [slot5] x5',
+                '  ADD slot10 slot11 slot18',
+                '  ADD slot9 slot10 [slot1]',
+                '  ADD slot8 slot9 [slot2]',
+                '  ADD slot7 slot8 [slot3]',
+                '  ADD slot6 slot7 [slot4]',
+                '  LOAD_EXTDATA_1 slot19 [slot5] x5',
+                '  ADD_SLOT0 *slot0 slot6 slot19',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
@@ -483,7 +503,7 @@ class CompilerTest extends TestCase {
             '{% let $s = "a" %}{{ ($s ~ $s ~ $s)|length }}' => [
                 '  LOAD_STRING_CONST slot1 `a`',
                 '  CONCAT3 slot2 slot1 slot1 slot1',
-                '  LENGTH_SLOT0_FILTER slot2 slot0',
+                '  LENGTH_SLOT0_FILTER *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
@@ -734,7 +754,7 @@ class CompilerTest extends TestCase {
             ],
             '{{ s|length }}' => [
                 '  LOAD_EXTDATA_1 slot2 [slot1] s',
-                '  LENGTH_SLOT0_FILTER slot2 slot1',
+                '  LENGTH_SLOT0_FILTER *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
@@ -749,7 +769,7 @@ class CompilerTest extends TestCase {
             '{{ x|default(0) }}' => [
                 '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  LOAD_INT_CONST slot3 0',
-                '  DEFAULT_SLOT0_FILTER slot2 slot3 slot1',
+                '  DEFAULT_SLOT0_FILTER *slot0 slot2 slot3',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
