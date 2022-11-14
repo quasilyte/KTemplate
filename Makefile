@@ -10,3 +10,5 @@ gen-opcodes: _script/gen_opcodes/main.go
 	go run ./_script/gen_opcodes/main.go > src/Internal/Op.php
 gen-exprs: _script/gen_exprs/main.go
 	go run ./_script/gen_exprs/main.go > src/Internal/Compile/ExprKind.php
+gen-tokens: _script/gen_tokens/main.go
+	go run ./_script/gen_tokens/main.go > src/Internal/Compile/TokenKind.php
