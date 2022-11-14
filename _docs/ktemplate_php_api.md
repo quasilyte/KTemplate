@@ -340,10 +340,10 @@ $result = $engine->renderTemplate($t);
 
 This approach leaves you with `Template` object that you can use.
 
-It's possible to look inside that template by disassembling it:
+It's possible to look inside that template by decompiling it:
 
 ```php
-$decompiled = $engine->disassembleTemplate($t);
+$decompiled = $engine->decompileTemplate($t);
 var_dump($decompiled->header);
 var_dump($decompiled->bytecode);
 ```
