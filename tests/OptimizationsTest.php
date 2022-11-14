@@ -19,38 +19,33 @@ class OptimizationsTest extends TestCase {
             // Reordered instructions: merged output ops.
             // Merged constants should not be present in the frame.
             ' {% let $x = "a" %}  {{ $x }}' => [
-                'slots={cache:0 local:2} constants={s:3 i:0 f:0}',
-                '  OUTPUT_SAFE_STRING_CONST ` `',
+                'slots={cache:0 local:2} constants={s:2 i:0 f:0}',
+                '  OUTPUT_SAFE_STRING_CONST `   `',
                 '  LOAD_STRING_CONST slot1 `a`',
-                '  OUTPUT_SAFE_STRING_CONST `  `',
                 '  OUTPUT_SAFE slot1',
                 '  RETURN',
             ],
 
-            // TODO: Comments should not interfere with the constant output merging.
+            // Comments should not interfere with the constant output merging.
             'a{# hello #}b' => [
-                'slots={cache:0 local:1} constants={s:2 i:0 f:0}',
-                '  OUTPUT_SAFE_STRING_CONST `a`',
-                '  OUTPUT_SAFE_STRING_CONST `b`',
+                'slots={cache:0 local:1} constants={s:1 i:0 f:0}',
+                '  OUTPUT_SAFE_STRING_CONST `ab`',
                 '  RETURN',
             ],
 
-            // TODO: Comments handling + output merging.
+            // Comments handling + output merging.
             'a{% let $x = "a" %}b{# ok #}c{{ $x }}' => [
-                'slots={cache:0 local:2} constants={s:3 i:0 f:0}',
-                '  OUTPUT_SAFE_STRING_CONST `a`',
+                'slots={cache:0 local:2} constants={s:2 i:0 f:0}',
+                '  OUTPUT_SAFE_STRING_CONST `abc`',
                 '  LOAD_STRING_CONST slot1 `a`',
-                '  OUTPUT_SAFE_STRING_CONST `b`',
-                '  OUTPUT_SAFE_STRING_CONST `c`',
                 '  OUTPUT_SAFE slot1',
                 '  RETURN',
             ],
 
-            // TODO: const-folded output should be merged too.
+            // Const-folded output should be merged too.
             'a{{ "b" ~ "c" }}' => [
-                'slots={cache:0 local:1} constants={s:2 i:0 f:0}',
-                '  OUTPUT_SAFE_STRING_CONST `a`',
-                '  OUTPUT_SAFE_STRING_CONST `bc`',
+                'slots={cache:0 local:1} constants={s:1 i:0 f:0}',
+                '  OUTPUT_SAFE_STRING_CONST `abc`',
                 '  RETURN',
             ],
 

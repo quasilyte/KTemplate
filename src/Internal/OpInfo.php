@@ -16,6 +16,30 @@ class OpInfo {
 
     public const FLAG_IMPLICIT_SLOT0 = 1 << 0;
     public const FLAG_HAS_SLOT_ARG = 1 << 1;
+    public const FLAG_HAS_STRING_ARG = 1 << 2;
+
+    public const KIND_OTHER = 0;
+    public const KIND_CALL = 1;
+    public const KIND_JUMP = 2;
+    public const KIND_SIMPLE_ASSIGN = 3;
+    public const KIND_COMPLEX_ASSIGN = 4;
+    public const KIND_OUTPUT = 5;
+
+    /**
+     * @param int $opdata
+     */
+    public static function getStringConstOffset($opdata) {
+        $op = $opdata & 0xff;
+        $args = Op::$args[$op];
+        $arg_shift = 8;
+        foreach ($args as $a) {
+            if ($a === self::ARG_STRING_CONST) {
+                return $arg_shift;
+            }
+            $arg_shift += OpInfo::argSize($a) * 8;
+        }
+        return -1;
+    }
 
     /**
      * @param int $arg

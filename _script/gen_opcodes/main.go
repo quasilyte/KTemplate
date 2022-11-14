@@ -11,10 +11,12 @@ type opcodeTemplate struct {
 	name       string
 	desc       string
 	resultType string
+	kind       string
 }
 
 type opcodeInfo struct {
 	Name       string
+	Kind       string
 	Opcode     byte
 	Args       []argumentInfo
 	ArgString  string
@@ -40,131 +42,141 @@ var (
 	unknownType    = "Types::UNKNOWN"
 )
 
+var (
+	kindOther         = "KIND_OTHER"
+	kindCall          = "KIND_CALL"
+	kindJump          = "KIND_JUMP"
+	kindSimpleAssign  = "KIND_SIMPLE_ASSIGN"
+	kindComplexAssign = "KIND_COMPLEX_ASSIGN"
+	kindOutput        = "KIND_OUTPUT"
+)
+
 var rawOpcodes = []opcodeTemplate{
-	{"RETURN", "op", unknownType},
+	{"RETURN", "op", unknownType, kindOther},
 
-	{"OUTPUT", "op arg:rslot", unknownType},
-	{"OUTPUT_SLOT0", "op *slot0", unknownType},
-	{"OUTPUT_SAFE", "op arg:rslot", unknownType},
-	{"OUTPUT_SAFE_SLOT0", "op *slot0", unknownType},
-	{"OUTPUT_STRING_CONST", "op val:strindex", unknownType},
-	{"OUTPUT_SAFE_STRING_CONST", "op val:strindex", unknownType},
-	{"OUTPUT_SAFE_INT_CONST", "op val:intindex", unknownType},
-	{"OUTPUT_EXTDATA_1", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType},
-	{"OUTPUT_EXTDATA_2", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType},
-	{"OUTPUT_EXTDATA_3", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType},
+	{"OUTPUT", "op arg:rslot", unknownType, kindOutput},
+	{"OUTPUT_SLOT0", "op *slot0", unknownType, kindOutput},
+	{"OUTPUT_SAFE", "op arg:rslot", unknownType, kindOutput},
+	{"OUTPUT_SAFE_SLOT0", "op *slot0", unknownType, kindOutput},
+	{"OUTPUT_STRING_CONST", "op val:strindex", unknownType, kindOutput},
+	{"OUTPUT_SAFE_STRING_CONST", "op val:strindex", unknownType, kindOutput},
+	{"OUTPUT_SAFE_INT_CONST", "op val:intindex", unknownType, kindOutput},
+	{"OUTPUT_EXTDATA_1", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType, kindOutput},
+	{"OUTPUT_EXTDATA_2", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType, kindOutput},
+	{"OUTPUT_EXTDATA_3", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType, kindOutput},
 
-	{"LOAD_BOOL", "op dst:wslot val:imm8", boolType},
-	{"LOAD_SLOT0_BOOL", "op *slot0 val:imm8", boolType},
-	{"LOAD_INT_CONST", "op dst:wslot val:intindex", intType},
-	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex", intType},
-	{"LOAD_FLOAT_CONST", "op dst:wslot val:floatindex", floatType},
-	{"LOAD_SLOT0_FLOAT_CONST", "op *slot0 val:floatindex", floatType},
-	{"LOAD_STRING_CONST", "op dst:wslot val:strindex", stringType},
-	{"LOAD_SLOT0_STRING_CONST", "op *slot0 val:strindex", stringType},
-	{"LOAD_EXTDATA_1", "op dst:wslot cache:cacheslot k:keyoffset", mixedType},
-	{"LOAD_SLOT0_EXTDATA_1", "op *slot0 cache:cacheslot k:keyoffset", mixedType},
-	{"LOAD_EXTDATA_2", "op dst:wslot cache:cacheslot k:keyoffset", mixedType},
-	{"LOAD_SLOT0_EXTDATA_2", "op *slot0 cache:cacheslot k:keyoffset", mixedType},
-	{"LOAD_EXTDATA_3", "op dst:wslot cache:cacheslot k:keyoffset", mixedType},
-	{"LOAD_SLOT0_EXTDATA_3", "op *slot0 cache:cacheslot k:keyoffset", mixedType},
-	{"LOAD_NULL", "op dst:wslot", nullType},
-	{"LOAD_SLOT0_NULL", "op", nullType},
+	{"LOAD_BOOL", "op dst:wslot val:imm8", boolType, kindSimpleAssign},
+	{"LOAD_SLOT0_BOOL", "op *slot0 val:imm8", boolType, kindSimpleAssign},
+	{"LOAD_INT_CONST", "op dst:wslot val:intindex", intType, kindSimpleAssign},
+	{"LOAD_SLOT0_INT_CONST", "op *slot0 val:intindex", intType, kindSimpleAssign},
+	{"LOAD_FLOAT_CONST", "op dst:wslot val:floatindex", floatType, kindSimpleAssign},
+	{"LOAD_SLOT0_FLOAT_CONST", "op *slot0 val:floatindex", floatType, kindSimpleAssign},
+	{"LOAD_STRING_CONST", "op dst:wslot val:strindex", stringType, kindSimpleAssign},
+	{"LOAD_SLOT0_STRING_CONST", "op *slot0 val:strindex", stringType, kindSimpleAssign},
+	{"LOAD_EXTDATA_1", "op dst:wslot cache:cacheslot k:keyoffset", mixedType, kindSimpleAssign},
+	{"LOAD_SLOT0_EXTDATA_1", "op *slot0 cache:cacheslot k:keyoffset", mixedType, kindSimpleAssign},
+	{"LOAD_EXTDATA_2", "op dst:wslot cache:cacheslot k:keyoffset", mixedType, kindSimpleAssign},
+	{"LOAD_SLOT0_EXTDATA_2", "op *slot0 cache:cacheslot k:keyoffset", mixedType, kindSimpleAssign},
+	{"LOAD_EXTDATA_3", "op dst:wslot cache:cacheslot k:keyoffset", mixedType, kindSimpleAssign},
+	{"LOAD_SLOT0_EXTDATA_3", "op *slot0 cache:cacheslot k:keyoffset", mixedType, kindSimpleAssign},
+	{"LOAD_NULL", "op dst:wslot", nullType, kindSimpleAssign},
+	{"LOAD_SLOT0_NULL", "op", nullType, kindSimpleAssign},
 
-	{"INDEX", "op dst:wslot src:rslot key:rslot", mixedType},
-	{"INDEX_SLOT0", "op *slot0 src:rslot key:rslot", mixedType},
-	{"INDEX_INT_KEY", "op dst:wslot src:rslot key:intindex", mixedType},
-	{"INDEX_SLOT0_INT_KEY", "op *slot0 src:rslot key:intindex", mixedType},
-	{"INDEX_STRING_KEY", "op dst:wslot src:rslot key:strindex", mixedType},
-	{"INDEX_SLOT0_STRING_KEY", "op *slot0 src:rslot key:strindex", mixedType},
+	{"INDEX", "op dst:wslot src:rslot key:rslot", mixedType, kindComplexAssign},
+	{"INDEX_SLOT0", "op *slot0 src:rslot key:rslot", mixedType, kindComplexAssign},
+	{"INDEX_INT_KEY", "op dst:wslot src:rslot key:intindex", mixedType, kindComplexAssign},
+	{"INDEX_SLOT0_INT_KEY", "op *slot0 src:rslot key:intindex", mixedType, kindComplexAssign},
+	{"INDEX_STRING_KEY", "op dst:wslot src:rslot key:strindex", mixedType, kindComplexAssign},
+	{"INDEX_SLOT0_STRING_KEY", "op *slot0 src:rslot key:strindex", mixedType, kindComplexAssign},
 
-	{"MOVE", "op dst:wslot src:rslot", mixedType},
-	{"MOVE_SLOT0", "op *slot0 src:rslot", mixedType},
-	{"MOVE_BOOL", "op dst:wslot src:rslot", boolType},
-	{"MOVE_SLOT0_BOOL", "op *slot0 src:rslot", boolType},
+	{"MOVE", "op dst:wslot src:rslot", mixedType, kindSimpleAssign},
+	{"MOVE_SLOT0", "op *slot0 src:rslot", mixedType, kindSimpleAssign},
+	{"MOVE_BOOL", "op dst:wslot src:rslot", boolType, kindSimpleAssign},
+	{"MOVE_SLOT0_BOOL", "op *slot0 src:rslot", boolType, kindSimpleAssign},
 
-	{"CONV_BOOL", "op dst:wslot", boolType},
-	{"CONV_SLOT0_BOOL", "op *slot0", boolType},
+	{"CONV_BOOL", "op dst:wslot", boolType, kindSimpleAssign},
+	{"CONV_SLOT0_BOOL", "op *slot0", boolType, kindSimpleAssign},
 
-	{"JUMP", "op pcdelta:rel16", unknownType},
-	{"JUMP_FALSY", "op pcdelta:rel16 cond:rslot", unknownType},
-	{"JUMP_SLOT0_FALSY", "op *slot0 pcdelta:rel16", unknownType},
-	{"JUMP_TRUTHY", "op pcdelta:rel16 cond:rslot", unknownType},
-	{"JUMP_SLOT0_TRUTHY", "op *slot0 pcdelta:rel16", unknownType},
-	{"JUMP_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType},
-	{"JUMP_SLOT0_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType},
+	{"JUMP", "op pcdelta:rel16", unknownType, kindJump},
+	{"JUMP_FALSY", "op pcdelta:rel16 cond:rslot", unknownType, kindJump},
+	{"JUMP_SLOT0_FALSY", "op *slot0 pcdelta:rel16", unknownType, kindJump},
+	{"JUMP_TRUTHY", "op pcdelta:rel16 cond:rslot", unknownType, kindJump},
+	{"JUMP_SLOT0_TRUTHY", "op *slot0 pcdelta:rel16", unknownType, kindJump},
+	{"JUMP_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType, kindJump},
+	{"JUMP_SLOT0_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType, kindJump},
 
-	{"FOR_VAL", "op *slot0 pcdelta:rel16 val:wslot", unknownType},
-	{"FOR_KEY_VAL", "op *slot0 pcdelta:rel16 key:wslot val:wslot", unknownType},
+	{"FOR_VAL", "op *slot0 pcdelta:rel16 val:wslot", unknownType, kindJump},
+	{"FOR_KEY_VAL", "op *slot0 pcdelta:rel16 key:wslot val:wslot", unknownType, kindJump},
 
-	{"CALL_FILTER1", "op dst:wslot arg1:rslot fn:filterid", mixedType},
-	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid", mixedType},
-	{"CALL_FILTER2", "op dst:wslot arg1:rslot arg2:rslot fn:filterid", mixedType},
-	{"CALL_SLOT0_FILTER2", "op *slot0 arg1:rslot arg2:rslot fn:filterid", mixedType},
-	{"CALL_FUNC0", "op dst:wslot fn:funcid", mixedType},
-	{"CALL_SLOT0_FUNC0", "op *slot0 fn:funcid", mixedType},
-	{"CALL_FUNC1", "op dst:wslot arg1:rslot fn:funcid", mixedType},
-	{"CALL_SLOT0_FUNC1", "op *slot0 arg1:rslot fn:funcid", mixedType},
-	{"CALL_FUNC2", "op dst:wslot arg1:rslot arg2:rslot fn:funcid", mixedType},
-	{"CALL_SLOT0_FUNC2", "op *slot0 arg1:rslot arg2:rslot fn:funcid", mixedType},
-	{"CALL_FUNC3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType},
-	{"CALL_SLOT0_FUNC3", "op *slot0 arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType},
-	{"LENGTH_FILTER", "op dst:wslot arg1:rslot", intType},
-	{"LENGTH_SLOT0_FILTER", "op dst:wslot arg1:rslot", intType},
-	{"DEFAULT_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType},
-	{"DEFAULT_SLOT0_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType},
-	{"ESCAPE_FILTER1", "op dst:wslot src:rslot", safeStringType},
-	{"ESCAPE_SLOT0_FILTER1", "op *slot0 src:rslot", safeStringType},
-	{"ESCAPE_FILTER2", "op dst:wslot src:rslot strategy:strindex", safeStringType},
-	{"ESCAPE_SLOT0_FILTER2", "op *slot0 src:rslot strategy:strindex", safeStringType},
+	{"CALL_FILTER1", "op dst:wslot arg1:rslot fn:filterid", mixedType, kindCall},
+	{"CALL_SLOT0_FILTER1", "op *slot0 arg1:rslot fn:filterid", mixedType, kindCall},
+	{"CALL_FILTER2", "op dst:wslot arg1:rslot arg2:rslot fn:filterid", mixedType, kindCall},
+	{"CALL_SLOT0_FILTER2", "op *slot0 arg1:rslot arg2:rslot fn:filterid", mixedType, kindCall},
+	{"CALL_FUNC0", "op dst:wslot fn:funcid", mixedType, kindCall},
+	{"CALL_SLOT0_FUNC0", "op *slot0 fn:funcid", mixedType, kindCall},
+	{"CALL_FUNC1", "op dst:wslot arg1:rslot fn:funcid", mixedType, kindCall},
+	{"CALL_SLOT0_FUNC1", "op *slot0 arg1:rslot fn:funcid", mixedType, kindCall},
+	{"CALL_FUNC2", "op dst:wslot arg1:rslot arg2:rslot fn:funcid", mixedType, kindCall},
+	{"CALL_SLOT0_FUNC2", "op *slot0 arg1:rslot arg2:rslot fn:funcid", mixedType, kindCall},
+	{"CALL_FUNC3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType, kindCall},
+	{"CALL_SLOT0_FUNC3", "op *slot0 arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType, kindCall},
+	{"LENGTH_FILTER", "op dst:wslot arg1:rslot", intType, kindCall},
+	{"LENGTH_SLOT0_FILTER", "op dst:wslot arg1:rslot", intType, kindCall},
+	{"DEFAULT_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType, kindCall},
+	{"DEFAULT_SLOT0_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType, kindCall},
+	{"ESCAPE_FILTER1", "op dst:wslot src:rslot", safeStringType, kindCall},
+	{"ESCAPE_SLOT0_FILTER1", "op *slot0 src:rslot", safeStringType, kindCall},
+	{"ESCAPE_FILTER2", "op dst:wslot src:rslot strategy:strindex", safeStringType, kindCall},
+	{"ESCAPE_SLOT0_FILTER2", "op *slot0 src:rslot strategy:strindex", safeStringType, kindCall},
 
-	{"NOT", "op dst:wslot arg:rslot", boolType},
-	{"NOT_SLOT0", "op *slot0 arg:rslot", boolType},
-	{"NEG", "op dst:wslot arg:rslot", numericType},
-	{"NEG_SLOT0", "op *slot0 arg:rslot", numericType},
+	{"NOT", "op dst:wslot arg:rslot", boolType, kindSimpleAssign},
+	{"NOT_SLOT0", "op *slot0 arg:rslot", boolType, kindSimpleAssign},
+	{"NEG", "op dst:wslot arg:rslot", numericType, kindSimpleAssign},
+	{"NEG_SLOT0", "op *slot0 arg:rslot", numericType, kindSimpleAssign},
 
-	{"OR", "op dst:wslot arg1:rslot arg2:rslot", boolType},
-	{"OR_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
-	{"AND", "op dst:wslot arg1:rslot arg2:rslot", boolType},
-	{"AND_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
-	{"CONCAT", "op dst:wslot arg1:rslot arg2:rslot", stringType},
-	{"CONCAT_SLOT0", "op *slot0 arg1:rslot arg2:rslot", stringType},
-	{"CONCAT3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot", stringType},
-	{"CONCAT3_SLOT0", "op *slot0 arg1:rslot arg2:rslot arg3:rslot", stringType},
-	{"APPEND", "op dst:wslot arg:rslot", stringType},
-	{"APPEND_SLOT0", "op *slot0 arg:rslot", stringType},
-	{"EQ", "op dst:wslot arg1:rslot arg2:rslot", boolType},
-	{"EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
-	{"LT", "op dst:wslot arg1:rslot arg2:rslot", boolType},
-	{"LT_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
-	{"LT_EQ", "op dst:wslot arg1:rslot arg2:rslot", boolType},
-	{"LT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
-	{"NOT_EQ", "op dst:wslot arg1:rslot arg2:rslot", boolType},
-	{"NOT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType},
-	{"ADD", "op dst:wslot arg1:rslot arg2:rslot", numericType},
-	{"ADD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
-	{"SUB", "op dst:wslot arg1:rslot arg2:rslot", numericType},
-	{"SUB_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
-	{"MUL", "op dst:wslot arg1:rslot arg2:rslot", numericType},
-	{"MUL_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
-	{"QUO", "op dst:wslot arg1:rslot arg2:rslot", numericType},
-	{"QUO_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
-	{"MOD", "op dst:wslot arg1:rslot arg2:rslot", numericType},
-	{"MOD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType},
+	{"OR", "op dst:wslot arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"OR_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"AND", "op dst:wslot arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"AND_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"CONCAT", "op dst:wslot arg1:rslot arg2:rslot", stringType, kindSimpleAssign},
+	{"CONCAT_SLOT0", "op *slot0 arg1:rslot arg2:rslot", stringType, kindSimpleAssign},
+	{"CONCAT3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot", stringType, kindSimpleAssign},
+	{"CONCAT3_SLOT0", "op *slot0 arg1:rslot arg2:rslot arg3:rslot", stringType, kindSimpleAssign},
+	{"APPEND", "op dst:wslot arg:rslot", stringType, kindSimpleAssign},
+	{"APPEND_SLOT0", "op *slot0 arg:rslot", stringType, kindSimpleAssign},
+	{"EQ", "op dst:wslot arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"LT", "op dst:wslot arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"LT_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"LT_EQ", "op dst:wslot arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"LT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"NOT_EQ", "op dst:wslot arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"NOT_EQ_SLOT0", "op *slot0 arg1:rslot arg2:rslot", boolType, kindSimpleAssign},
+	{"ADD", "op dst:wslot arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"ADD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"SUB", "op dst:wslot arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"SUB_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"MUL", "op dst:wslot arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"MUL_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"QUO", "op dst:wslot arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"QUO_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"MOD", "op dst:wslot arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
+	{"MOD_SLOT0", "op *slot0 arg1:rslot arg2:rslot", numericType, kindSimpleAssign},
 
-	{"MATCHES", "op dst:wslot s:rslot regexp:strindex", boolType},
-	{"MATCHES_SLOT0", "op *slot0 s:rslot regexp:strindex", boolType},
+	{"MATCHES", "op dst:wslot s:rslot regexp:strindex", boolType, kindComplexAssign},
+	{"MATCHES_SLOT0", "op *slot0 s:rslot regexp:strindex", boolType, kindComplexAssign},
 
-	{"START_TMP_OUTPUT", "op", unknownType},
-	{"FINISH_TMP_OUTPUT", "op dst:wslot", unknownType},
+	{"START_TMP_OUTPUT", "op", unknownType, kindOther},
+	{"FINISH_TMP_OUTPUT", "op dst:wslot", unknownType, kindOther},
 
-	{"PREPARE_TEMPLATE", "op path:strindex", unknownType},
-	{"INCLUDE_TEMPLATE", "op", unknownType},
+	{"PREPARE_TEMPLATE", "op path:strindex", unknownType, kindOther},
+	{"INCLUDE_TEMPLATE", "op", unknownType, kindOther},
 }
 
 func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 	var result opcodeInfo
 	result.Name = data.name
+	result.Kind = data.kind
 	result.ResultType = data.resultType
 	if data.resultType == unknownType {
 		result.ResultType = ""
@@ -180,6 +192,7 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 	var flagparts []string
 	var encparts []string
 	hasSlotArg := false
+	hasStringArg := false
 	numDst := 0
 	dstPos := -1
 	argPos := 0
@@ -213,6 +226,7 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 			arg.Kind = "OpInfo::ARG_KEY_OFFSET"
 		case "strindex":
 			arg.Kind = "OpInfo::ARG_STRING_CONST"
+			hasStringArg = true
 		case "intindex":
 			arg.Kind = "OpInfo::ARG_INT_CONST"
 		case "floatindex":
@@ -234,6 +248,9 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 
 	if hasSlotArg {
 		flagparts = append(flagparts, "OpInfo::FLAG_HAS_SLOT_ARG")
+	}
+	if hasStringArg {
+		flagparts = append(flagparts, "OpInfo::FLAG_HAS_STRING_ARG")
 	}
 
 	if data.resultType != unknownType {
@@ -310,12 +327,27 @@ class Op {
 
     /**
      * @param int $op
+     * @return int
+     */
+    public static function opcodeKind($op) {
+        switch ($op) {
+        {{- range $.Opcodes }}
+        case self::{{.Name}}:
+            return OpInfo::{{.Kind}};
+        {{- end }}
+        default:
+            return OpInfo::KIND_OTHER;
+        }
+    }
+
+    /**
+     * @param int $op
      * @return string
      */
     public static function opcodeString($op) {
         switch ($op) {
         {{- range $.Opcodes }}
-        case {{.Opcode}}:
+        case self::{{.Name}}:
             return '{{.Name}}';
         {{- end }}
         default:
@@ -347,7 +379,7 @@ class Op {
     public static function opcodeFlags($op) {
         switch ($op) {
         {{- range $.Opcodes }}
-        case {{.Opcode}}: // {{.Name}}
+        case self::{{.Name}}:
             return {{.Flags}};
         {{- end }}
         default:

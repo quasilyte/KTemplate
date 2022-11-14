@@ -87,8 +87,10 @@ class BenchmarkRenderer {
         $this->mixed_template = $c->compile($env, 'test', '
             {% let $v = y %}
             {% for $item in items %}
+                {# comment #}
+                {% let $s = $item ~ x ~ $v %}
                 {% if $item %}
-                    > {{ $item ~ x ~ $v }}
+                    > {{ $s }}
                 {% end %}
             {% end %}
         ');

@@ -36,7 +36,9 @@ class Compiler {
     private $label_seq = 0;
 
     /** @var int[] */
-    private $string_values;
+    private $string_value_map;
+    /** @var string[] */
+    private $string_value_list;
     /** @var int[] */
     private $int_values;
 
@@ -55,6 +57,13 @@ class Compiler {
     private $current_template_path = '';
     /** @var string */
     private $current_template_arg = '';
+
+    /** @var int */
+    private $output_merge_seq = 0;
+    /** @var int */
+    private $prev_output_pc = -1;
+    /** @var string */
+    private $prev_output_string = '';
 
     /** @var string */
     private $tmp_output_tag = '';
@@ -537,12 +546,23 @@ class Compiler {
         if ($v === '') {
             return;
         }
-        $string_id = $this->internString($v);
-        if ($this->env->ctx->escape_func && !$safe) {
-            $this->emit1(Op::OUTPUT_STRING_CONST, $string_id);
-        } else {
-            $this->emit1(Op::OUTPUT_SAFE_STRING_CONST, $string_id);
+        $op = $this->env->ctx->escape_func && !$safe ? Op::OUTPUT_STRING_CONST : Op::OUTPUT_SAFE_STRING_CONST;
+        if ($this->prev_output_pc !== -1 && $this->output_merge_seq < 10) {
+            $opdata = $this->result->code[$this->prev_output_pc];
+            if (($opdata & 0xff) === $op) {
+                $this->output_merge_seq++;
+                $this->prev_output_string .= $v;
+                $new_string_id = $this->internString($this->prev_output_string);
+                $arg_offset = OpInfo::getStringConstOffset($opdata);
+                $this->result->code[$this->prev_output_pc] = self::patchOpdata2($opdata, $arg_offset, $new_string_id);
+                return;
+            }
         }
+        $this->output_merge_seq = 0;
+        $this->prev_output_pc = $this->getPC();
+        $this->prev_output_string = $v;
+        $string_id = $this->internString($v);
+        $this->emit1($op, $string_id);
     }
 
     /**
@@ -1271,8 +1291,10 @@ class Compiler {
      */
     private function finish() {
         $this->env = null;
-        $this->string_values = [];
+        $this->string_value_map = [];
+        $this->string_value_list = [];
         $this->int_values = [];
+        $this->prev_output_string = '';
     }
 
     /**
@@ -1285,7 +1307,8 @@ class Compiler {
         $this->result = new Template();
         $this->lexer->setSource($filename, $source);
         $this->frame->reset($this->result);
-        $this->string_values = [];
+        $this->string_value_map = [];
+        $this->string_value_list = [];
         $this->int_values = [];
         $this->addr_by_label_id = [];
         $this->label_seq = 0;
@@ -1295,6 +1318,10 @@ class Compiler {
         $this->template_arg_deps = [];
         $this->current_template_path = '';
         $this->current_template_arg = '';
+
+        $this->output_merge_seq = 0;
+        $this->prev_output_pc = -1;
+        $this->prev_output_string = '';
 
         $this->tmp_output_tag = '';
     }
@@ -1408,6 +1435,23 @@ class Compiler {
      * @param int $opdata
      */
     private function emit($opdata) {
+        if ($this->prev_output_pc !== -1) {
+            // Decide whether we need to close the output merging region.
+            $op = $opdata & 0xff;
+            switch (Op::opcodeKind($op)) {
+            case OpInfo::KIND_SIMPLE_ASSIGN:
+                break; // OK, simple assignments can't affect the const output.
+            case OpInfo::KIND_OUTPUT:
+                if ($op === Op::OUTPUT_STRING_CONST || $op === Op::OUTPUT_SAFE_STRING_CONST) {
+                    // OK, const outputs can be merged.
+                } else {
+                    $this->prev_output_pc = -1;
+                }
+                break;
+            default:
+                $this->prev_output_pc = -1;
+            }
+        }
         $this->result->code[] = $opdata;
     }
 
@@ -1466,15 +1510,15 @@ class Compiler {
      * @return int
      */
     private function internString($v) {
-        if (array_key_exists($v, $this->string_values)) {
-            return $this->string_values[$v];
+        if (array_key_exists($v, $this->string_value_map)) {
+            return $this->string_value_map[$v];
         }
-        $id = count($this->result->string_values);
+        $id = count($this->string_value_list);
         if ($id > 0xffff) {
             $this->fail(-1, "can't compile: too many string const values");
         }
-        $this->result->string_values[] = $v;
-        $this->string_values[$v] = $id;
+        $this->string_value_map[$v] = $id;
+        $this->string_value_list[] = $v;
         return $id;
     }
 
@@ -1579,6 +1623,7 @@ class Compiler {
     private function finalizeTemplate() {
         $this->linkJumps();
         $this->reallocateSlots();
+        $this->bindStringValues();
 
         $num_cache_slots = count($this->frame->cache_slots);
         $frame_size = $num_cache_slots + $this->frame->num_locals;
@@ -1590,6 +1635,65 @@ class Compiler {
         }
 
         return $this->resolveTemplateDeps();
+    }
+
+    private function bindStringValues() {
+        if (count($this->string_value_list) === 0) {
+            // Nothing to do: there were no string constants.
+            // It's a very rare case though.
+            return;
+        }
+
+        // Since string_value_map (and list) can contain the unused (dead) values,
+        // we fill the result list with only actually used constants.
+        $live_strings_map = [];
+        foreach ($this->result->code as $pc => $opdata) {
+            $op = $opdata & 0xff;
+            $op_flags = Op::opcodeFlags($op);
+            if (($op_flags & OpInfo::FLAG_HAS_STRING_ARG) === 0) {
+                // Skip non-interesting opcodes to make compilation faster.
+                continue;
+            }
+            $arg_shift = OpInfo::getStringConstOffset($opdata);
+            $old_value_id = ($opdata >> $arg_shift) & 0xffff;
+            $s = $this->string_value_list[$old_value_id];
+            $new_value_id = 0;
+            if (array_key_exists($s, $live_strings_map)) {
+                $new_value_id = $live_strings_map[$s];
+            } else {
+                $new_value_id = count($this->result->string_values);
+                $live_strings_map[$s] = $new_value_id;
+                $this->result->string_values[] = $s;
+            }
+            // In case there were no dead values, all IDs will
+            // be the same; don't bother to path the bytecode.
+            if ($old_value_id === $new_value_id) {
+                continue;
+            }
+            $this->result->code[$pc] = self::patchOpdata2($opdata, $arg_shift, $new_value_id);
+        }
+    }
+
+    /**
+     * @param int $opdata
+     * @param int $shift
+     * @param int $value
+     * @return int
+     */
+    private static function patchOpdata1($opdata, $shift, $value) {
+        $mask = (0xff << $shift);
+        return ($opdata & (~$mask)) | ($value << $shift);
+    }
+
+    /**
+     * @param int $opdata
+     * @param int $shift
+     * @param int $value
+     * @return int
+     */
+    private static function patchOpdata2($opdata, $shift, $value) {
+        $mask = (0xffff << $shift);
+        return ($opdata & (~$mask)) | ($value << $shift);
     }
 
     private function resolveTemplateDeps() {
@@ -1610,7 +1714,6 @@ class Compiler {
 
         /** @var Template[] $template_cache */
         $template_cache = [];
-        $dst_mask = 0xff << 8;
         $frame_slot_offset = 1; // Skip slot0 index
         foreach ($template_arg_deps as $pc => $tup) {
             [$load_path, $arg_name] = $tup;
@@ -1633,8 +1736,7 @@ class Compiler {
             // have dst at fixed offset.
             $opdata = $result->code[$pc];
             Assert::true((($opdata >> 8) & 0xff) === Frame::ARG_SLOT_PLACEHOLDER, 'bad argument slot placeholder');
-            $opdata = ($opdata & (~$dst_mask)) | ($arg_slot << 8);
-            $result->code[$pc] = $opdata;
+            $result->code[$pc] = self::patchOpdata1($opdata, 8, $arg_slot);
         }
 
         return $result;
@@ -1660,8 +1762,7 @@ class Compiler {
                 if ($a == OpInfo::ARG_SLOT) {
                     $orig_slot = ($opdata >> $arg_shift) & 0xff;
                     $new_slot = $orig_slot + $num_cache_slots;
-                    $arg_mask = 0xff << $arg_shift;
-                    $new_opdata = ($new_opdata & (~$arg_mask)) | ($new_slot << $arg_shift);
+                    $new_opdata = self::patchOpdata1($new_opdata, $arg_shift, $new_slot);
                 }
                 $arg_shift += OpInfo::argSize($a) * 8;
             }
@@ -1670,8 +1771,8 @@ class Compiler {
     }
 
     private function linkJumps() {
-        $mask = 0xffff << 8;
-        foreach ($this->result->code as $pc => $opdata) {
+        foreach ($this->result->code as $mixed_pc => $opdata) {
+            $pc = (int)$mixed_pc;
             $op = $opdata & 0xff;
             if (!OpInfo::isJump($op)) {
                 continue;
@@ -1682,7 +1783,7 @@ class Compiler {
             if ($jump_offset < -32768 || $jump_offset > 32767) {
                 $this->fail(-1, "can't compile: jump offset $jump_offset doesn't fit into int16");
             }
-            $this->result->code[$pc] = ($opdata & (~$mask)) | ($jump_offset << 8);
+            $this->result->code[$pc] = self::patchOpdata2($opdata, 8, $jump_offset);
         }
     }
 
@@ -1705,6 +1806,11 @@ class Compiler {
         if (array_key_exists($label_id, $this->addr_by_label_id)) {
             $this->fail(-1, "internal error: binding label with id=$label_id twice");
         }
+
+        // Labels start a new basic block.
+        // We can't optimize between the blocks.
+        $this->prev_output_pc = -1;
+
         $this->addr_by_label_id[$label_id] = $this->getPC();
     }
 

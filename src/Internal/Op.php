@@ -34,10 +34,12 @@ class Op {
     public const OUTPUT_SAFE_SLOT0 = 5;
     
     // Encoding: 0x06 val:strindex
+    // Flags: FLAG_HAS_STRING_ARG
     // Result type: unknown/varying
     public const OUTPUT_STRING_CONST = 6;
     
     // Encoding: 0x07 val:strindex
+    // Flags: FLAG_HAS_STRING_ARG
     // Result type: unknown/varying
     public const OUTPUT_SAFE_STRING_CONST = 7;
     
@@ -88,12 +90,12 @@ class Op {
     public const LOAD_SLOT0_FLOAT_CONST = 17;
     
     // Encoding: 0x12 dst:wslot val:strindex
-    // Flags: FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::STRING
     public const LOAD_STRING_CONST = 18;
     
     // Encoding: 0x13 val:strindex
-    // Flags: FLAG_IMPLICIT_SLOT0
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_STRING_ARG
     // Result type: Types::STRING
     public const LOAD_SLOT0_STRING_CONST = 19;
     
@@ -157,12 +159,12 @@ class Op {
     public const INDEX_SLOT0_INT_KEY = 31;
     
     // Encoding: 0x20 dst:wslot src:rslot key:strindex
-    // Flags: FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::MIXED
     public const INDEX_STRING_KEY = 32;
     
     // Encoding: 0x21 src:rslot key:strindex
-    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::MIXED
     public const INDEX_SLOT0_STRING_KEY = 33;
     
@@ -331,12 +333,12 @@ class Op {
     public const ESCAPE_SLOT0_FILTER1 = 66;
     
     // Encoding: 0x43 dst:wslot src:rslot strategy:strindex
-    // Flags: FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::SAFE_STRING
     public const ESCAPE_FILTER2 = 67;
     
     // Encoding: 0x44 src:rslot strategy:strindex
-    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::SAFE_STRING
     public const ESCAPE_SLOT0_FILTER2 = 68;
     
@@ -501,12 +503,12 @@ class Op {
     public const MOD_SLOT0 = 100;
     
     // Encoding: 0x65 dst:wslot s:rslot regexp:strindex
-    // Flags: FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::BOOL
     public const MATCHES = 101;
     
     // Encoding: 0x66 s:rslot regexp:strindex
-    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::BOOL
     public const MATCHES_SLOT0 = 102;
     
@@ -520,6 +522,7 @@ class Op {
     public const FINISH_TMP_OUTPUT = 104;
     
     // Encoding: 0x69 path:strindex
+    // Flags: FLAG_HAS_STRING_ARG
     // Result type: unknown/varying
     public const PREPARE_TEMPLATE = 105;
     
@@ -530,221 +533,444 @@ class Op {
 
     /**
      * @param int $op
+     * @return int
+     */
+    public static function opcodeKind($op) {
+        switch ($op) {
+        case self::RETURN:
+            return OpInfo::KIND_OTHER;
+        case self::OUTPUT:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_SLOT0:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_SAFE:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_SAFE_SLOT0:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_STRING_CONST:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_SAFE_STRING_CONST:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_SAFE_INT_CONST:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_EXTDATA_1:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_EXTDATA_2:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT_EXTDATA_3:
+            return OpInfo::KIND_OUTPUT;
+        case self::LOAD_BOOL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_BOOL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_INT_CONST:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_INT_CONST:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_FLOAT_CONST:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_FLOAT_CONST:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_STRING_CONST:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_STRING_CONST:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_EXTDATA_1:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_EXTDATA_1:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_EXTDATA_2:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_EXTDATA_2:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_EXTDATA_3:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_EXTDATA_3:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_NULL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LOAD_SLOT0_NULL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::INDEX:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::INDEX_SLOT0:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::INDEX_INT_KEY:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::INDEX_SLOT0_INT_KEY:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::INDEX_STRING_KEY:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::INDEX_SLOT0_STRING_KEY:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::MOVE:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MOVE_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MOVE_BOOL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MOVE_SLOT0_BOOL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::CONV_BOOL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::CONV_SLOT0_BOOL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::JUMP:
+            return OpInfo::KIND_JUMP;
+        case self::JUMP_FALSY:
+            return OpInfo::KIND_JUMP;
+        case self::JUMP_SLOT0_FALSY:
+            return OpInfo::KIND_JUMP;
+        case self::JUMP_TRUTHY:
+            return OpInfo::KIND_JUMP;
+        case self::JUMP_SLOT0_TRUTHY:
+            return OpInfo::KIND_JUMP;
+        case self::JUMP_NOT_NULL:
+            return OpInfo::KIND_JUMP;
+        case self::JUMP_SLOT0_NOT_NULL:
+            return OpInfo::KIND_JUMP;
+        case self::FOR_VAL:
+            return OpInfo::KIND_JUMP;
+        case self::FOR_KEY_VAL:
+            return OpInfo::KIND_JUMP;
+        case self::CALL_FILTER1:
+            return OpInfo::KIND_CALL;
+        case self::CALL_SLOT0_FILTER1:
+            return OpInfo::KIND_CALL;
+        case self::CALL_FILTER2:
+            return OpInfo::KIND_CALL;
+        case self::CALL_SLOT0_FILTER2:
+            return OpInfo::KIND_CALL;
+        case self::CALL_FUNC0:
+            return OpInfo::KIND_CALL;
+        case self::CALL_SLOT0_FUNC0:
+            return OpInfo::KIND_CALL;
+        case self::CALL_FUNC1:
+            return OpInfo::KIND_CALL;
+        case self::CALL_SLOT0_FUNC1:
+            return OpInfo::KIND_CALL;
+        case self::CALL_FUNC2:
+            return OpInfo::KIND_CALL;
+        case self::CALL_SLOT0_FUNC2:
+            return OpInfo::KIND_CALL;
+        case self::CALL_FUNC3:
+            return OpInfo::KIND_CALL;
+        case self::CALL_SLOT0_FUNC3:
+            return OpInfo::KIND_CALL;
+        case self::LENGTH_FILTER:
+            return OpInfo::KIND_CALL;
+        case self::LENGTH_SLOT0_FILTER:
+            return OpInfo::KIND_CALL;
+        case self::DEFAULT_FILTER:
+            return OpInfo::KIND_CALL;
+        case self::DEFAULT_SLOT0_FILTER:
+            return OpInfo::KIND_CALL;
+        case self::ESCAPE_FILTER1:
+            return OpInfo::KIND_CALL;
+        case self::ESCAPE_SLOT0_FILTER1:
+            return OpInfo::KIND_CALL;
+        case self::ESCAPE_FILTER2:
+            return OpInfo::KIND_CALL;
+        case self::ESCAPE_SLOT0_FILTER2:
+            return OpInfo::KIND_CALL;
+        case self::NOT:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::NOT_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::NEG:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::NEG_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::OR:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::OR_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::AND:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::AND_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::CONCAT:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::CONCAT_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::CONCAT3:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::CONCAT3_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::APPEND:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::APPEND_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::EQ:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::EQ_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LT:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LT_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LT_EQ:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::LT_EQ_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::NOT_EQ:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::NOT_EQ_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::ADD:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::ADD_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::SUB:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::SUB_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MUL:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MUL_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::QUO:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::QUO_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MOD:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MOD_SLOT0:
+            return OpInfo::KIND_SIMPLE_ASSIGN;
+        case self::MATCHES:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::MATCHES_SLOT0:
+            return OpInfo::KIND_COMPLEX_ASSIGN;
+        case self::START_TMP_OUTPUT:
+            return OpInfo::KIND_OTHER;
+        case self::FINISH_TMP_OUTPUT:
+            return OpInfo::KIND_OTHER;
+        case self::PREPARE_TEMPLATE:
+            return OpInfo::KIND_OTHER;
+        case self::INCLUDE_TEMPLATE:
+            return OpInfo::KIND_OTHER;
+        default:
+            return OpInfo::KIND_OTHER;
+        }
+    }
+
+    /**
+     * @param int $op
      * @return string
      */
     public static function opcodeString($op) {
         switch ($op) {
-        case 1:
+        case self::RETURN:
             return 'RETURN';
-        case 2:
+        case self::OUTPUT:
             return 'OUTPUT';
-        case 3:
+        case self::OUTPUT_SLOT0:
             return 'OUTPUT_SLOT0';
-        case 4:
+        case self::OUTPUT_SAFE:
             return 'OUTPUT_SAFE';
-        case 5:
+        case self::OUTPUT_SAFE_SLOT0:
             return 'OUTPUT_SAFE_SLOT0';
-        case 6:
+        case self::OUTPUT_STRING_CONST:
             return 'OUTPUT_STRING_CONST';
-        case 7:
+        case self::OUTPUT_SAFE_STRING_CONST:
             return 'OUTPUT_SAFE_STRING_CONST';
-        case 8:
+        case self::OUTPUT_SAFE_INT_CONST:
             return 'OUTPUT_SAFE_INT_CONST';
-        case 9:
+        case self::OUTPUT_EXTDATA_1:
             return 'OUTPUT_EXTDATA_1';
-        case 10:
+        case self::OUTPUT_EXTDATA_2:
             return 'OUTPUT_EXTDATA_2';
-        case 11:
+        case self::OUTPUT_EXTDATA_3:
             return 'OUTPUT_EXTDATA_3';
-        case 12:
+        case self::LOAD_BOOL:
             return 'LOAD_BOOL';
-        case 13:
+        case self::LOAD_SLOT0_BOOL:
             return 'LOAD_SLOT0_BOOL';
-        case 14:
+        case self::LOAD_INT_CONST:
             return 'LOAD_INT_CONST';
-        case 15:
+        case self::LOAD_SLOT0_INT_CONST:
             return 'LOAD_SLOT0_INT_CONST';
-        case 16:
+        case self::LOAD_FLOAT_CONST:
             return 'LOAD_FLOAT_CONST';
-        case 17:
+        case self::LOAD_SLOT0_FLOAT_CONST:
             return 'LOAD_SLOT0_FLOAT_CONST';
-        case 18:
+        case self::LOAD_STRING_CONST:
             return 'LOAD_STRING_CONST';
-        case 19:
+        case self::LOAD_SLOT0_STRING_CONST:
             return 'LOAD_SLOT0_STRING_CONST';
-        case 20:
+        case self::LOAD_EXTDATA_1:
             return 'LOAD_EXTDATA_1';
-        case 21:
+        case self::LOAD_SLOT0_EXTDATA_1:
             return 'LOAD_SLOT0_EXTDATA_1';
-        case 22:
+        case self::LOAD_EXTDATA_2:
             return 'LOAD_EXTDATA_2';
-        case 23:
+        case self::LOAD_SLOT0_EXTDATA_2:
             return 'LOAD_SLOT0_EXTDATA_2';
-        case 24:
+        case self::LOAD_EXTDATA_3:
             return 'LOAD_EXTDATA_3';
-        case 25:
+        case self::LOAD_SLOT0_EXTDATA_3:
             return 'LOAD_SLOT0_EXTDATA_3';
-        case 26:
+        case self::LOAD_NULL:
             return 'LOAD_NULL';
-        case 27:
+        case self::LOAD_SLOT0_NULL:
             return 'LOAD_SLOT0_NULL';
-        case 28:
+        case self::INDEX:
             return 'INDEX';
-        case 29:
+        case self::INDEX_SLOT0:
             return 'INDEX_SLOT0';
-        case 30:
+        case self::INDEX_INT_KEY:
             return 'INDEX_INT_KEY';
-        case 31:
+        case self::INDEX_SLOT0_INT_KEY:
             return 'INDEX_SLOT0_INT_KEY';
-        case 32:
+        case self::INDEX_STRING_KEY:
             return 'INDEX_STRING_KEY';
-        case 33:
+        case self::INDEX_SLOT0_STRING_KEY:
             return 'INDEX_SLOT0_STRING_KEY';
-        case 34:
+        case self::MOVE:
             return 'MOVE';
-        case 35:
+        case self::MOVE_SLOT0:
             return 'MOVE_SLOT0';
-        case 36:
+        case self::MOVE_BOOL:
             return 'MOVE_BOOL';
-        case 37:
+        case self::MOVE_SLOT0_BOOL:
             return 'MOVE_SLOT0_BOOL';
-        case 38:
+        case self::CONV_BOOL:
             return 'CONV_BOOL';
-        case 39:
+        case self::CONV_SLOT0_BOOL:
             return 'CONV_SLOT0_BOOL';
-        case 40:
+        case self::JUMP:
             return 'JUMP';
-        case 41:
+        case self::JUMP_FALSY:
             return 'JUMP_FALSY';
-        case 42:
+        case self::JUMP_SLOT0_FALSY:
             return 'JUMP_SLOT0_FALSY';
-        case 43:
+        case self::JUMP_TRUTHY:
             return 'JUMP_TRUTHY';
-        case 44:
+        case self::JUMP_SLOT0_TRUTHY:
             return 'JUMP_SLOT0_TRUTHY';
-        case 45:
+        case self::JUMP_NOT_NULL:
             return 'JUMP_NOT_NULL';
-        case 46:
+        case self::JUMP_SLOT0_NOT_NULL:
             return 'JUMP_SLOT0_NOT_NULL';
-        case 47:
+        case self::FOR_VAL:
             return 'FOR_VAL';
-        case 48:
+        case self::FOR_KEY_VAL:
             return 'FOR_KEY_VAL';
-        case 49:
+        case self::CALL_FILTER1:
             return 'CALL_FILTER1';
-        case 50:
+        case self::CALL_SLOT0_FILTER1:
             return 'CALL_SLOT0_FILTER1';
-        case 51:
+        case self::CALL_FILTER2:
             return 'CALL_FILTER2';
-        case 52:
+        case self::CALL_SLOT0_FILTER2:
             return 'CALL_SLOT0_FILTER2';
-        case 53:
+        case self::CALL_FUNC0:
             return 'CALL_FUNC0';
-        case 54:
+        case self::CALL_SLOT0_FUNC0:
             return 'CALL_SLOT0_FUNC0';
-        case 55:
+        case self::CALL_FUNC1:
             return 'CALL_FUNC1';
-        case 56:
+        case self::CALL_SLOT0_FUNC1:
             return 'CALL_SLOT0_FUNC1';
-        case 57:
+        case self::CALL_FUNC2:
             return 'CALL_FUNC2';
-        case 58:
+        case self::CALL_SLOT0_FUNC2:
             return 'CALL_SLOT0_FUNC2';
-        case 59:
+        case self::CALL_FUNC3:
             return 'CALL_FUNC3';
-        case 60:
+        case self::CALL_SLOT0_FUNC3:
             return 'CALL_SLOT0_FUNC3';
-        case 61:
+        case self::LENGTH_FILTER:
             return 'LENGTH_FILTER';
-        case 62:
+        case self::LENGTH_SLOT0_FILTER:
             return 'LENGTH_SLOT0_FILTER';
-        case 63:
+        case self::DEFAULT_FILTER:
             return 'DEFAULT_FILTER';
-        case 64:
+        case self::DEFAULT_SLOT0_FILTER:
             return 'DEFAULT_SLOT0_FILTER';
-        case 65:
+        case self::ESCAPE_FILTER1:
             return 'ESCAPE_FILTER1';
-        case 66:
+        case self::ESCAPE_SLOT0_FILTER1:
             return 'ESCAPE_SLOT0_FILTER1';
-        case 67:
+        case self::ESCAPE_FILTER2:
             return 'ESCAPE_FILTER2';
-        case 68:
+        case self::ESCAPE_SLOT0_FILTER2:
             return 'ESCAPE_SLOT0_FILTER2';
-        case 69:
+        case self::NOT:
             return 'NOT';
-        case 70:
+        case self::NOT_SLOT0:
             return 'NOT_SLOT0';
-        case 71:
+        case self::NEG:
             return 'NEG';
-        case 72:
+        case self::NEG_SLOT0:
             return 'NEG_SLOT0';
-        case 73:
+        case self::OR:
             return 'OR';
-        case 74:
+        case self::OR_SLOT0:
             return 'OR_SLOT0';
-        case 75:
+        case self::AND:
             return 'AND';
-        case 76:
+        case self::AND_SLOT0:
             return 'AND_SLOT0';
-        case 77:
+        case self::CONCAT:
             return 'CONCAT';
-        case 78:
+        case self::CONCAT_SLOT0:
             return 'CONCAT_SLOT0';
-        case 79:
+        case self::CONCAT3:
             return 'CONCAT3';
-        case 80:
+        case self::CONCAT3_SLOT0:
             return 'CONCAT3_SLOT0';
-        case 81:
+        case self::APPEND:
             return 'APPEND';
-        case 82:
+        case self::APPEND_SLOT0:
             return 'APPEND_SLOT0';
-        case 83:
+        case self::EQ:
             return 'EQ';
-        case 84:
+        case self::EQ_SLOT0:
             return 'EQ_SLOT0';
-        case 85:
+        case self::LT:
             return 'LT';
-        case 86:
+        case self::LT_SLOT0:
             return 'LT_SLOT0';
-        case 87:
+        case self::LT_EQ:
             return 'LT_EQ';
-        case 88:
+        case self::LT_EQ_SLOT0:
             return 'LT_EQ_SLOT0';
-        case 89:
+        case self::NOT_EQ:
             return 'NOT_EQ';
-        case 90:
+        case self::NOT_EQ_SLOT0:
             return 'NOT_EQ_SLOT0';
-        case 91:
+        case self::ADD:
             return 'ADD';
-        case 92:
+        case self::ADD_SLOT0:
             return 'ADD_SLOT0';
-        case 93:
+        case self::SUB:
             return 'SUB';
-        case 94:
+        case self::SUB_SLOT0:
             return 'SUB_SLOT0';
-        case 95:
+        case self::MUL:
             return 'MUL';
-        case 96:
+        case self::MUL_SLOT0:
             return 'MUL_SLOT0';
-        case 97:
+        case self::QUO:
             return 'QUO';
-        case 98:
+        case self::QUO_SLOT0:
             return 'QUO_SLOT0';
-        case 99:
+        case self::MOD:
             return 'MOD';
-        case 100:
+        case self::MOD_SLOT0:
             return 'MOD_SLOT0';
-        case 101:
+        case self::MATCHES:
             return 'MATCHES';
-        case 102:
+        case self::MATCHES_SLOT0:
             return 'MATCHES_SLOT0';
-        case 103:
+        case self::START_TMP_OUTPUT:
             return 'START_TMP_OUTPUT';
-        case 104:
+        case self::FINISH_TMP_OUTPUT:
             return 'FINISH_TMP_OUTPUT';
-        case 105:
+        case self::PREPARE_TEMPLATE:
             return 'PREPARE_TEMPLATE';
-        case 106:
+        case self::INCLUDE_TEMPLATE:
             return 'INCLUDE_TEMPLATE';
         default:
             return '?';
@@ -932,217 +1158,217 @@ class Op {
      */
     public static function opcodeFlags($op) {
         switch ($op) {
-        case 1: // RETURN
+        case self::RETURN:
             return 0;
-        case 2: // OUTPUT
+        case self::OUTPUT:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 3: // OUTPUT_SLOT0
+        case self::OUTPUT_SLOT0:
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 4: // OUTPUT_SAFE
+        case self::OUTPUT_SAFE:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 5: // OUTPUT_SAFE_SLOT0
+        case self::OUTPUT_SAFE_SLOT0:
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 6: // OUTPUT_STRING_CONST
+        case self::OUTPUT_STRING_CONST:
+            return OpInfo::FLAG_HAS_STRING_ARG;
+        case self::OUTPUT_SAFE_STRING_CONST:
+            return OpInfo::FLAG_HAS_STRING_ARG;
+        case self::OUTPUT_SAFE_INT_CONST:
             return 0;
-        case 7: // OUTPUT_SAFE_STRING_CONST
+        case self::OUTPUT_EXTDATA_1:
             return 0;
-        case 8: // OUTPUT_SAFE_INT_CONST
+        case self::OUTPUT_EXTDATA_2:
             return 0;
-        case 9: // OUTPUT_EXTDATA_1
+        case self::OUTPUT_EXTDATA_3:
             return 0;
-        case 10: // OUTPUT_EXTDATA_2
+        case self::LOAD_BOOL:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LOAD_SLOT0_BOOL:
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case self::LOAD_INT_CONST:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LOAD_SLOT0_INT_CONST:
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case self::LOAD_FLOAT_CONST:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LOAD_SLOT0_FLOAT_CONST:
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case self::LOAD_STRING_CONST:
+            return OpInfo::FLAG_HAS_SLOT_ARG | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::LOAD_SLOT0_STRING_CONST:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::LOAD_EXTDATA_1:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LOAD_SLOT0_EXTDATA_1:
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case self::LOAD_EXTDATA_2:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LOAD_SLOT0_EXTDATA_2:
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case self::LOAD_EXTDATA_3:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LOAD_SLOT0_EXTDATA_3:
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case self::LOAD_NULL:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LOAD_SLOT0_NULL:
             return 0;
-        case 11: // OUTPUT_EXTDATA_3
+        case self::INDEX:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::INDEX_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::INDEX_INT_KEY:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::INDEX_SLOT0_INT_KEY:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::INDEX_STRING_KEY:
+            return OpInfo::FLAG_HAS_SLOT_ARG | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::INDEX_SLOT0_STRING_KEY:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::MOVE:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MOVE_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MOVE_BOOL:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MOVE_SLOT0_BOOL:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CONV_BOOL:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CONV_SLOT0_BOOL:
+            return OpInfo::FLAG_IMPLICIT_SLOT0;
+        case self::JUMP:
             return 0;
-        case 12: // LOAD_BOOL
+        case self::JUMP_FALSY:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 13: // LOAD_SLOT0_BOOL
+        case self::JUMP_SLOT0_FALSY:
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 14: // LOAD_INT_CONST
+        case self::JUMP_TRUTHY:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 15: // LOAD_SLOT0_INT_CONST
+        case self::JUMP_SLOT0_TRUTHY:
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 16: // LOAD_FLOAT_CONST
+        case self::JUMP_NOT_NULL:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 17: // LOAD_SLOT0_FLOAT_CONST
+        case self::JUMP_SLOT0_NOT_NULL:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::FOR_VAL:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::FOR_KEY_VAL:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_FILTER1:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_SLOT0_FILTER1:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_FILTER2:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_SLOT0_FILTER2:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_FUNC0:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_SLOT0_FUNC0:
             return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 18: // LOAD_STRING_CONST
+        case self::CALL_FUNC1:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 19: // LOAD_SLOT0_STRING_CONST
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 20: // LOAD_EXTDATA_1
+        case self::CALL_SLOT0_FUNC1:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_FUNC2:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 21: // LOAD_SLOT0_EXTDATA_1
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 22: // LOAD_EXTDATA_2
+        case self::CALL_SLOT0_FUNC2:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CALL_FUNC3:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 23: // LOAD_SLOT0_EXTDATA_2
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 24: // LOAD_EXTDATA_3
+        case self::CALL_SLOT0_FUNC3:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LENGTH_FILTER:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 25: // LOAD_SLOT0_EXTDATA_3
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 26: // LOAD_NULL
+        case self::LENGTH_SLOT0_FILTER:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 27: // LOAD_SLOT0_NULL
+        case self::DEFAULT_FILTER:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::DEFAULT_SLOT0_FILTER:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::ESCAPE_FILTER1:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::ESCAPE_SLOT0_FILTER1:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::ESCAPE_FILTER2:
+            return OpInfo::FLAG_HAS_SLOT_ARG | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::ESCAPE_SLOT0_FILTER2:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::NOT:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::NOT_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::NEG:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::NEG_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::OR:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::OR_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::AND:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::AND_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CONCAT:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CONCAT_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CONCAT3:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::CONCAT3_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::APPEND:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::APPEND_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::EQ:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::EQ_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LT:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LT_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LT_EQ:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::LT_EQ_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::NOT_EQ:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::NOT_EQ_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::ADD:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::ADD_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::SUB:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::SUB_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MUL:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MUL_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::QUO:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::QUO_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MOD:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MOD_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
+        case self::MATCHES:
+            return OpInfo::FLAG_HAS_SLOT_ARG | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::MATCHES_SLOT0:
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG | OpInfo::FLAG_HAS_STRING_ARG;
+        case self::START_TMP_OUTPUT:
             return 0;
-        case 28: // INDEX
+        case self::FINISH_TMP_OUTPUT:
             return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 29: // INDEX_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 30: // INDEX_INT_KEY
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 31: // INDEX_SLOT0_INT_KEY
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 32: // INDEX_STRING_KEY
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 33: // INDEX_SLOT0_STRING_KEY
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 34: // MOVE
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 35: // MOVE_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 36: // MOVE_BOOL
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 37: // MOVE_SLOT0_BOOL
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 38: // CONV_BOOL
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 39: // CONV_SLOT0_BOOL
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 40: // JUMP
-            return 0;
-        case 41: // JUMP_FALSY
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 42: // JUMP_SLOT0_FALSY
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 43: // JUMP_TRUTHY
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 44: // JUMP_SLOT0_TRUTHY
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 45: // JUMP_NOT_NULL
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 46: // JUMP_SLOT0_NOT_NULL
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 47: // FOR_VAL
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 48: // FOR_KEY_VAL
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 49: // CALL_FILTER1
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 50: // CALL_SLOT0_FILTER1
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 51: // CALL_FILTER2
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 52: // CALL_SLOT0_FILTER2
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 53: // CALL_FUNC0
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 54: // CALL_SLOT0_FUNC0
-            return OpInfo::FLAG_IMPLICIT_SLOT0;
-        case 55: // CALL_FUNC1
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 56: // CALL_SLOT0_FUNC1
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 57: // CALL_FUNC2
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 58: // CALL_SLOT0_FUNC2
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 59: // CALL_FUNC3
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 60: // CALL_SLOT0_FUNC3
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 61: // LENGTH_FILTER
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 62: // LENGTH_SLOT0_FILTER
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 63: // DEFAULT_FILTER
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 64: // DEFAULT_SLOT0_FILTER
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 65: // ESCAPE_FILTER1
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 66: // ESCAPE_SLOT0_FILTER1
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 67: // ESCAPE_FILTER2
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 68: // ESCAPE_SLOT0_FILTER2
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 69: // NOT
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 70: // NOT_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 71: // NEG
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 72: // NEG_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 73: // OR
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 74: // OR_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 75: // AND
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 76: // AND_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 77: // CONCAT
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 78: // CONCAT_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 79: // CONCAT3
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 80: // CONCAT3_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 81: // APPEND
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 82: // APPEND_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 83: // EQ
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 84: // EQ_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 85: // LT
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 86: // LT_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 87: // LT_EQ
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 88: // LT_EQ_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 89: // NOT_EQ
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 90: // NOT_EQ_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 91: // ADD
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 92: // ADD_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 93: // SUB
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 94: // SUB_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 95: // MUL
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 96: // MUL_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 97: // QUO
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 98: // QUO_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 99: // MOD
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 100: // MOD_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 101: // MATCHES
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 102: // MATCHES_SLOT0
-            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
-        case 103: // START_TMP_OUTPUT
-            return 0;
-        case 104: // FINISH_TMP_OUTPUT
-            return OpInfo::FLAG_HAS_SLOT_ARG;
-        case 105: // PREPARE_TEMPLATE
-            return 0;
-        case 106: // INCLUDE_TEMPLATE
+        case self::PREPARE_TEMPLATE:
+            return OpInfo::FLAG_HAS_STRING_ARG;
+        case self::INCLUDE_TEMPLATE:
             return 0;
         default:
             return 0;
