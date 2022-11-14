@@ -3,8 +3,34 @@
 namespace KTemplate\Internal;
 
 use KTemplate\Template;
+use KTemplate\DecompiledTemplate;
 
 class Disasm {
+    /**
+     * @param Env $env
+     * @param Template $t
+     * @param int $max_str_len
+     * @return DecompiledTemplate
+     */
+    public static function decompile($env, $t, $max_str_len = 32) {
+        $header = self::getFrameHeader($env, $t);
+        $bytecode = self::getBytecode($env, $t);
+        return new DecompiledTemplate($header, $bytecode);
+    }
+
+    /**
+     * @param Env $env
+     * @param Template $t
+     * @return string
+     */
+    public static function getFrameHeader($env, $t) {
+        $num_cache_slots = $t->numCacheSlots();
+        $num_slots = $t->frameSize() - $num_cache_slots;
+        $slots = "slots={cache:$num_cache_slots local:$num_slots}";
+        $constants = "constants={s:" . count($t->string_values) . ' i:' . count($t->int_values) . ' f:' . count($t->float_values) . '}';
+        return "$slots $constants";
+    }
+
     /**
      * @param Env $env
      * @param Template $t

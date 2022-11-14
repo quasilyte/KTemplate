@@ -343,7 +343,9 @@ This approach leaves you with `Template` object that you can use.
 It's possible to look inside that template by disassembling it:
 
 ```php
-$disasm = $engine->disassembleTemplate($t);
+$decompiled = $engine->disassembleTemplate($t);
+var_dump($decompiled->header);
+var_dump($decompiled->bytecode);
 ```
 
 ## Handling compilation errors

@@ -14,7 +14,7 @@ use KTemplate\Internal\Disasm;
  *
  * If you need to compile a template, use load().
  * If you need to render a template, use render() or renderTemplate().
- * If you have a template, you can use disassembleTemplate() to get its bytecode.
+ * If you have a template, you can use decompileTemplate() to get its bytecode.
  *
  * registerFunctionX() and registerFilterX() methods can be used to
  * define symbols accessible from the compiled templates.
@@ -83,14 +83,14 @@ class Engine {
     }
 
     /**
-     * disassembleTemplate returns a bytecode that is stored inside a template.
+     * decompileTemplate returns a bytecode that is stored inside a template.
      *
      * @param Template $t - a template to be disassembled
      * @param int $max_str_len - truncate string values longer than this threshold
-     * @return string[] - disassembled listing in form of string lines
+     * @return DecompiledTemplate
      */
-    public function disassembleTemplate($t, $max_str_len = 32) {
-        return Disasm::getBytecode($this->env, $t, $max_str_len);
+    public function decompileTemplate($t, $max_str_len = 32) {
+        return Disasm::decompile($this->env, $t, $max_str_len);
     }
 
     /**
