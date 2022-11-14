@@ -228,7 +228,7 @@ class Op {
     public const JUMP_NOT_NULL = 45;
     
     // Encoding: 0x2e pcdelta:rel16 cond:rslot
-    // Flags: FLAG_HAS_SLOT_ARG
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
     public const JUMP_SLOT0_NOT_NULL = 46;
     
@@ -307,8 +307,8 @@ class Op {
     // Result type: Types::INT
     public const LENGTH_FILTER = 61;
     
-    // Encoding: 0x3e dst:wslot arg1:rslot
-    // Flags: FLAG_HAS_SLOT_ARG
+    // Encoding: 0x3e arg1:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::INT
     public const LENGTH_SLOT0_FILTER = 62;
     
@@ -317,8 +317,8 @@ class Op {
     // Result type: Types::MIXED
     public const DEFAULT_FILTER = 63;
     
-    // Encoding: 0x40 dst:wslot arg1:rslot arg2:rslot
-    // Flags: FLAG_HAS_SLOT_ARG
+    // Encoding: 0x40 arg1:rslot arg2:rslot
+    // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
     public const DEFAULT_SLOT0_FILTER = 64;
     
@@ -1249,7 +1249,7 @@ class Op {
         case self::JUMP_NOT_NULL:
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case self::JUMP_SLOT0_NOT_NULL:
-            return OpInfo::FLAG_HAS_SLOT_ARG;
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
         case self::FOR_VAL:
             return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
         case self::FOR_KEY_VAL:
@@ -1281,11 +1281,11 @@ class Op {
         case self::LENGTH_FILTER:
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case self::LENGTH_SLOT0_FILTER:
-            return OpInfo::FLAG_HAS_SLOT_ARG;
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
         case self::DEFAULT_FILTER:
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case self::DEFAULT_SLOT0_FILTER:
-            return OpInfo::FLAG_HAS_SLOT_ARG;
+            return OpInfo::FLAG_IMPLICIT_SLOT0 | OpInfo::FLAG_HAS_SLOT_ARG;
         case self::ESCAPE_FILTER1:
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case self::ESCAPE_SLOT0_FILTER1:
@@ -1437,9 +1437,9 @@ class Op {
         self::CALL_FUNC3 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_FUNC_ID],
         self::CALL_SLOT0_FUNC3 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_FUNC_ID],
         self::LENGTH_FILTER => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
-        self::LENGTH_SLOT0_FILTER => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::LENGTH_SLOT0_FILTER => [OpInfo::ARG_SLOT],
         self::DEFAULT_FILTER => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
-        self::DEFAULT_SLOT0_FILTER => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
+        self::DEFAULT_SLOT0_FILTER => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::ESCAPE_FILTER1 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::ESCAPE_SLOT0_FILTER1 => [OpInfo::ARG_SLOT],
         self::ESCAPE_FILTER2 => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT, OpInfo::ARG_STRING_CONST],

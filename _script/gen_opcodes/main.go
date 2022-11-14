@@ -103,7 +103,7 @@ var rawOpcodes = []opcodeTemplate{
 	{"JUMP_TRUTHY", "op pcdelta:rel16 cond:rslot", unknownType, kindJump},
 	{"JUMP_SLOT0_TRUTHY", "op *slot0 pcdelta:rel16", unknownType, kindJump},
 	{"JUMP_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType, kindJump},
-	{"JUMP_SLOT0_NOT_NULL", "op pcdelta:rel16 cond:rslot", unknownType, kindJump},
+	{"JUMP_SLOT0_NOT_NULL", "op *slot0 pcdelta:rel16 cond:rslot", unknownType, kindJump},
 
 	{"FOR_VAL", "op *slot0 pcdelta:rel16 val:wslot", unknownType, kindJump},
 	{"FOR_KEY_VAL", "op *slot0 pcdelta:rel16 key:wslot val:wslot", unknownType, kindJump},
@@ -121,9 +121,9 @@ var rawOpcodes = []opcodeTemplate{
 	{"CALL_FUNC3", "op dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType, kindCall},
 	{"CALL_SLOT0_FUNC3", "op *slot0 arg1:rslot arg2:rslot arg3:rslot fn:funcid", mixedType, kindCall},
 	{"LENGTH_FILTER", "op dst:wslot arg1:rslot", intType, kindCall},
-	{"LENGTH_SLOT0_FILTER", "op dst:wslot arg1:rslot", intType, kindCall},
+	{"LENGTH_SLOT0_FILTER", "op *slot0 arg1:rslot", intType, kindCall},
 	{"DEFAULT_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType, kindCall},
-	{"DEFAULT_SLOT0_FILTER", "op dst:wslot arg1:rslot arg2:rslot", mixedType, kindCall},
+	{"DEFAULT_SLOT0_FILTER", "op *slot0 arg1:rslot arg2:rslot", mixedType, kindCall},
 	{"ESCAPE_FILTER1", "op dst:wslot src:rslot", safeStringType, kindCall},
 	{"ESCAPE_SLOT0_FILTER1", "op *slot0 src:rslot", safeStringType, kindCall},
 	{"ESCAPE_FILTER2", "op dst:wslot src:rslot strategy:strindex", safeStringType, kindCall},
@@ -191,6 +191,7 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 	}
 	var flagparts []string
 	var encparts []string
+	hasSlot0Arg := false
 	hasSlotArg := false
 	hasStringArg := false
 	numDst := 0
@@ -198,6 +199,7 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 	argPos := 0
 	for _, p := range strings.Split(desc, " ") {
 		if p == "*slot0" {
+			hasSlot0Arg = true
 			flagparts = append(flagparts, "OpInfo::FLAG_IMPLICIT_SLOT0")
 			if !strings.Contains(data.name, "SLOT0") && data.resultType != unknownType {
 				panic(fmt.Sprintf("%s has slot0 arument but it's not reflected in the opcode name", data.name))
@@ -244,6 +246,10 @@ func getOpcodeInfo(data opcodeTemplate) opcodeInfo {
 		}
 		result.Args = append(result.Args, arg)
 		encparts = append(encparts, p)
+	}
+
+	if strings.Contains(data.name, "SLOT0") && !hasSlot0Arg {
+		panic(fmt.Sprintf("%s: name contains SLOT0, but there is no such arg", data.name))
 	}
 
 	if hasSlotArg {
