@@ -76,8 +76,10 @@ class Disasm {
                 }
                 $v = ($opdata >> $arg_shift) & $arg_mask;
                 switch ($a) {
-                case OpInfo::ARG_SLOT:
                 case OpInfo::ARG_CACHE_SLOT:
+                    $parts[] = "[slot$v]";
+                    break;
+                case OpInfo::ARG_SLOT:
                     if ($v <= $t->frameSize()) {
                         $parts[] = "slot$v";
                     } else {

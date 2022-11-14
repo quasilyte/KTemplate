@@ -97,7 +97,7 @@ class CompilerTest extends TestCase {
                         '  RETURN',
                     ],
                     'a' => [
-                        '  LOAD_EXTDATA_2 slot3 slot1 date.year',
+                        '  LOAD_EXTDATA_2 slot3 [slot1] date.year',
                         '  ADD_SLOT0 *slot0 slot2 slot3',
                         '  OUTPUT_SAFE_SLOT0 *slot0',
                         '  RETURN',
@@ -160,20 +160,20 @@ class CompilerTest extends TestCase {
         $tests = [
             // These expressions should be escaped.
             '{{ x.y.z }}' => [
-                '  OUTPUT_EXTDATA_3 slot1 x.y.z $1',
+                '  OUTPUT_EXTDATA_3 [slot1] x.y.z $1',
                 '  RETURN',
             ],
             '{{ x.y }}' => [
-                '  OUTPUT_EXTDATA_2 slot1 x.y $1',
+                '  OUTPUT_EXTDATA_2 [slot1] x.y $1',
                 '  RETURN',
             ],
             '{{ x }}' => [
-                '  OUTPUT_EXTDATA_1 slot1 x $1',
+                '  OUTPUT_EXTDATA_1 [slot1] x $1',
                 '  RETURN',
             ],
             '{{ (x~y) }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  CONCAT_SLOT0 *slot0 slot3 slot4',
                 '  OUTPUT_SLOT0 *slot0',
                 '  RETURN',
@@ -184,7 +184,7 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ (x|escape) ~ "x" }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  ESCAPE_FILTER1 slot2 slot3',
                 '  LOAD_STRING_CONST slot4 `x`',
                 '  CONCAT_SLOT0 *slot0 slot2 slot4',
@@ -194,13 +194,13 @@ class CompilerTest extends TestCase {
 
             // Matches operator. Never escaped.
             '{{ x matches "/abc/" }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  MATCHES_SLOT0 *slot0 slot2 `/abc/`',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ not (y matches "/a/") }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] y',
                 '  MATCHES slot2 slot3 `/a/`',
                 '  NOT_SLOT0 *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
@@ -209,32 +209,32 @@ class CompilerTest extends TestCase {
 
             // Safe strings are not escaped.
             '{{ x|escape }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  ESCAPE_SLOT0_FILTER1 *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|escape("url") }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  ESCAPE_SLOT0_FILTER2 *slot0 slot2 `url`',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|escape("url")|escape("html") }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  ESCAPE_FILTER2 slot2 slot3 `url`',
                 '  ESCAPE_SLOT0_FILTER2 *slot0 slot2 `html`',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|e }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  ESCAPE_SLOT0_FILTER1 *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|e("url") }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  ESCAPE_SLOT0_FILTER2 *slot0 slot2 `url`',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
@@ -242,23 +242,23 @@ class CompilerTest extends TestCase {
 
             // Some expression types are never escaped.
             '{{ x or y }}' => [
-                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 x',
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot1] x',
                 '  JUMP_SLOT0_TRUTHY *slot0 L0',
-                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot2 y',
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot2] y',
                 'L0:',
                 '  CONV_SLOT0_BOOL *slot0',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x + y }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  ADD_SLOT0 *slot0 slot3 slot4',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|length }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  LENGTH_SLOT0_FILTER slot2 slot1',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
@@ -266,22 +266,22 @@ class CompilerTest extends TestCase {
 
             // Raw filter suppresses escaping.
             '{{ x|raw }}' => [
-                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 x',
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot1] x',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x.y|raw }}' => [
-                '  LOAD_SLOT0_EXTDATA_2 *slot0 slot1 x.y',
+                '  LOAD_SLOT0_EXTDATA_2 *slot0 [slot1] x.y',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x.y.z|raw }}' => [
-                '  LOAD_SLOT0_EXTDATA_3 *slot0 slot1 x.y.z',
+                '  LOAD_SLOT0_EXTDATA_3 *slot0 [slot1] x.y.z',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ (x.y|raw) ~ "a" }}' => [
-                '  LOAD_EXTDATA_2 slot2 slot1 x.y',
+                '  LOAD_EXTDATA_2 slot2 [slot1] x.y',
                 '  LOAD_STRING_CONST slot3 `a`',
                 '  CONCAT_SLOT0 *slot0 slot2 slot3',
                 '  OUTPUT_SLOT0 *slot0',
@@ -368,14 +368,14 @@ class CompilerTest extends TestCase {
 
             // Extdata.
             '{{ x }}{% let $y = 2 %}{{ x }}{{ $y }}' => [
-                '  OUTPUT_EXTDATA_1 slot1 x $0',
+                '  OUTPUT_EXTDATA_1 [slot1] x $0',
                 '  LOAD_INT_CONST slot2 2',
-                '  OUTPUT_EXTDATA_1 slot1 x $0',
+                '  OUTPUT_EXTDATA_1 [slot1] x $0',
                 '  OUTPUT_SAFE slot2',
                 '  RETURN',
             ],
             '{{ x }}{% let $s = "a" %}{{ $s == "a" }}' => [
-                '  OUTPUT_EXTDATA_1 slot1 x $0',
+                '  OUTPUT_EXTDATA_1 [slot1] x $0',
                 '  LOAD_STRING_CONST slot2 `a`',
                 '  LOAD_STRING_CONST slot3 `a`',
                 '  EQ_SLOT0 *slot0 slot2 slot3',
@@ -383,35 +383,35 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ x + x }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  ADD_SLOT0 *slot0 slot2 slot3',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{% let $i=1 %}{{ x.y }}{{$i}}' => [
                 '  LOAD_INT_CONST slot2 1',
-                '  OUTPUT_EXTDATA_2 slot1 x.y $0',
+                '  OUTPUT_EXTDATA_2 [slot1] x.y $0',
                 '  OUTPUT_SAFE slot2',
                 '  RETURN',
             ],
             '{% let $i=1 %}{{ x.y.z }}{{$i}}' => [
                 '  LOAD_INT_CONST slot2 1',
-                '  OUTPUT_EXTDATA_3 slot1 x.y.z $0',
+                '  OUTPUT_EXTDATA_3 [slot1] x.y.z $0',
                 '  OUTPUT_SAFE slot2',
                 '  RETURN',
             ],
             '{{ x }}{{ x.y }}{{ x.y.z }}{{ x }}{{ x.y }}' => [
-                '  OUTPUT_EXTDATA_1 slot1 x $0',
-                '  OUTPUT_EXTDATA_2 slot2 x.y $0',
-                '  OUTPUT_EXTDATA_3 slot3 x.y.z $0',
-                '  OUTPUT_EXTDATA_1 slot1 x $0',
-                '  OUTPUT_EXTDATA_2 slot2 x.y $0',
+                '  OUTPUT_EXTDATA_1 [slot1] x $0',
+                '  OUTPUT_EXTDATA_2 [slot2] x.y $0',
+                '  OUTPUT_EXTDATA_3 [slot3] x.y.z $0',
+                '  OUTPUT_EXTDATA_1 [slot1] x $0',
+                '  OUTPUT_EXTDATA_2 [slot2] x.y $0',
                 '  RETURN',
             ],
             '{{ x.y + x.y.z }}' => [
-                '  LOAD_EXTDATA_2 slot3 slot1 x.y',
-                '  LOAD_EXTDATA_3 slot4 slot2 x.y.z',
+                '  LOAD_EXTDATA_2 slot3 [slot1] x.y',
+                '  LOAD_EXTDATA_3 slot4 [slot2] x.y.z',
                 '  ADD_SLOT0 *slot0 slot3 slot4',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
@@ -465,13 +465,13 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ -x }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  NEG_SLOT0 *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ -x - 10 }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  NEG slot2 slot3',
                 '  LOAD_INT_CONST slot4 10',
                 '  SUB_SLOT0 *slot0 slot2 slot4',
@@ -479,19 +479,19 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ x / y / z }}' => [
-                '  LOAD_EXTDATA_1 slot5 slot1 x',
-                '  LOAD_EXTDATA_1 slot6 slot2 y',
+                '  LOAD_EXTDATA_1 slot5 [slot1] x',
+                '  LOAD_EXTDATA_1 slot6 [slot2] y',
                 '  QUO slot4 slot5 slot6',
-                '  LOAD_EXTDATA_1 slot7 slot3 z',
+                '  LOAD_EXTDATA_1 slot7 [slot3] z',
                 '  QUO_SLOT0 *slot0 slot4 slot7',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x % y % z }}' => [
-                '  LOAD_EXTDATA_1 slot5 slot1 x',
-                '  LOAD_EXTDATA_1 slot6 slot2 y',
+                '  LOAD_EXTDATA_1 slot5 [slot1] x',
+                '  LOAD_EXTDATA_1 slot6 [slot2] y',
                 '  MOD slot4 slot5 slot6',
-                '  LOAD_EXTDATA_1 slot7 slot3 z',
+                '  LOAD_EXTDATA_1 slot7 [slot3] z',
                 '  MOD_SLOT0 *slot0 slot4 slot7',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
@@ -499,29 +499,29 @@ class CompilerTest extends TestCase {
 
             // Comparisons.
             '{{ x < y }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  LT_SLOT0 *slot0 slot3 slot4',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x > y }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  LT_SLOT0 *slot0 slot4 slot3',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x <= y }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  LT_EQ_SLOT0 *slot0 slot3 slot4',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x >= y }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  LT_EQ_SLOT0 *slot0 slot4 slot3',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
@@ -529,33 +529,33 @@ class CompilerTest extends TestCase {
 
             // Array indexing.
             '{{ x[10] }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  INDEX_SLOT0_INT_KEY *slot0 slot2 10',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x["aaa"] }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  INDEX_SLOT0_STRING_KEY *slot0 slot2 `aaa`',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x[y] }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  INDEX_SLOT0 *slot0 slot3 slot4',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x[1][2] }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  INDEX_INT_KEY slot2 slot3 1',
                 '  INDEX_SLOT0_INT_KEY *slot0 slot2 2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x["y"]["z"] }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  INDEX_STRING_KEY slot2 slot3 `y`',
                 '  INDEX_SLOT0_STRING_KEY *slot0 slot2 `z`',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
@@ -665,18 +665,18 @@ class CompilerTest extends TestCase {
 
             // Filters.
             '{{ s|strlen }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 s',
+                '  LOAD_EXTDATA_1 slot2 [slot1] s',
                 '  CALL_SLOT0_FILTER1 *slot0 slot2 strlen',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ s|strlen + 1 }}{{ s|strlen }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 s',
+                '  LOAD_EXTDATA_1 slot3 [slot1] s',
                 '  CALL_FILTER1 slot2 slot3 strlen',
                 '  LOAD_INT_CONST slot4 1',
                 '  ADD_SLOT0 *slot0 slot2 slot4',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
-                '  LOAD_EXTDATA_1 slot2 slot1 s',
+                '  LOAD_EXTDATA_1 slot2 [slot1] s',
                 '  CALL_SLOT0_FILTER1 *slot0 slot2 strlen',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
@@ -697,13 +697,13 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ s|length }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 s',
+                '  LOAD_EXTDATA_1 slot2 [slot1] s',
                 '  LENGTH_SLOT0_FILTER slot2 slot1',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ (s|length) + 1 }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 s',
+                '  LOAD_EXTDATA_1 slot3 [slot1] s',
                 '  LENGTH_FILTER slot2 slot3',
                 '  LOAD_INT_CONST slot4 1',
                 '  ADD_SLOT0 *slot0 slot2 slot4',
@@ -711,21 +711,21 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ x|default(0) }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  LOAD_INT_CONST slot3 0',
                 '  DEFAULT_SLOT0_FILTER slot2 slot3 slot1',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|mydefault(0) }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  LOAD_INT_CONST slot3 0',
                 '  CALL_SLOT0_FILTER2 *slot0 slot2 slot3 mydefault',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|mydefault(0)|add1|mydefault(10) }}' => [
-                '  LOAD_EXTDATA_1 slot4 slot1 x',
+                '  LOAD_EXTDATA_1 slot4 [slot1] x',
                 '  LOAD_INT_CONST slot5 0',
                 '  CALL_FILTER2 slot3 slot4 slot5 mydefault',
                 '  CALL_FILTER1 slot2 slot3 add1',
@@ -735,20 +735,20 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ x|mydefault(y) }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
-                '  LOAD_EXTDATA_1 slot4 slot2 y',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
+                '  LOAD_EXTDATA_1 slot4 [slot2] y',
                 '  CALL_SLOT0_FILTER2 *slot0 slot3 slot4 mydefault',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ x|escape }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  ESCAPE_SLOT0_FILTER1 *slot0 slot2',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ (x|escape) ~ "a" }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  ESCAPE_FILTER1 slot2 slot3',
                 '  LOAD_STRING_CONST slot4 `a`',
                 '  CONCAT_SLOT0 *slot0 slot2 slot4',
@@ -756,13 +756,13 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{{ x|escape("html") }}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  ESCAPE_SLOT0_FILTER2 *slot0 slot2 `html`',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
             ],
             '{{ (x|escape("url")) ~ "a" }}' => [
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  ESCAPE_FILTER2 slot2 slot3 `url`',
                 '  LOAD_STRING_CONST slot4 `a`',
                 '  CONCAT_SLOT0 *slot0 slot2 slot4',
@@ -841,7 +841,7 @@ class CompilerTest extends TestCase {
             
             // Loops.
             '{% for $x in xs %}{{ $x }}{% end %}' => [
-                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot1] xs',
                 '  FOR_VAL *slot0 L0 slot2',
                 '  OUTPUT_SAFE slot2',
                 '  RETURN',
@@ -849,7 +849,7 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{% for $k, $v in xs %}{{ $k ~ "/" ~ $v }}{% end %}' => [
-                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot1] xs',
                 '  FOR_KEY_VAL *slot0 L0 slot2 slot3',
                 '  LOAD_STRING_CONST slot4 `/`',
                 '  CONCAT3_SLOT0 *slot0 slot2 slot4 slot3',
@@ -859,7 +859,7 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{% let $arr = arr %}{% for $x in $arr %}{{ $x }}{% end %}' => [
-                '  LOAD_EXTDATA_1 slot2 slot1 arr',
+                '  LOAD_EXTDATA_1 slot2 [slot1] arr',
                 '  MOVE_SLOT0 *slot0 slot2',
                 '  FOR_VAL *slot0 L0 slot3',
                 '  OUTPUT_SAFE slot3',
@@ -868,7 +868,7 @@ class CompilerTest extends TestCase {
                 '  RETURN',
             ],
             '{% for $x in xs %}1{% else %}2{% end %}' => [
-                '  LOAD_SLOT0_EXTDATA_1 *slot0 slot1 xs',
+                '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot1] xs',
                 '  FOR_VAL *slot0 L0 slot2',
                 '  OUTPUT_SAFE_STRING_CONST `1`',
                 '  RETURN',

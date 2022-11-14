@@ -61,7 +61,7 @@ class OptimizationsTest extends TestCase {
             '{{ "a" ~ "b" ~ x }}' => [
                 'slots={cache:1 local:3} constants={s:1 i:0 f:0}',
                 '  LOAD_STRING_CONST slot2 `ab`',
-                '  LOAD_EXTDATA_1 slot3 slot1 x',
+                '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  CONCAT_SLOT0 *slot0 slot2 slot3',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
                 '  RETURN',
@@ -76,9 +76,9 @@ class OptimizationsTest extends TestCase {
             // TODO: do not reload extdata inside one expression; re-use slot2 here
             '{{ x ~ "a" ~ "b" ~ x ~ "c" ~ "d" }}' => [
                 'slots={cache:1 local:5} constants={s:2 i:0 f:0}',
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  LOAD_STRING_CONST slot3 `ab`',
-                '  LOAD_EXTDATA_1 slot4 slot1 x',
+                '  LOAD_EXTDATA_1 slot4 [slot1] x',
                 '  CONCAT3_SLOT0 *slot0 slot2 slot3 slot4',
                 '  LOAD_STRING_CONST slot5 `cd`',
                 '  APPEND_SLOT0 *slot0 slot5',
@@ -87,7 +87,7 @@ class OptimizationsTest extends TestCase {
             ],
             '{{ x + 10 + 20 }}' => [
                 'slots={cache:1 local:3} constants={s:0 i:1 f:0}',
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  LOAD_INT_CONST slot3 30',
                 '  ADD_SLOT0 *slot0 slot2 slot3',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
@@ -95,7 +95,7 @@ class OptimizationsTest extends TestCase {
             ],
             '{{ x * 10 * 20 }}' => [
                 'slots={cache:1 local:3} constants={s:0 i:1 f:0}',
-                '  LOAD_EXTDATA_1 slot2 slot1 x',
+                '  LOAD_EXTDATA_1 slot2 [slot1] x',
                 '  LOAD_INT_CONST slot3 200',
                 '  MUL_SLOT0 *slot0 slot2 slot3',
                 '  OUTPUT_SAFE_SLOT0 *slot0',
