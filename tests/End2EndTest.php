@@ -83,6 +83,20 @@ class SimpleTestDataProvider implements DataProviderInterface {
                 0 => 'zero',
                 'key' => 'z',
             ],
+            'leaf' => 10,
+            'nested' => [
+                'leaf' => 20,
+            ],
+            'items' => [
+                'a',
+                'b',
+                'c',
+                '',
+                'd',
+                'e',
+                'f',
+                '',
+            ],
         ];
         $this->time = [
             'year' => 2022,

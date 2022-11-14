@@ -20,6 +20,42 @@ class CompilerTest extends TestCase {
         $tests = [
             [
                 'sources' => [
+                    'main' => '
+                        {% let $v = y %}
+                        {% for $item in items %}
+                            {# comment #}
+                            {% let $s = $item ~ x ~ $v %}
+                            {% if $item %}
+                                > {{ $s }}
+                            {% end %}
+                        {% end %}
+                    ',
+                ],
+                'disasm' => [
+                    'main' => [
+                        '  OUTPUT_SAFE_STRING_CONST `\n                        \n ...`',
+                        '  LOAD_EXTDATA_1 slot4 [slot1] y',
+                        '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot2] items',
+                        '  FOR_VAL *slot0 L0 slot5',
+                        '  OUTPUT_SAFE_STRING_CONST `\n                           ...`',
+                        '  LOAD_EXTDATA_1 slot7 [slot3] x',
+                        '  CONCAT3 slot6 slot5 slot7 slot4',
+                        '  JUMP_FALSY L1 slot5',
+                        '  OUTPUT_SAFE_STRING_CONST `\n                           ...`',
+                        '  OUTPUT slot6',
+                        '  OUTPUT_SAFE_STRING_CONST `\n                            `',
+                        'L1:',
+                        '  OUTPUT_SAFE_STRING_CONST `\n                        `',
+                        '  RETURN',
+                        'L0:',
+                        '  OUTPUT_SAFE_STRING_CONST `\n                    `',
+                        '  RETURN',
+                    ],
+                ],
+            ],
+
+            [
+                'sources' => [
                     'main' => '{% include "a" %}{% end %}',
                     'a' => 'hello',
                 ],
