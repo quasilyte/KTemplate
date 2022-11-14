@@ -1,0 +1,8 @@
+{% let $v = leaf %}
+{% for $item in items %}
+    {# comment #}
+    {% let $s = $item ~ nested.leaf ~ $v %}
+    {% if $item %}
+        > {{ $s }}
+    {% end %}
+{% end %}
