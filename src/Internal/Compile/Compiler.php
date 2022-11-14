@@ -1303,7 +1303,7 @@ class Compiler {
      * @param int $label_id - 16bit
      */
     private function emitJump($label_id) {
-        $this->result->code[] = Op::JUMP| ($label_id << 8);
+        $this->emit(Op::JUMP| ($label_id << 8));
     }
 
     /**
@@ -1313,10 +1313,10 @@ class Compiler {
      */
     private function emitCondJump($op, $cond_slot, $label_id) {
         if ($cond_slot === 0) {
-            $this->result->code[] = ($op+1) | ($label_id << 8);
+            $this->emit(($op+1) | ($label_id << 8));
             return;
         }
-        $this->result->code[] = ($op) | ($label_id << 8) | ($cond_slot << 24);
+        $this->emit(($op) | ($label_id << 8) | ($cond_slot << 24));
     }
 
     /**
@@ -1416,7 +1416,7 @@ class Compiler {
      * @param int $arg1
      */
     private function emit1($op, $arg1) {
-        $this->result->code[] = $op | ($arg1 << 8);
+        $this->emit($op | ($arg1 << 8));
     }
 
     /**
@@ -1425,7 +1425,7 @@ class Compiler {
      * @param int $arg2
      */
     private function emit2($op, $arg1, $arg2) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16);
+        $this->emit($op | ($arg1 << 8) | ($arg2 << 16));
     }
 
     /**
@@ -1435,7 +1435,7 @@ class Compiler {
      * @param int $arg3
      */
     private function emit3($op, $arg1, $arg2, $arg3) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24);
+        $this->emit($op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24));
     }
 
     /**
@@ -1446,7 +1446,7 @@ class Compiler {
      * @param int $arg4
      */
     private function emit4($op, $arg1, $arg2, $arg3, $arg4) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32);
+        $this->emit($op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32));
     }
 
     /**
@@ -1458,7 +1458,7 @@ class Compiler {
      * @param int $arg5
      */
     private function emit5($op, $arg1, $arg2, $arg3, $arg4, $arg5) {
-        $this->result->code[] = $op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32) | ($arg5 << 40);
+        $this->emit($op | ($arg1 << 8) | ($arg2 << 16) | ($arg3 << 24) | ($arg4 << 32) | ($arg5 << 40));
     }
 
     /**
