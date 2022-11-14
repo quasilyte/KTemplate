@@ -28,7 +28,7 @@ class DataKey {
      * Example: "a.b.c"   => "a"
      * @var string
      */
-    public $part1;
+    public $part1 = '';
 
     /**
      * A second part of the data key.
@@ -36,7 +36,7 @@ class DataKey {
      * Example: "a.b.c"   => "b"
      * @var string
      */
-    public $part2;
+    public $part2 = '';
 
     /**
      * A third part of the data key.
@@ -44,7 +44,7 @@ class DataKey {
      * Example: "a.b.c"   => "c"
      * @var string
      */
-    public $part3;
+    public $part3 = '';
 
     /**
      * Return all parts of the key combined.
