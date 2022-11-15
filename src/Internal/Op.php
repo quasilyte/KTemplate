@@ -59,476 +59,481 @@ class Op {
     // Result type: unknown/varying
     public const OUTPUT_EXTDATA_3 = 11;
     
-    // Encoding: 0x0c dst:wslot val:imm8
+    // Encoding: 0x0c arg1:rslot arg2:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    // Result type: unknown/varying
+    public const OUTPUT2_SAFE = 12;
+    
+    // Encoding: 0x0d dst:wslot val:imm8
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LOAD_BOOL = 12;
+    public const LOAD_BOOL = 13;
     
-    // Encoding: 0x0d val:imm8
+    // Encoding: 0x0e val:imm8
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::BOOL
-    public const LOAD_SLOT0_BOOL = 13;
+    public const LOAD_SLOT0_BOOL = 14;
     
-    // Encoding: 0x0e dst:wslot val:intindex
+    // Encoding: 0x0f dst:wslot val:intindex
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::INT
-    public const LOAD_INT_CONST = 14;
+    public const LOAD_INT_CONST = 15;
     
-    // Encoding: 0x0f val:intindex
+    // Encoding: 0x10 val:intindex
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::INT
-    public const LOAD_SLOT0_INT_CONST = 15;
+    public const LOAD_SLOT0_INT_CONST = 16;
     
-    // Encoding: 0x10 dst:wslot val:floatindex
+    // Encoding: 0x11 dst:wslot val:floatindex
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::FLOAT
-    public const LOAD_FLOAT_CONST = 16;
+    public const LOAD_FLOAT_CONST = 17;
     
-    // Encoding: 0x11 val:floatindex
+    // Encoding: 0x12 val:floatindex
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::FLOAT
-    public const LOAD_SLOT0_FLOAT_CONST = 17;
+    public const LOAD_SLOT0_FLOAT_CONST = 18;
     
-    // Encoding: 0x12 dst:wslot val:strindex
+    // Encoding: 0x13 dst:wslot val:strindex
     // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::STRING
-    public const LOAD_STRING_CONST = 18;
+    public const LOAD_STRING_CONST = 19;
     
-    // Encoding: 0x13 val:strindex
+    // Encoding: 0x14 val:strindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_STRING_ARG
     // Result type: Types::STRING
-    public const LOAD_SLOT0_STRING_CONST = 19;
+    public const LOAD_SLOT0_STRING_CONST = 20;
     
-    // Encoding: 0x14 dst:wslot cache:cacheslot k:keyoffset
+    // Encoding: 0x15 dst:wslot cache:cacheslot k:keyoffset
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const LOAD_EXTDATA_1 = 20;
+    public const LOAD_EXTDATA_1 = 21;
     
-    // Encoding: 0x15 cache:cacheslot k:keyoffset
+    // Encoding: 0x16 cache:cacheslot k:keyoffset
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::MIXED
-    public const LOAD_SLOT0_EXTDATA_1 = 21;
+    public const LOAD_SLOT0_EXTDATA_1 = 22;
     
-    // Encoding: 0x16 dst:wslot cache:cacheslot k:keyoffset
+    // Encoding: 0x17 dst:wslot cache:cacheslot k:keyoffset
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const LOAD_EXTDATA_2 = 22;
+    public const LOAD_EXTDATA_2 = 23;
     
-    // Encoding: 0x17 cache:cacheslot k:keyoffset
+    // Encoding: 0x18 cache:cacheslot k:keyoffset
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::MIXED
-    public const LOAD_SLOT0_EXTDATA_2 = 23;
+    public const LOAD_SLOT0_EXTDATA_2 = 24;
     
-    // Encoding: 0x18 dst:wslot cache:cacheslot k:keyoffset
+    // Encoding: 0x19 dst:wslot cache:cacheslot k:keyoffset
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const LOAD_EXTDATA_3 = 24;
+    public const LOAD_EXTDATA_3 = 25;
     
-    // Encoding: 0x19 cache:cacheslot k:keyoffset
+    // Encoding: 0x1a cache:cacheslot k:keyoffset
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::MIXED
-    public const LOAD_SLOT0_EXTDATA_3 = 25;
+    public const LOAD_SLOT0_EXTDATA_3 = 26;
     
-    // Encoding: 0x1a dst:wslot
+    // Encoding: 0x1b dst:wslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NULL
-    public const LOAD_NULL = 26;
+    public const LOAD_NULL = 27;
     
-    // Encoding: 0x1b
+    // Encoding: 0x1c
     // Result type: Types::NULL
-    public const LOAD_SLOT0_NULL = 27;
+    public const LOAD_SLOT0_NULL = 28;
     
-    // Encoding: 0x1c dst:wslot src:rslot key:rslot
+    // Encoding: 0x1d dst:wslot src:rslot key:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const INDEX = 28;
+    public const INDEX = 29;
     
-    // Encoding: 0x1d src:rslot key:rslot
+    // Encoding: 0x1e src:rslot key:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const INDEX_SLOT0 = 29;
+    public const INDEX_SLOT0 = 30;
     
-    // Encoding: 0x1e dst:wslot src:rslot key:intindex
+    // Encoding: 0x1f dst:wslot src:rslot key:intindex
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const INDEX_INT_KEY = 30;
+    public const INDEX_INT_KEY = 31;
     
-    // Encoding: 0x1f src:rslot key:intindex
+    // Encoding: 0x20 src:rslot key:intindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const INDEX_SLOT0_INT_KEY = 31;
+    public const INDEX_SLOT0_INT_KEY = 32;
     
-    // Encoding: 0x20 dst:wslot src:rslot key:strindex
+    // Encoding: 0x21 dst:wslot src:rslot key:strindex
     // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::MIXED
-    public const INDEX_STRING_KEY = 32;
+    public const INDEX_STRING_KEY = 33;
     
-    // Encoding: 0x21 src:rslot key:strindex
+    // Encoding: 0x22 src:rslot key:strindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::MIXED
-    public const INDEX_SLOT0_STRING_KEY = 33;
+    public const INDEX_SLOT0_STRING_KEY = 34;
     
-    // Encoding: 0x22 dst:wslot src:rslot
+    // Encoding: 0x23 dst:wslot src:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const MOVE = 34;
+    public const MOVE = 35;
     
-    // Encoding: 0x23 src:rslot
+    // Encoding: 0x24 src:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const MOVE_SLOT0 = 35;
+    public const MOVE_SLOT0 = 36;
     
-    // Encoding: 0x24 dst:wslot src:rslot
+    // Encoding: 0x25 dst:wslot src:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const MOVE_BOOL = 36;
+    public const MOVE_BOOL = 37;
     
-    // Encoding: 0x25 src:rslot
+    // Encoding: 0x26 src:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const MOVE_SLOT0_BOOL = 37;
+    public const MOVE_SLOT0_BOOL = 38;
     
-    // Encoding: 0x26 dst:wslot
+    // Encoding: 0x27 dst:wslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const CONV_BOOL = 38;
+    public const CONV_BOOL = 39;
     
-    // Encoding: 0x27
+    // Encoding: 0x28
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::BOOL
-    public const CONV_SLOT0_BOOL = 39;
+    public const CONV_SLOT0_BOOL = 40;
     
-    // Encoding: 0x28 pcdelta:rel16
+    // Encoding: 0x29 pcdelta:rel16
     // Result type: unknown/varying
-    public const JUMP = 40;
+    public const JUMP = 41;
     
-    // Encoding: 0x29 pcdelta:rel16 cond:rslot
+    // Encoding: 0x2a pcdelta:rel16 cond:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const JUMP_FALSY = 41;
+    public const JUMP_FALSY = 42;
     
-    // Encoding: 0x2a pcdelta:rel16
+    // Encoding: 0x2b pcdelta:rel16
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: unknown/varying
-    public const JUMP_SLOT0_FALSY = 42;
+    public const JUMP_SLOT0_FALSY = 43;
     
-    // Encoding: 0x2b pcdelta:rel16 cond:rslot
+    // Encoding: 0x2c pcdelta:rel16 cond:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const JUMP_TRUTHY = 43;
+    public const JUMP_TRUTHY = 44;
     
-    // Encoding: 0x2c pcdelta:rel16
+    // Encoding: 0x2d pcdelta:rel16
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: unknown/varying
-    public const JUMP_SLOT0_TRUTHY = 44;
-    
-    // Encoding: 0x2d pcdelta:rel16 cond:rslot
-    // Flags: FLAG_HAS_SLOT_ARG
-    // Result type: unknown/varying
-    public const JUMP_NOT_NULL = 45;
+    public const JUMP_SLOT0_TRUTHY = 45;
     
     // Encoding: 0x2e pcdelta:rel16 cond:rslot
+    // Flags: FLAG_HAS_SLOT_ARG
+    // Result type: unknown/varying
+    public const JUMP_NOT_NULL = 46;
+    
+    // Encoding: 0x2f pcdelta:rel16 cond:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const JUMP_SLOT0_NOT_NULL = 46;
+    public const JUMP_SLOT0_NOT_NULL = 47;
     
-    // Encoding: 0x2f pcdelta:rel16 val:wslot
+    // Encoding: 0x30 pcdelta:rel16 val:wslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const FOR_VAL = 47;
+    public const FOR_VAL = 48;
     
-    // Encoding: 0x30 pcdelta:rel16 key:wslot val:wslot
+    // Encoding: 0x31 pcdelta:rel16 key:wslot val:wslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const FOR_KEY_VAL = 48;
+    public const FOR_KEY_VAL = 49;
     
-    // Encoding: 0x31 dst:wslot arg1:rslot fn:filterid
+    // Encoding: 0x32 dst:wslot arg1:rslot fn:filterid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FILTER1 = 49;
+    public const CALL_FILTER1 = 50;
     
-    // Encoding: 0x32 arg1:rslot fn:filterid
+    // Encoding: 0x33 arg1:rslot fn:filterid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FILTER1 = 50;
+    public const CALL_SLOT0_FILTER1 = 51;
     
-    // Encoding: 0x33 dst:wslot arg1:rslot arg2:rslot fn:filterid
+    // Encoding: 0x34 dst:wslot arg1:rslot arg2:rslot fn:filterid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FILTER2 = 51;
+    public const CALL_FILTER2 = 52;
     
-    // Encoding: 0x34 arg1:rslot arg2:rslot fn:filterid
+    // Encoding: 0x35 arg1:rslot arg2:rslot fn:filterid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FILTER2 = 52;
+    public const CALL_SLOT0_FILTER2 = 53;
     
-    // Encoding: 0x35 dst:wslot fn:funcid
+    // Encoding: 0x36 dst:wslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC0 = 53;
+    public const CALL_FUNC0 = 54;
     
-    // Encoding: 0x36 fn:funcid
+    // Encoding: 0x37 fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC0 = 54;
+    public const CALL_SLOT0_FUNC0 = 55;
     
-    // Encoding: 0x37 dst:wslot arg1:rslot fn:funcid
+    // Encoding: 0x38 dst:wslot arg1:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC1 = 55;
+    public const CALL_FUNC1 = 56;
     
-    // Encoding: 0x38 arg1:rslot fn:funcid
+    // Encoding: 0x39 arg1:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC1 = 56;
+    public const CALL_SLOT0_FUNC1 = 57;
     
-    // Encoding: 0x39 dst:wslot arg1:rslot arg2:rslot fn:funcid
+    // Encoding: 0x3a dst:wslot arg1:rslot arg2:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC2 = 57;
+    public const CALL_FUNC2 = 58;
     
-    // Encoding: 0x3a arg1:rslot arg2:rslot fn:funcid
+    // Encoding: 0x3b arg1:rslot arg2:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC2 = 58;
+    public const CALL_SLOT0_FUNC2 = 59;
     
-    // Encoding: 0x3b dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid
+    // Encoding: 0x3c dst:wslot arg1:rslot arg2:rslot arg3:rslot fn:funcid
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_FUNC3 = 59;
+    public const CALL_FUNC3 = 60;
     
-    // Encoding: 0x3c arg1:rslot arg2:rslot arg3:rslot fn:funcid
+    // Encoding: 0x3d arg1:rslot arg2:rslot arg3:rslot fn:funcid
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const CALL_SLOT0_FUNC3 = 60;
+    public const CALL_SLOT0_FUNC3 = 61;
     
-    // Encoding: 0x3d dst:wslot arg1:rslot
+    // Encoding: 0x3e dst:wslot arg1:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::INT
-    public const LENGTH_FILTER = 61;
+    public const LENGTH_FILTER = 62;
     
-    // Encoding: 0x3e arg1:rslot
+    // Encoding: 0x3f arg1:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::INT
-    public const LENGTH_SLOT0_FILTER = 62;
+    public const LENGTH_SLOT0_FILTER = 63;
     
-    // Encoding: 0x3f dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x40 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const DEFAULT_FILTER = 63;
+    public const DEFAULT_FILTER = 64;
     
-    // Encoding: 0x40 arg1:rslot arg2:rslot
+    // Encoding: 0x41 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::MIXED
-    public const DEFAULT_SLOT0_FILTER = 64;
+    public const DEFAULT_SLOT0_FILTER = 65;
     
-    // Encoding: 0x41 dst:wslot src:rslot
+    // Encoding: 0x42 dst:wslot src:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_FILTER1 = 65;
+    public const ESCAPE_FILTER1 = 66;
     
-    // Encoding: 0x42 src:rslot
+    // Encoding: 0x43 src:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_SLOT0_FILTER1 = 66;
+    public const ESCAPE_SLOT0_FILTER1 = 67;
     
-    // Encoding: 0x43 dst:wslot src:rslot strategy:strindex
+    // Encoding: 0x44 dst:wslot src:rslot strategy:strindex
     // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_FILTER2 = 67;
+    public const ESCAPE_FILTER2 = 68;
     
-    // Encoding: 0x44 src:rslot strategy:strindex
+    // Encoding: 0x45 src:rslot strategy:strindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::SAFE_STRING
-    public const ESCAPE_SLOT0_FILTER2 = 68;
+    public const ESCAPE_SLOT0_FILTER2 = 69;
     
-    // Encoding: 0x45 dst:wslot arg:rslot
+    // Encoding: 0x46 dst:wslot arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT = 69;
+    public const NOT = 70;
     
-    // Encoding: 0x46 arg:rslot
+    // Encoding: 0x47 arg:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT_SLOT0 = 70;
+    public const NOT_SLOT0 = 71;
     
-    // Encoding: 0x47 dst:wslot arg:rslot
+    // Encoding: 0x48 dst:wslot arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const NEG = 71;
+    public const NEG = 72;
     
-    // Encoding: 0x48 arg:rslot
+    // Encoding: 0x49 arg:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const NEG_SLOT0 = 72;
+    public const NEG_SLOT0 = 73;
     
-    // Encoding: 0x49 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x4a dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const OR = 73;
+    public const OR = 74;
     
-    // Encoding: 0x4a arg1:rslot arg2:rslot
+    // Encoding: 0x4b arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const OR_SLOT0 = 74;
+    public const OR_SLOT0 = 75;
     
-    // Encoding: 0x4b dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x4c dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const AND = 75;
+    public const AND = 76;
     
-    // Encoding: 0x4c arg1:rslot arg2:rslot
+    // Encoding: 0x4d arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const AND_SLOT0 = 76;
+    public const AND_SLOT0 = 77;
     
-    // Encoding: 0x4d dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x4e dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::STRING
-    public const CONCAT = 77;
+    public const CONCAT = 78;
     
-    // Encoding: 0x4e arg1:rslot arg2:rslot
+    // Encoding: 0x4f arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::STRING
-    public const CONCAT_SLOT0 = 78;
+    public const CONCAT_SLOT0 = 79;
     
-    // Encoding: 0x4f dst:wslot arg1:rslot arg2:rslot arg3:rslot
+    // Encoding: 0x50 dst:wslot arg1:rslot arg2:rslot arg3:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::STRING
-    public const CONCAT3 = 79;
+    public const CONCAT3 = 80;
     
-    // Encoding: 0x50 arg1:rslot arg2:rslot arg3:rslot
+    // Encoding: 0x51 arg1:rslot arg2:rslot arg3:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::STRING
-    public const CONCAT3_SLOT0 = 80;
+    public const CONCAT3_SLOT0 = 81;
     
-    // Encoding: 0x51 dst:wslot arg:rslot
+    // Encoding: 0x52 dst:wslot arg:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::STRING
-    public const APPEND = 81;
+    public const APPEND = 82;
     
-    // Encoding: 0x52 arg:rslot
+    // Encoding: 0x53 arg:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::STRING
-    public const APPEND_SLOT0 = 82;
+    public const APPEND_SLOT0 = 83;
     
-    // Encoding: 0x53 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x54 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const EQ = 83;
+    public const EQ = 84;
     
-    // Encoding: 0x54 arg1:rslot arg2:rslot
+    // Encoding: 0x55 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const EQ_SLOT0 = 84;
+    public const EQ_SLOT0 = 85;
     
-    // Encoding: 0x55 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x56 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT = 85;
+    public const LT = 86;
     
-    // Encoding: 0x56 arg1:rslot arg2:rslot
+    // Encoding: 0x57 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_SLOT0 = 86;
+    public const LT_SLOT0 = 87;
     
-    // Encoding: 0x57 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x58 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_EQ = 87;
+    public const LT_EQ = 88;
     
-    // Encoding: 0x58 arg1:rslot arg2:rslot
+    // Encoding: 0x59 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const LT_EQ_SLOT0 = 88;
+    public const LT_EQ_SLOT0 = 89;
     
-    // Encoding: 0x59 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x5a dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT_EQ = 89;
+    public const NOT_EQ = 90;
     
-    // Encoding: 0x5a arg1:rslot arg2:rslot
+    // Encoding: 0x5b arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::BOOL
-    public const NOT_EQ_SLOT0 = 90;
+    public const NOT_EQ_SLOT0 = 91;
     
-    // Encoding: 0x5b dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x5c dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const ADD = 91;
+    public const ADD = 92;
     
-    // Encoding: 0x5c arg1:rslot arg2:rslot
+    // Encoding: 0x5d arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const ADD_SLOT0 = 92;
+    public const ADD_SLOT0 = 93;
     
-    // Encoding: 0x5d dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x5e dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const SUB = 93;
+    public const SUB = 94;
     
-    // Encoding: 0x5e arg1:rslot arg2:rslot
+    // Encoding: 0x5f arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const SUB_SLOT0 = 94;
+    public const SUB_SLOT0 = 95;
     
-    // Encoding: 0x5f dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x60 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MUL = 95;
+    public const MUL = 96;
     
-    // Encoding: 0x60 arg1:rslot arg2:rslot
+    // Encoding: 0x61 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MUL_SLOT0 = 96;
+    public const MUL_SLOT0 = 97;
     
-    // Encoding: 0x61 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x62 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const QUO = 97;
+    public const QUO = 98;
     
-    // Encoding: 0x62 arg1:rslot arg2:rslot
+    // Encoding: 0x63 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const QUO_SLOT0 = 98;
+    public const QUO_SLOT0 = 99;
     
-    // Encoding: 0x63 dst:wslot arg1:rslot arg2:rslot
+    // Encoding: 0x64 dst:wslot arg1:rslot arg2:rslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MOD = 99;
+    public const MOD = 100;
     
-    // Encoding: 0x64 arg1:rslot arg2:rslot
+    // Encoding: 0x65 arg1:rslot arg2:rslot
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG
     // Result type: Types::NUMERIC
-    public const MOD_SLOT0 = 100;
+    public const MOD_SLOT0 = 101;
     
-    // Encoding: 0x65 dst:wslot s:rslot regexp:strindex
+    // Encoding: 0x66 dst:wslot s:rslot regexp:strindex
     // Flags: FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::BOOL
-    public const MATCHES = 101;
+    public const MATCHES = 102;
     
-    // Encoding: 0x66 s:rslot regexp:strindex
+    // Encoding: 0x67 s:rslot regexp:strindex
     // Flags: FLAG_IMPLICIT_SLOT0 | FLAG_HAS_SLOT_ARG | FLAG_HAS_STRING_ARG
     // Result type: Types::BOOL
-    public const MATCHES_SLOT0 = 102;
+    public const MATCHES_SLOT0 = 103;
     
-    // Encoding: 0x67
+    // Encoding: 0x68
     // Result type: unknown/varying
-    public const START_TMP_OUTPUT = 103;
+    public const START_TMP_OUTPUT = 104;
     
-    // Encoding: 0x68 dst:wslot
+    // Encoding: 0x69 dst:wslot
     // Flags: FLAG_HAS_SLOT_ARG
     // Result type: unknown/varying
-    public const FINISH_TMP_OUTPUT = 104;
+    public const FINISH_TMP_OUTPUT = 105;
     
-    // Encoding: 0x69 path:strindex
+    // Encoding: 0x6a path:strindex
     // Flags: FLAG_HAS_STRING_ARG
     // Result type: unknown/varying
-    public const PREPARE_TEMPLATE = 105;
+    public const PREPARE_TEMPLATE = 106;
     
-    // Encoding: 0x6a
+    // Encoding: 0x6b
     // Result type: unknown/varying
-    public const INCLUDE_TEMPLATE = 106;
+    public const INCLUDE_TEMPLATE = 107;
     
 
     /**
@@ -558,6 +563,8 @@ class Op {
         case self::OUTPUT_EXTDATA_2:
             return OpInfo::KIND_OUTPUT;
         case self::OUTPUT_EXTDATA_3:
+            return OpInfo::KIND_OUTPUT;
+        case self::OUTPUT2_SAFE:
             return OpInfo::KIND_OUTPUT;
         case self::LOAD_BOOL:
             return OpInfo::KIND_SIMPLE_ASSIGN;
@@ -782,6 +789,8 @@ class Op {
             return 'OUTPUT_EXTDATA_2';
         case self::OUTPUT_EXTDATA_3:
             return 'OUTPUT_EXTDATA_3';
+        case self::OUTPUT2_SAFE:
+            return 'OUTPUT2_SAFE';
         case self::LOAD_BOOL:
             return 'LOAD_BOOL';
         case self::LOAD_SLOT0_BOOL:
@@ -1180,6 +1189,8 @@ class Op {
             return 0;
         case self::OUTPUT_EXTDATA_3:
             return 0;
+        case self::OUTPUT2_SAFE:
+            return OpInfo::FLAG_HAS_SLOT_ARG;
         case self::LOAD_BOOL:
             return OpInfo::FLAG_HAS_SLOT_ARG;
         case self::LOAD_SLOT0_BOOL:
@@ -1387,6 +1398,7 @@ class Op {
         self::OUTPUT_EXTDATA_1 => [OpInfo::ARG_CACHE_SLOT, OpInfo::ARG_KEY_OFFSET, OpInfo::ARG_IMM8],
         self::OUTPUT_EXTDATA_2 => [OpInfo::ARG_CACHE_SLOT, OpInfo::ARG_KEY_OFFSET, OpInfo::ARG_IMM8],
         self::OUTPUT_EXTDATA_3 => [OpInfo::ARG_CACHE_SLOT, OpInfo::ARG_KEY_OFFSET, OpInfo::ARG_IMM8],
+        self::OUTPUT2_SAFE => [OpInfo::ARG_SLOT, OpInfo::ARG_SLOT],
         self::LOAD_BOOL => [OpInfo::ARG_SLOT, OpInfo::ARG_IMM8],
         self::LOAD_SLOT0_BOOL => [OpInfo::ARG_IMM8],
         self::LOAD_INT_CONST => [OpInfo::ARG_SLOT, OpInfo::ARG_INT_CONST],

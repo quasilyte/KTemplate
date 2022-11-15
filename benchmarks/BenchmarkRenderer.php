@@ -79,10 +79,10 @@ class BenchmarkRenderer {
         $this->default_filter_template = $c->compile($env, 'test', '{% let $x = null %}{{ $x|default(0) }}{{ $x|default("a") }}{{ $x|default(1) }}{{ $x|default(null)|default(1) }}');
         $this->slot0_template = $c->compile($env, 'test', '{{null}}{{null}}{{null}}{{null}}');
 
-        $this->concat2_template = $c->compile($env, 'test', '{% let $s = "a" %}{{ $s ~ $s }}');
-        $this->concat3_template = $c->compile($env, 'test', '{% let $s = "a" %}{{ $s ~ $s ~ $s }}');
-        $this->concat4_template = $c->compile($env, 'test', '{% let $s = "a" %}{{ $s ~ $s ~ $s ~ $s }}');
-        $this->concat5_template = $c->compile($env, 'test', '{% let $s = "a" %}{{ $s ~ $s ~ $s ~ $s ~ $s }}');
+        $this->concat2_template = $c->compile($env, 'test', '{% let $s = "a" %}{% let $s2 = $s ~ $s %}');
+        $this->concat3_template = $c->compile($env, 'test', '{% let $s = "a" %}{% let $s2 = $s ~ $s ~ $s %}');
+        $this->concat4_template = $c->compile($env, 'test', '{% let $s = "a" %}{% let $s2 = $s ~ $s ~ $s ~ $s %}');
+        $this->concat5_template = $c->compile($env, 'test', '{% let $s = "a" %}{% let $s2 = $s ~ $s ~ $s ~ $s ~ $s %}');
 
         $this->mixed_template = $c->compile($env, 'test', '
             {% let $v = y %}

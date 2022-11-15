@@ -582,6 +582,15 @@ class Compiler {
             return true;
         }
         switch ($e->kind) {
+        case ExprKind::CONCAT:
+            if (!$this->needsEscaping(Types::MIXED)) {
+                // Compiling the concat may require tmp slots.
+                $this->frame->enterTempBlock();
+                $this->compileConcat(0, $e, true);
+                $this->frame->leaveTempBlock();
+                return true;
+            }
+            return false;
         case ExprKind::DOLLAR_IDENT:
             $var_slot = $this->lookupLocalVar($e);
             $op = $this->needsEscaping(Types::MIXED) ? Op::OUTPUT : Op::OUTPUT_SAFE;
@@ -752,14 +761,6 @@ class Compiler {
         default:
             return $this->env->ctx->auto_escape_expr;
         }
-    }
-
-    /**
-     * @param int $dst
-     * @param int $type
-     */
-    private function maybeEscape($dst, $type) {
-        
     }
 
     /**
@@ -1223,9 +1224,10 @@ class Compiler {
     /**
      * @param int $dst
      * @param Expr $e
+     * @param bool $direct_output
      * @return int
      */
-    private function compileConcat($dst, $e) {
+    private function compileConcat($dst, $e, $direct_output = false) {
         $this->tmp_expr_array_size = 0;
         Expr::walk($this->parser, $e, function ($x) {
             if ($x->kind === ExprKind::CONCAT) {
@@ -1254,6 +1256,41 @@ class Compiler {
         }
 
         $i = 0;
+        if ($direct_output) {
+            // for the direct output without escaping,
+            // {{ x }}{{ y }} is identical to {{ x ~ y }} but
+            // doesn't produce a temporary string to be appended to the output;
+            // we also have OUTPUT2 instruction just for the cases like this.
+            while ($num_args > 0) {
+                $concat_arg = $this->tmp_expr_array[$i];
+                if ($concat_arg->kind === ExprKind::STRING_LIT) {
+                    $this->compileOutputStringConst((string)$concat_arg->value, !$this->env->ctx->auto_escape_const_expr);
+                    $i++;
+                    $num_args--;
+                    continue;
+                }
+                if ($concat_arg->kind === ExprKind::INT_LIT) {
+                    $this->compileOutputIntConst((int)$concat_arg->value);
+                    $i++;
+                    $num_args--;
+                    continue;
+                }
+                if ($num_args >= 2) {
+                    $arg1 = $this->compileTempExpr($this->tmp_expr_array[$i]);
+                    $arg2 = $this->compileTempExpr($this->tmp_expr_array[$i+1]);
+                    $this->emit2(Op::OUTPUT2_SAFE, $arg1, $arg2);
+                    $i += 2;
+                    $num_args -= 2;
+                } else {
+                    $arg = $this->compileTempExpr($this->tmp_expr_array[$i]);
+                    $this->emit1(Op::OUTPUT_SAFE, $arg);
+                    $i++;
+                    $num_args--;
+                }
+            }
+            return Types::UNKNOWN;
+        }
+
         if ($num_args >= 3) {
             $i = 3;
             $arg1 = $this->compileTempExpr($this->tmp_expr_array[0]);

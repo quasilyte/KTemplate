@@ -64,6 +64,7 @@ var rawOpcodes = []opcodeTemplate{
 	{"OUTPUT_EXTDATA_1", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType, kindOutput},
 	{"OUTPUT_EXTDATA_2", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType, kindOutput},
 	{"OUTPUT_EXTDATA_3", "op cache:cacheslot k:keyoffset escapebit:imm8", unknownType, kindOutput},
+	{"OUTPUT2_SAFE", "op arg1:rslot arg2:rslot", unknownType, kindOutput},
 
 	{"LOAD_BOOL", "op dst:wslot val:imm8", boolType, kindSimpleAssign},
 	{"LOAD_SLOT0_BOOL", "op *slot0 val:imm8", boolType, kindSimpleAssign},

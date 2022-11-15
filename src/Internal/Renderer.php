@@ -125,6 +125,10 @@ class Renderer {
             case Op::OUTPUT_SAFE_INT_CONST:
                 $state->buf .= $t->int_values[($opdata >> 8) & 0xffff];
                 break;
+            case Op::OUTPUT2_SAFE:
+                $state->buf .= $state->slots[$fp + (($opdata >> 8) & 0xff)];
+                $state->buf .= $state->slots[$fp + (($opdata >> 16) & 0xff)];
+                break;
             case Op::OUTPUT_EXTDATA_1:
                 $cache_slot = ($opdata >> 8) & 0xff;
                 $cache_mask = 1 << ($cache_slot - 1);

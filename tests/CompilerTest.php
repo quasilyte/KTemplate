@@ -343,6 +343,31 @@ class CompilerTest extends TestCase {
                 '  OUTPUT_SAFE_STRING_CONST `ab`',
                 '  RETURN',
             ],
+
+            '{% let $x %}
+                {%- let $x = 100 -%}
+                {{- $x*2 -}}
+             {% end %}
+             {{ $x }}' => [
+                '  START_TMP_OUTPUT',
+                '  LOAD_INT_CONST slot2 100',
+                '  LOAD_INT_CONST slot3 2',
+                '  MUL_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  FINISH_TMP_OUTPUT slot1',
+                '  OUTPUT_SAFE_STRING_CONST `\n             `',
+                '  OUTPUT slot1',
+                '  RETURN',
+            ],
+
+            '{% let $s = "a" %}{{ $s ~ $s ~ $s ~ $s ~ $s }}' => [
+                '  LOAD_STRING_CONST slot1 `a`',
+                '  CONCAT3_SLOT0 *slot0 slot1 slot1 slot1',
+                '  APPEND_SLOT0 *slot0 slot1',
+                '  APPEND_SLOT0 *slot0 slot1',
+                '  OUTPUT_SLOT0 *slot0',
+                '  RETURN',
+            ],
         ];
 
         $env = $this->newTestEnv(new Context());
@@ -489,15 +514,14 @@ class CompilerTest extends TestCase {
             ],
             '{% let $s = "a" %}{{ $s ~ $s ~ $s }}' => [
                 '  LOAD_STRING_CONST slot1 `a`',
-                '  CONCAT3_SLOT0 *slot0 slot1 slot1 slot1',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  OUTPUT2_SAFE slot1 slot1',
+                '  OUTPUT_SAFE slot1',
                 '  RETURN',
             ],
             '{% let $s = "a" %}{{ $s ~ $s ~ $s ~ $s }}' => [
                 '  LOAD_STRING_CONST slot1 `a`',
-                '  CONCAT3_SLOT0 *slot0 slot1 slot1 slot1',
-                '  APPEND_SLOT0 *slot0 slot1',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  OUTPUT2_SAFE slot1 slot1',
+                '  OUTPUT2_SAFE slot1 slot1',
                 '  RETURN',
             ],
             '{% let $s = "a" %}{{ ($s ~ $s ~ $s)|length }}' => [
@@ -807,8 +831,7 @@ class CompilerTest extends TestCase {
                 '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  ESCAPE_FILTER1 slot2 slot3',
                 '  LOAD_STRING_CONST slot4 `a`',
-                '  CONCAT_SLOT0 *slot0 slot2 slot4',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  OUTPUT2_SAFE slot2 slot4',
                 '  RETURN',
             ],
             '{{ x|escape("html") }}' => [
@@ -821,8 +844,7 @@ class CompilerTest extends TestCase {
                 '  LOAD_EXTDATA_1 slot3 [slot1] x',
                 '  ESCAPE_FILTER2 slot2 slot3 `url`',
                 '  LOAD_STRING_CONST slot4 `a`',
-                '  CONCAT_SLOT0 *slot0 slot2 slot4',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  OUTPUT2_SAFE slot2 slot4',
                 '  RETURN',
             ],
 
@@ -908,8 +930,8 @@ class CompilerTest extends TestCase {
                 '  LOAD_SLOT0_EXTDATA_1 *slot0 [slot1] xs',
                 '  FOR_KEY_VAL *slot0 L0 slot2 slot3',
                 '  LOAD_STRING_CONST slot4 `/`',
-                '  CONCAT3_SLOT0 *slot0 slot2 slot4 slot3',
-                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  OUTPUT2_SAFE slot2 slot4',
+                '  OUTPUT_SAFE slot3',
                 '  RETURN',
                 'L0:',
                 '  RETURN',
@@ -960,6 +982,29 @@ class CompilerTest extends TestCase {
                 '  START_TMP_OUTPUT',
                 '  OUTPUT_SAFE_STRING_CONST `2`',
                 '  FINISH_TMP_OUTPUT slot1',
+                '  RETURN',
+            ],
+            '{% let $x %}
+                {%- let $x = 100 -%}
+                {{- $x*2 -}}
+             {% end %}
+             {{ $x }}' => [
+                '  START_TMP_OUTPUT',
+                '  LOAD_INT_CONST slot2 100',
+                '  LOAD_INT_CONST slot3 2',
+                '  MUL_SLOT0 *slot0 slot2 slot3',
+                '  OUTPUT_SAFE_SLOT0 *slot0',
+                '  FINISH_TMP_OUTPUT slot1',
+                '  OUTPUT_SAFE_STRING_CONST `\n             `',
+                '  OUTPUT_SAFE slot1',
+                '  RETURN',
+            ],
+
+            '{% let $s = "a" %}{{ $s ~ $s ~ $s ~ $s ~ $s }}' => [
+                '  LOAD_STRING_CONST slot1 `a`',
+                '  OUTPUT2_SAFE slot1 slot1',
+                '  OUTPUT2_SAFE slot1 slot1',
+                '  OUTPUT_SAFE slot1',
                 '  RETURN',
             ],
         ];
