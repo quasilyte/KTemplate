@@ -34,11 +34,6 @@ class ExprParser {
         return $this->expr_pool[$e->members_offset + $i];
     }
 
-    private function newExprCopy(Expr $e) {
-        $cloned = $this->newExpr(0);
-        $cloned->assign($e);
-    }
-
     private function newExpr(int $kind, $value = null): Expr {
         if ($this->num_allocated == count($this->expr_pool)) {
             $this->growPool(10);
