@@ -116,7 +116,10 @@ class Compiler {
         return $result;
     }
 
-    private function compileToken(Token $tok) {
+    /**
+     * @param Token $tok
+     */
+    private function compileToken($tok) {
         switch ($tok->kind) {
         case TokenKind::COMMENT:
             return; // Just skip the comment

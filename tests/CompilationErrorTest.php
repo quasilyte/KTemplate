@@ -18,7 +18,7 @@ class CompilationErrorTest extends TestCase {
     /** @var Context */
     private static $context;
 
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass() {
         self::$context = new Context();
         self::$loader = new ArrayLoader();
         self::$engine = new Engine(self::$context, self::$loader);
