@@ -234,6 +234,12 @@ class LexerTest extends TestCase {
                 ['ECHO_START', 'DOLLAR_IDENT($x)', 'MATCHES', 'STRING_LIT_Q2("/abc/")', 'ECHO_END'],
             ],
 
+            // Braces inside text.
+            [
+                'a { b } c',
+                ['TEXT(a { b } c)'],
+            ],
+
             // Mixing everything together.
             [
                 'a{{x_2}}b',

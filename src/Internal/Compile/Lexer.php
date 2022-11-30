@@ -508,17 +508,20 @@ class Lexer {
         while (true) {
             $lbrace_pos = strpos($this->src, '{', $this->pos);
             if ($lbrace_pos === false || ($lbrace_pos === $this->src_len - 1)) {
+                // End of the source or no '{' found.
                 $dst->pos_to = $this->src_len;
                 $this->pos = $dst->pos_to;
                 return;
             }
             $next_char = $this->src[$lbrace_pos + 1];
             if ($next_char === '{' || $next_char === '%' || $next_char === '#') {
+                // One of the control characters.
                 $dst->pos_to = $lbrace_pos;
                 $this->pos = $lbrace_pos;
                 return;
             }
-            $this->pos = $lbrace_pos;
+            // Just a single '{', continue scanning the text.
+            $this->pos = $lbrace_pos + 1;
         }
     }
 
