@@ -55,7 +55,8 @@ Most of the time, the transformation is straightforward.
 ```html
 {% param $title = "" %}
 {% param $head = "" %}
-{% param $content %}
+{% param $content = "" %}
+{% param $footer %}
     &copy; Copyright 2011 by <a href="http://domain.invalid/">you</a>.
 {% end %}
 
