@@ -10,7 +10,7 @@ class OptimizationsTest extends TestCase {
     /** @var Compiler */
     private static $compiler;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$compiler = new Compiler();
     }
 
