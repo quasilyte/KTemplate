@@ -12,7 +12,7 @@ class CompilerTest extends TestCase {
     /** @var Compiler */
     private static $compiler;
 
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass() {
         self::$compiler = new Compiler();
     }
 

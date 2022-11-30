@@ -24,7 +24,11 @@ class Lexer {
         $this->tok2 = new Token();
     }
 
-    public function setSource(string $filename, string $src) {
+    /**
+     * @param string $filename
+     * @param string $src
+     */
+    public function setSource($filename, $src) {
         $this->filename = $filename;
         $this->pos = 0;
         $this->src = $src;
@@ -38,12 +42,19 @@ class Lexer {
         $this->tok2->reset();
     }
 
-    public function setExprSource(string $filename, string $src) {
+    /**
+     * @param string $filename
+     * @param string $src
+     */
+    public function setExprSource($filename, $src) {
         $this->setSource($filename, $src);
         $this->inside_expr = true;
     }
 
-    public function scan(): Token {
+    /**
+     * @return Token
+     */
+    public function scan() {
         if ($this->has_tok2) {
             $this->has_tok2 = false;
             $this->tok1->assign($this->tok2);
@@ -53,7 +64,11 @@ class Lexer {
         return $this->tok1;
     }
 
-    public function consume(int $kind) {
+    /**
+     * @param int $kind
+     * @return bool
+     */
+    public function consume($kind) {
         if ($this->peek()->kind == $kind) {
             $this->has_tok2 = false;
             return true;
@@ -61,11 +76,20 @@ class Lexer {
         return false;
     }
 
-    public function getFilename(): string { return $this->filename; }
+    /**
+     * @return string
+     */
+    public function getFilename() { return $this->filename; }
 
-    public function getPos(): int { return $this->pos; }
+    /**
+     * @return int
+     */
+    public function getPos() { return $this->pos; }
 
-    public function peek(): Token {
+    /**
+     * @return Token
+     */
+    public function peek() {
         if ($this->has_tok2) {
             return $this->tok2;
         }
@@ -101,11 +125,18 @@ class Lexer {
         return (string)substr($this->src, $from, $to);
     }
 
-    public function getError(): string {
+    /**
+     * @return string
+     */
+    public function getError() {
         return $this->err;
     }
 
-    public function getLineByPos(int $pos): int {
+    /**
+     * @param int $pos
+     * @return int
+     */
+    public function getLineByPos($pos) {
         if ($this->err_cursor > $pos) {
             return -1;
         }
@@ -116,24 +147,44 @@ class Lexer {
         return $this->last_err_line;
     }
 
-    private static function isLetter(int $ch) {
+    /**
+     * @param int $ch
+     * @return bool
+     */
+    private static function isLetter($ch) {
         return ($ch >= ord('a') && $ch <= ord('z')) ||
             ($ch >= ord('A') && $ch <= ord('Z'));
     }
 
-    private static function isDigitChar(int $ch) {
+    /**
+     * @param int $ch
+     * @return bool
+     */
+    private static function isDigitChar($ch) {
         return $ch >= ord('0') && $ch <= ord('9');
     }
 
-    private static function isFirstIdentChar(int $ch) {
+    /**
+     * @param int $ch
+     * @return bool
+     */
+    private static function isFirstIdentChar($ch) {
         return $ch === ord('$') || self::isLetter($ch) || $ch === ord('_');
     }
 
-    private static function isIdentChar(int $ch) {
+    /**
+     * @param int $ch
+     * @return bool
+     */
+    private static function isIdentChar($ch) {
         return self::isLetter($ch) || $ch === ord('_') || self::isDigitChar($ch);
     }
 
-    private function peekChar(int $offset) {
+    /**
+     * @param int $offset
+     * @return int
+     */
+    private function peekChar($offset) {
         $pos = $this->pos + $offset;
         if ($pos >= $this->src_len) {
             return 0;
@@ -141,7 +192,10 @@ class Lexer {
         return ord($this->src[$pos]);
     }
 
-    private function scanInto(Token $dst) {
+    /**
+     * @param Token $dst
+     */
+    private function scanInto($dst) {
         if ($this->inside_expr) {
             $this->skipWhitespace();
             if ($this->pos >= $this->src_len) {
@@ -490,7 +544,10 @@ class Lexer {
         }
     }
 
-    private function scanCommentInto(Token $dst) {
+    /**
+     * @param Token $dst
+     */
+    private function scanCommentInto($dst) {
         $dst->kind = TokenKind::COMMENT;
         $dst->pos_from = $this->pos + 2;
         $end_pos = strpos($this->src, '#}', $this->pos + 2);
@@ -502,7 +559,10 @@ class Lexer {
         $this->pos = $end_pos + 2;
     }
 
-    private function scanTextInto(Token $dst) {
+    /**
+     * @param Token $dst
+     */
+    private function scanTextInto($dst) {
         $dst->kind = TokenKind::TEXT;
         $dst->pos_from = $this->pos;
         while (true) {
@@ -525,14 +585,23 @@ class Lexer {
         }
     }
 
-    private function acceptSimpleToken(Token $dst, int $kind, int $width) {
+    /**
+     * @param Token $dst
+     * @param int $kind
+     * @param int $width
+     */
+    private function acceptSimpleToken($dst, $kind, $width) {
         $dst->kind = $kind;
         $dst->pos_from = $this->pos;
         $dst->pos_to = $this->pos + $width;
         $this->pos += $width;
     }
 
-    private function setError(Token $dst, string $err) {
+    /**
+     * @param Token $dst
+     * @param string $err
+     */
+    private function setError($dst, $err) {
         $dst->kind = TokenKind::ERROR;
         $this->err = $err;
         $this->pos = $this->src_len;

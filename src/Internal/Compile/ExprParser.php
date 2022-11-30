@@ -18,7 +18,11 @@ class ExprParser {
         $this->tmp = new Expr();
     }
 
-    public function parseRootExpr(Lexer $lexer): Expr {
+    /**
+     * @param Lexer $lexer
+     * @return Expr
+     */
+    public function parseRootExpr($lexer) {
         $this->num_allocated = 0;
         $this->lexer = $lexer;
         $e = $this->newExpr(0);
@@ -30,16 +34,21 @@ class ExprParser {
         return $this->num_allocated;
     }
 
-    public function getExprMember(Expr $e, int $i): Expr {
+    /**
+     * @param Expr $e
+     * @param int $i
+     * @return Expr
+     */
+    public function getExprMember($e, $i) {
         return $this->expr_pool[$e->members_offset + $i];
     }
 
-    private function newExprCopy(Expr $e) {
-        $cloned = $this->newExpr(0);
-        $cloned->assign($e);
-    }
-
-    private function newExpr(int $kind, $value = null): Expr {
+    /**
+     * @param int $kind
+     * @param mixed $value
+     * @return Expr
+     */
+    private function newExpr($kind, $value = null) {
         if ($this->num_allocated == count($this->expr_pool)) {
             $this->growPool(10);
         }
@@ -50,7 +59,11 @@ class ExprParser {
         return $e;
     }
 
-    private function allocateExprMembers(Expr $e, int $num_members) {
+    /**
+     * @param Expr $e
+     * @param int $num_members
+     */
+    private function allocateExprMembers($e, $num_members) {
         if ($this->num_allocated + $num_members >= count($this->expr_pool)) {
             $this->growPool($num_members + 10);
         }
@@ -58,21 +71,32 @@ class ExprParser {
         $this->num_allocated += $num_members;
     }
 
-    private function growPool(int $extra) {
+    /**
+     * @param int $extra
+     */
+    private function growPool($extra) {
         while ($extra > 0) {
             $this->expr_pool[] = new Expr();
             $extra--;
         }
     }
 
-    private function setError(Expr $e, string $msg) {
+    /**
+     * @param Expr $e
+     * @param string $msg
+     */
+    private function setError($e, $msg) {
         $pos = $this->lexer->getPos();
         $line = $this->lexer->getLineByPos($pos);
         $e->kind = ExprKind::BAD;
         $e->value = ['line' => $line, 'msg' => $msg];
     }
 
-    private function parseExpr(Expr $dst, int $precedence) {
+    /**
+     * @param Expr $dst
+     * @param int $precedence
+     */
+    private function parseExpr($dst, $precedence) {
         $left = $dst;
         $lexer = $this->lexer;
         $tok = $lexer->scan();
@@ -248,14 +272,24 @@ class ExprParser {
         }
     }
 
-    private function parseUnaryExpr(Expr $left, int $kind, int $prec) {
+    /**
+     * @param Expr $left
+     * @param int $kind
+     * @param int $prec
+     */
+    private function parseUnaryExpr($left, $kind, $prec) {
         $left->kind = $kind;
         $this->allocateExprMembers($left, 1);
         $x = $this->getExprMember($left, 0);
         $this->parseExpr($x, $prec);
     }
 
-    private function parseBinaryExpr(Expr $left, int $kind, int $prec) {
+    /**
+     * @param Expr $left
+     * @param int $kind
+     * @param int $prec
+     */
+    private function parseBinaryExpr($left, $kind, $prec) {
         $this->tmp->assign($left);
         $left->kind = $kind;
         $this->allocateExprMembers($left, 2);
@@ -293,7 +327,11 @@ class ExprParser {
         return stripcslashes($raw_string);
     }
 
-    private function unaryPrecedence(int $kind): int {
+    /**
+     * @param int $kind
+     * @return int
+     */
+    private function unaryPrecedence($kind) {
         switch ($kind) {
         case TokenKind::KEYWORD_NOT:
             return 6;
@@ -305,7 +343,11 @@ class ExprParser {
         }
     }
 
-    private function infixPrecedence(Token $tok): int {
+    /**
+     * @param Token $tok
+     * @return int
+     */
+    private function infixPrecedence($tok) {
         // For the reference:
         // https://github.com/twigphp/Twig/blob/760341fa8c41c764a5a819a31deb3c5ad66befb1/src/Extension/CoreExtension.php#L261
         switch ($tok->kind) {

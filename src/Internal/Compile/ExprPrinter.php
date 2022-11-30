@@ -3,7 +3,12 @@
 namespace KTemplate\Internal\Compile;
 
 class ExprPrinter {
-    public static function formatExpr(ExprParser $p, Expr $e): string {
+    /**
+     * @param ExprParser $p
+     * @param Expr $e
+     * @return string
+     */
+    public static function formatExpr($p, $e) {
         switch ($e->kind) {
         case ExprKind::IDENT:
         case ExprKind::INT_LIT:
@@ -80,13 +85,25 @@ class ExprPrinter {
         }
     }
 
-    private static function formatBinaryExpr(ExprParser $p, Expr $e, string $op): string {
+    /**
+     * @param ExprParser $p
+     * @param Expr $e
+     * @param string $op
+     * @return string
+     */
+    private static function formatBinaryExpr($p, $e, $op) {
         $x = $p->getExprMember($e, 0);
         $y = $p->getExprMember($e, 1);
         return '(' . $op . ' ' . self::formatExpr($p, $x) . ' ' . self::formatExpr($p, $y) . ')';
     }
 
-    private static function formatUnaryExpr(ExprParser $p, Expr $e, string $op): string {
+    /**
+     * @param ExprParser $p
+     * @param Expr $e
+     * @param string $op
+     * @return string
+     */
+    private static function formatUnaryExpr($p, $e, $op) {
         $x = $p->getExprMember($e, 0);
         return '(' . $op . ' ' . self::formatExpr($p, $x) . ')';
     }
