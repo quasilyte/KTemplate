@@ -30,7 +30,6 @@ class BenchmarkRenderer {
     /** @var Renderer */
     private $renderer;
     private $array_data_provider;
-    private $null_data_provider;
 
     public function __construct() {
         $ctx = new Context();
@@ -39,6 +38,7 @@ class BenchmarkRenderer {
 
         $this->renderer = new Renderer($env);
         $this->array_data_provider = new \KTemplate\ArrayDataProvider([
+            'test_name' => 'abc',
             'leaf' => 10,
             'nested' => [
                 'leaf' => 20,
@@ -56,7 +56,6 @@ class BenchmarkRenderer {
                 '',
             ],
         ]);
-        $this->null_data_provider = new NullDataProvider();
 
         $c = new Compiler();
 
@@ -146,11 +145,5 @@ class BenchmarkRenderer {
 
     public function benchmarkMixed() {
         return $this->renderer->render($this->mixed_template, $this->array_data_provider);
-    }
-}
-
-class NullDataProvider implements DataProviderInterface {
-    public function getData($key) {
-        return null;
     }
 }
