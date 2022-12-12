@@ -6,6 +6,7 @@ use KTemplate\Context;
 
 
 class BenchmarkCompiler {
+    /** @var Compiler */
     private $compiler;
     private $env;
 

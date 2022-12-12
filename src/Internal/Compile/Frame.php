@@ -262,26 +262,20 @@ class Frame {
      * @param int $n
      */
     private function popVarIDs($n) {
-        for ($i = 0; $i < $n; $i++) {
-            array_pop($this->var_ids);
-        }
+        array_splice($this->var_ids, count($this->var_ids) - $n);
     }
 
     /**
      * @param int $n
      */
     private function popVars($n) {
-        for ($i = 0; $i < $n; $i++) {
-            array_pop($this->vars);
-        }
+        array_splice($this->vars, count($this->vars) - $n);
     }
 
     /**
      * @param int $n
      */
     private function popDepths($n) {
-        for ($i = 0; $i < $n; $i++) {
-            array_pop($this->depths);
-        }
+        array_splice($this->depths, count($this->depths) - $n);
     }
 }
