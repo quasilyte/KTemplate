@@ -78,7 +78,7 @@ class TemplateCache {
             $load_path_dir = dirname($dst->load_path);
             $load_path_basename = basename($dst->load_path);
             $cache_file_dir = $this->ctx->cache_dir . '/' . $load_path_dir;
-            if (KPHP_COMPILER_VERSION) {
+            if (defined('KPHP_COMPILER_VERSION')) {
                 $cache_filename = "$cache_file_dir/$load_path_basename.kphp.$dst->key_mtime.$dst->key_file_size.tdata";
             } else {
                 $cache_filename = "$cache_file_dir/$load_path_basename.php.$dst->key_mtime.$dst->key_file_size.tdata";
