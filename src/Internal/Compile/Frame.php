@@ -262,20 +262,20 @@ class Frame {
      * @param int $n
      */
     private function popVarIDs($n) {
-        array_splice($this->var_ids, count($this->var_ids) - $n);
+        array_splice($this->var_ids, count($this->var_ids) - $n, $n);
     }
 
     /**
      * @param int $n
      */
     private function popVars($n) {
-        array_splice($this->vars, count($this->vars) - $n);
+        array_splice($this->vars, count($this->vars) - $n, $n);
     }
 
     /**
      * @param int $n
      */
     private function popDepths($n) {
-        array_splice($this->depths, count($this->depths) - $n);
+        array_splice($this->depths, count($this->depths) - $n, $n);
     }
 }
